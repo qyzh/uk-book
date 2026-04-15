@@ -47,6 +47,7 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
   const [book, setBook] = useState<Book | null>(null)
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(true)
+  const [bookNotFound, setBookNotFound] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -55,13 +56,16 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
       try {
         const response = await fetch(`/api/books/${bookId}`)
         if (!response.ok) {
-          console.error('Book not found')
+          setBookNotFound(true)
+          setLoading(false)
           return
         }
         const { data } = await response.json()
         setBook(data)
       } catch (error) {
         console.error('Failed to fetch book:', error)
+        setBookNotFound(true)
+        setLoading(false)
       }
     }
 
@@ -91,18 +95,19 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
     }
 
     const loadBook = async () => {
-      // If ID is 4 characters (short ID), resolve to full ID
       if (id.length === 4) {
         const fullId = await resolveShortId(id)
         if (fullId) {
-          // Redirect to full ID URL
           window.history.replaceState(null, '', `/books/${fullId}`)
           fetchBook(fullId)
           fetchQuotes(fullId)
           return
+        } else {
+          setBookNotFound(true)
+          setLoading(false)
+          return
         }
       }
-      // Full UUID or couldn't resolve short ID
       fetchBook(id)
       fetchQuotes(id)
     }
@@ -114,7 +119,7 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
     return <Loading text="loading book" fullPage />
   }
 
-  if (!book) {
+  if (bookNotFound || !book) {
     return (
       <div className="min-h-screen bg-black text-slate-300" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
         <Navigation />
