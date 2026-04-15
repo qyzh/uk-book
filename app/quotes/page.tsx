@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import Navigation from '@/app/components/Navigation'
 import Loading from '@/app/components/Loading'
+import QuoteShareButton from '@/app/components/QuoteShareButton'
 import { useQuotes } from '@/lib/hooks/useQuotes'
 
 export default function QuotesPage() {
@@ -109,9 +110,15 @@ export default function QuotesPage() {
                   <blockquote className="text-slate-200 italic leading-relaxed">"{quote.text}"</blockquote>
                   {quote.is_favorite && <span className="text-purple-300 text-xs font-bold whitespace-nowrap">favorite</span>}
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
-                  <span>book: {quote.books?.title || 'unknown book'}</span>
-                  {quote.page_number && <span>page {quote.page_number}</span>}
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                  <div className="text-xs text-slate-500">
+                    <span>book: {quote.books?.title || 'unknown book'}</span>
+                    {quote.page_number && <span className="ml-3">page {quote.page_number}</span>}
+                  </div>
+                  <QuoteShareButton
+                    quoteText={quote.text}
+                    bookTitle={quote.books?.title || 'Unknown Book'}
+                  />
                 </div>
               </article>
             ))}
