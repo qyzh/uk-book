@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import Navigation from '@/app/components/Navigation'
+import Loading from '@/app/components/Loading'
 import type { Author } from '@/lib/types/library'
 
 interface AuthorsResponse {
@@ -31,12 +32,7 @@ export default function AuthorsPage() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-slate-400" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
-        <Navigation />
-        <div className="flex items-center justify-center py-32">loading authors...</div>
-      </div>
-    )
+    return <Loading text="loading authors" fullPage />
   }
 
   return (

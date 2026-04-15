@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 import { GENRES, SUB_GENRES } from '@/lib/constants/library'
+import Loading from '@/app/components/Loading'
 
 interface Author {
     id: string
@@ -675,9 +676,7 @@ export default function AdminPage() {
 
                         {/* Books List */}
                         {loading ? (
-                            <div className="p-4 text-purple-300 text-xs">
-                                ⟳ loading books...
-                            </div>
+                            <Loading text="loading books" />
                         ) : books.length === 0 ? (
                             <div className="p-4 text-slate-500 text-xs">
                                 <span className="text-slate-600">root@terminal:</span> no books found. use <span className="text-slate-300">[+] new</span> to add

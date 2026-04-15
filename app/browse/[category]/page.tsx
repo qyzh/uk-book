@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { use } from 'react'
 import Navigation from '@/app/components/Navigation'
 import BookCard from '@/app/components/BookCard'
+import Loading from '@/app/components/Loading'
 import { useBooks } from '@/lib/hooks/useBooks'
 
 export default function CategoryBrowsePage({ params }: { params: Promise<{ category: string }> }) {

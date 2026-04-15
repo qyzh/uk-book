@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import Loading from '@/app/components/Loading'
 import { useCurrentlyReading } from '@/lib/hooks/useCurrentlyReading'
 
 interface CurrentlyReadingProps {
@@ -13,7 +14,9 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
 
   if (loading) {
     return (
-      <div className="animate-pulse bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl h-96 border border-slate-700" />
+      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl h-96 border border-slate-700 flex items-center justify-center">
+        <Loading text="booting_reader" />
+      </div>
     )
   }
 

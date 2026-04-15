@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import Image from 'next/image'
 import Navigation from '@/app/components/Navigation'
 import CurrentlyReading from '@/app/components/CurrentlyReading'
+import Loading from '@/app/components/Loading'
 import { useBooks } from '@/lib/hooks/useBooks'
 import { useQuoteCarousel } from '@/lib/hooks/useQuoteCarousel'
 
@@ -19,11 +20,7 @@ export default function HomePage() {
   )
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-slate-400">
-        loading library...
-      </div>
-    )
+    return <Loading text="loading library" fullPage />
   }
 
   return (
@@ -60,11 +57,10 @@ export default function HomePage() {
                   <button
                     key={i}
                     onClick={() => setCurrentQuoteIndex(i)}
-                    className={`w-2 h-2 rounded-full transition ${
-                      i === currentQuoteIndex % favoriteQuotes.length
+                    className={`w-2 h-2 rounded-full transition ${i === currentQuoteIndex % favoriteQuotes.length
                         ? 'bg-purple-400'
                         : 'bg-slate-700 hover:bg-slate-600'
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
@@ -129,13 +125,12 @@ export default function HomePage() {
                     <div className="flex items-center justify-between text-xs text-slate-600">
                       <span>{book.published_year || '—'}</span>
                       <span
-                        className={`${
-                          book.reading_status === 'completed'
+                        className={`${book.reading_status === 'completed'
                             ? 'text-slate-400'
                             : book.reading_status === 'reading'
-                            ? 'text-purple-400'
-                            : 'text-slate-600'
-                        }`}
+                              ? 'text-purple-400'
+                              : 'text-slate-600'
+                          }`}
                       >
                         [{book.reading_status}]
                       </span>
@@ -158,9 +153,9 @@ export default function HomePage() {
                 <Link
                   key={book.id}
                   href={`/books/${book.id}`}
-                  className="group border border-slate-700 hover:border-purple-500 transition"
+                  className="group border border-slate-700 hover:border-purple-500 transition overflow-hidden"
                 >
-                  <div className="aspect-[3/4] bg-slate-900 relative">
+                  <div className="aspect-[3/4] overflow-hidden bg-slate-900 relative">
                     {book.cover_url ? (
                       <Image
                         src={book.cover_url}

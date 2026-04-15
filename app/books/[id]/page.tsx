@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { use } from 'react'
 import Navigation from '@/app/components/Navigation'
+import Loading from '@/app/components/Loading'
 
 interface Author {
   id: string
@@ -76,11 +77,7 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
   }, [id])
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-slate-400" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
-        loading...
-      </div>
-    )
+    return <Loading text="loading book" fullPage />
   }
 
   if (!book) {

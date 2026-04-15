@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import Navigation from '@/app/components/Navigation'
+import Loading from '@/app/components/Loading'
 import { useQuotes } from '@/lib/hooks/useQuotes'
 
 export default function QuotesPage() {
@@ -44,12 +45,7 @@ export default function QuotesPage() {
   )
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-slate-400" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
-        <Navigation />
-        <div className="flex items-center justify-center py-32">loading quotes...</div>
-      </div>
-    )
+    return <Loading text="loading quotes" fullPage />
   }
 
   return (
