@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Loading from '@/app/components/Loading'
 import { useCurrentlyReading } from '@/lib/hooks/useCurrentlyReading'
+import { getShortId } from '@/lib/utils/slug'
 
 interface CurrentlyReadingProps {
   minimal?: boolean
@@ -30,7 +31,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
 
   if (minimal) {
     return (
-      <Link href={`/books/${currentBook.id}`}>
+      <Link href={`/books/${getShortId(currentBook.id)}`}>
         <div className="group cursor-pointer">
           <div className="relative overflow-hidden rounded-xl mb-3 aspect-[3/4] bg-slate-900">
             {currentBook.cover_url ? (
@@ -99,7 +100,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8 mb-6">
           {/* Book Cover */}
-          <Link href={`/books/${currentBook.id}`} className="group/cover">
+          <Link href={`/books/${getShortId(currentBook.id)}`} className="group/cover">
             <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-purple-500/30 group-hover/cover:ring-purple-400/60 transition">
               {currentBook.cover_url ? (
                 <Image
@@ -121,7 +122,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
           <div className="flex flex-col justify-between space-y-4">
             {/* Title & Author */}
             <div>
-              <Link href={`/books/${currentBook.id}`} className="group/title">
+              <Link href={`/books/${getShortId(currentBook.id)}`} className="group/title">
                 <h2 className="font-serif text-3xl md:text-4xl font-bold text-slate-100 mb-2 group-hover/title:text-transparent group-hover/title:bg-gradient-to-r group-hover/title:from-purple-400 group-hover/title:to-pink-400 group-hover/title:bg-clip-text transition leading-tight">
                   {currentBook.title}
                 </h2>

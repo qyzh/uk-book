@@ -51,9 +51,13 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
   useEffect(() => {
     if (!id) return
 
-    const fetchBook = async () => {
+    const fetchBook = async (bookId: string) => {
       try {
-        const response = await fetch(`/api/books/${id}`)
+        const response = await fetch(`/api/books/${bookId}`)
+        if (!response.ok) {
+          console.error('Book not found')
+          return
+        }
         const { data } = await response.json()
         setBook(data)
       } catch (error) {
@@ -61,9 +65,9 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
       }
     }
 
-    const fetchQuotes = async () => {
+    const fetchQuotes = async (bookId: string) => {
       try {
-        const response = await fetch(`/api/quotes?book_id=${id}`)
+        const response = await fetch(`/api/quotes?book_id=${bookId}`)
         const { data } = await response.json()
         setQuotes(data || [])
       } catch (error) {
@@ -73,8 +77,37 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
       }
     }
 
-    fetchBook()
-    fetchQuotes()
+    const resolveShortId = async (shortId: string) => {
+      try {
+        const response = await fetch(`/api/books/short/${shortId}`)
+        if (response.ok) {
+          const { id: fullId } = await response.json()
+          return fullId
+        }
+      } catch {
+        // ignore
+      }
+      return null
+    }
+
+    const loadBook = async () => {
+      // If ID is 4 characters (short ID), resolve to full ID
+      if (id.length === 4) {
+        const fullId = await resolveShortId(id)
+        if (fullId) {
+          // Redirect to full ID URL
+          window.history.replaceState(null, '', `/books/${fullId}`)
+          fetchBook(fullId)
+          fetchQuotes(fullId)
+          return
+        }
+      }
+      // Full UUID or couldn't resolve short ID
+      fetchBook(id)
+      fetchQuotes(id)
+    }
+
+    loadBook()
   }, [id])
 
   if (loading) {

@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Book } from '@/lib/types/library'
+import { getShortId } from '@/lib/utils/slug'
 
 interface BookCardProps {
   book: Book
@@ -16,7 +17,7 @@ function getStatusStyles(status: string) {
 export default function BookCard({ book }: BookCardProps) {
   return (
     <Link
-      href={`/books/${book.id}`}
+      href={`/books/${getShortId(book.id)}`}
       className="group border border-slate-700 hover:border-purple-600 transition overflow-hidden hover:shadow-lg hover:shadow-purple-500/20"
     >
       <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden">

@@ -8,6 +8,7 @@ import CurrentlyReading from '@/app/components/CurrentlyReading'
 import Loading from '@/app/components/Loading'
 import { useBooks } from '@/lib/hooks/useBooks'
 import { useQuoteCarousel } from '@/lib/hooks/useQuoteCarousel'
+import { getShortId } from '@/lib/utils/slug'
 
 export default function HomePage() {
   const { books, loading } = useBooks()
@@ -46,7 +47,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 text-slate-400 text-sm">
                   <span>—</span>
                   <Link
-                    href={`/books/${favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].book_id}`}
+                    href={`/books/${getShortId(favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].book_id)}`}
                     className="text-purple-300 hover:text-purple-200 transition"
                   >
                     {favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].books?.title || 'Unknown Book'}
@@ -97,7 +98,7 @@ export default function HomePage() {
               {recentBooks.map((book) => (
                 <Link
                   key={book.id}
-                  href={`/books/${book.id}`}
+                  href={`/books/${getShortId(book.id)}`}
                   className="group border border-slate-700 hover:border-purple-600 transition overflow-hidden hover:shadow-lg hover:shadow-purple-500/20"
                 >
                   <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden">
@@ -153,7 +154,7 @@ export default function HomePage() {
               {wishlistBooks.map((book) => (
                 <Link
                   key={book.id}
-                  href={`/books/${book.id}`}
+                  href={`/books/${getShortId(book.id)}`}
                   className="group border border-slate-700 hover:border-blue-500 transition overflow-hidden"
                 >
                   <div className="aspect-[3/4] overflow-hidden bg-slate-900 relative">
@@ -192,7 +193,7 @@ export default function HomePage() {
               {books.filter(b => b.reading_status !== 'wishlist').slice(6).map((book) => (
                 <Link
                   key={book.id}
-                  href={`/books/${book.id}`}
+                  href={`/books/${getShortId(book.id)}`}
                   className="group border border-slate-700 hover:border-purple-500 transition overflow-hidden"
                 >
                   <div className="aspect-[3/4] overflow-hidden bg-slate-900 relative">
