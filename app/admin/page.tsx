@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
+import { GENRES, SUB_GENRES } from '@/lib/constants/library'
 
 interface Author {
     id: string
@@ -27,6 +28,7 @@ interface Book {
     reading_status: string
     language: string
     genre?: string
+    sub_genre?: string
     started_at?: string
     finished_at?: string
     current_page?: number
@@ -66,6 +68,7 @@ export default function AdminPage() {
         reading_status: 'to-read',
         language: 'id',
         genre: 'fiction',
+        sub_genre: '',
         started_at: '',
         finished_at: '',
         current_page: '',
@@ -338,6 +341,7 @@ export default function AdminPage() {
             reading_status: book.reading_status || 'to-read',
             language: book.language || 'id',
             genre: book.genre || 'fiction',
+            sub_genre: book.sub_genre || '',
             started_at: book.started_at || '',
             finished_at: book.finished_at || '',
             current_page: book.current_page?.toString() || '',
@@ -358,6 +362,7 @@ export default function AdminPage() {
             reading_status: 'to-read',
             language: 'id',
             genre: 'fiction',
+            sub_genre: '',
             started_at: '',
             finished_at: '',
             current_page: '',
@@ -525,7 +530,7 @@ export default function AdminPage() {
                                     {/* Classification Section */}
                                     <div className="border border-slate-700 p-3 space-y-2 bg-black bg-opacity-30">
                                         <div className="text-slate-400 text-xs font-bold mb-2">▸ classification</div>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                             <div>
                                                 <label className="text-slate-200 text-xs font-bold block mb-1">language</label>
                                                 <select
@@ -544,8 +549,26 @@ export default function AdminPage() {
                                                     onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
                                                     className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
                                                 >
-                                                    <option value="fiction" className="bg-black">fiction</option>
-                                                    <option value="non-fiction" className="bg-black">non-fiction</option>
+                                                    {GENRES.map((genre) => (
+                                                        <option key={genre} value={genre} className="bg-black">
+                                                            {genre}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="text-slate-200 text-xs font-bold block mb-1">sub-genre</label>
+                                                <select
+                                                    value={formData.sub_genre}
+                                                    onChange={(e) => setFormData({ ...formData, sub_genre: e.target.value })}
+                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
+                                                >
+                                                    <option value="" className="bg-black">none</option>
+                                                    {SUB_GENRES.map((subGenre) => (
+                                                        <option key={subGenre} value={subGenre} className="bg-black">
+                                                            {subGenre}
+                                                        </option>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>
@@ -667,6 +690,7 @@ export default function AdminPage() {
                                             <th className="px-3 py-2 text-left text-slate-300 font-bold">TITLE</th>
                                             <th className="px-3 py-2 text-left text-slate-300 font-bold">AUTHOR</th>
                                             <th className="px-3 py-2 text-left text-slate-300 font-bold">YEAR</th>
+                                            <th className="px-3 py-2 text-left text-slate-300 font-bold">SUB-GENRE</th>
                                             <th className="px-3 py-2 text-left text-slate-300 font-bold">STATUS</th>
                                             <th className="px-3 py-2 text-right text-slate-300 font-bold">ACTIONS</th>
                                         </tr>
@@ -680,6 +704,7 @@ export default function AdminPage() {
                                                 <td className="px-3 py-2 text-slate-200">{book.title}</td>
                                                 <td className="px-3 py-2 text-slate-400">{book.authors?.name || '-'}</td>
                                                 <td className="px-3 py-2 text-slate-500">{book.published_year || '-'}</td>
+                                                <td className="px-3 py-2 text-slate-500">{book.sub_genre || '-'}</td>
                                                 <td className="px-3 py-2">
                                                     <span className={`text-xs font-bold ${book.reading_status === 'completed' ? 'text-slate-400' :
                                                         book.reading_status === 'reading' ? 'text-purple-300' :
@@ -841,14 +866,28 @@ export default function AdminPage() {
                     <div className="border-2 border-slate-500 bg-black h-fit lg:col-span-1">
                         <div className="border-b border-slate-500 px-4 py-2 bg-slate-500 bg-opacity-5 flex justify-between items-center">
                             <div className="text-slate-300 font-bold text-sm">$ authors</div>
-                            {!showAuthorForm && (
-                                <button
-                                    onClick={() => setShowAuthorForm(true)}
+                            <div className="flex items-center gap-2">
+                                <Link
+                                    href="/authors"
                                     className="text-slate-300 hover:text-slate-200 font-bold text-xs border border-slate-500 px-2 py-1 transition"
                                 >
-                                    [+]
-                                </button>
-                            )}
+                                    list
+                                </Link>
+                                <Link
+                                    href="/authors/add"
+                                    className="text-slate-300 hover:text-slate-200 font-bold text-xs border border-slate-500 px-2 py-1 transition"
+                                >
+                                    new
+                                </Link>
+                                {!showAuthorForm && (
+                                    <button
+                                        onClick={() => setShowAuthorForm(true)}
+                                        className="text-slate-300 hover:text-slate-200 font-bold text-xs border border-slate-500 px-2 py-1 transition"
+                                    >
+                                        [+]
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         {/* Add Author Form */}
@@ -900,7 +939,15 @@ export default function AdminPage() {
                                     key={author.id}
                                     className="px-4 py-2 border-b border-slate-500 border-opacity-30 hover:bg-slate-500 hover:bg-opacity-5 transition text-xs"
                                 >
-                                    <div className="text-slate-300 font-bold">{author.name}</div>
+                                    <div className="flex items-center justify-between gap-2">
+                                        <div className="text-slate-300 font-bold">{author.name}</div>
+                                        <Link
+                                            href={`/authors/${author.id}/edit`}
+                                            className="text-slate-500 hover:text-slate-300 border border-slate-600 px-1.5 py-0.5 text-[10px] transition"
+                                        >
+                                            edit
+                                        </Link>
+                                    </div>
                                     {author.nationality && (
                                         <div className="text-slate-500 text-xs">◆ {author.nationality}</div>
                                     )}

@@ -3,6 +3,8 @@
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { GENRES, SUB_GENRES } from '@/lib/constants/library'
 
 interface Author {
   id: string
@@ -16,9 +18,6 @@ export default function AddBookPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const GENRES = ['fiction', 'non-fiction']
-  const STATUSES = ['to-read', 'reading', 'completed', 'wishlist']
-
   const [formData, setFormData] = useState({
     title: '',
     author_id: '',
@@ -28,6 +27,7 @@ export default function AddBookPage() {
     publisher: '',
     language: 'id',
     genre: 'fiction',
+    sub_genre: '',
     reading_status: 'to-read',
     summary: '',
     started_at: '',
@@ -130,9 +130,14 @@ export default function AddBookPage() {
 
             {/* Author */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Author *
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-slate-700">
+                  Author *
+                </label>
+                <Link href="/authors/add" className="text-xs text-blue-600 hover:text-blue-500">
+                  + add author
+                </Link>
+              </div>
               <select
                 name="author_id"
                 value={formData.author_id}
@@ -150,7 +155,8 @@ export default function AddBookPage() {
             </div>
 
             {/* Genre */}
-            <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Genre *
               </label>
@@ -166,6 +172,25 @@ export default function AddBookPage() {
                   </option>
                 ))}
               </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Sub-Genre
+                </label>
+                <select
+                  name="sub_genre"
+                  value={formData.sub_genre}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">None</option>
+                  {SUB_GENRES.map((subGenre) => (
+                    <option key={subGenre} value={subGenre}>
+                      {subGenre.charAt(0).toUpperCase() + subGenre.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Status */}

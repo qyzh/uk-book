@@ -28,6 +28,8 @@ export default function CategoryBrowsePage({ params }: { params: Promise<{ categ
       filtered = filtered.filter(b => b.authors?.id === categoryValue)
     } else if (categoryType === 'language') {
       filtered = filtered.filter(b => b.language === categoryValue)
+    } else if (categoryType === 'sub-genre') {
+      filtered = filtered.filter((b) => b.sub_genre === categoryValue)
     }
 
     filtered.sort((a, b) => a.title.localeCompare(b.title))
@@ -42,6 +44,8 @@ export default function CategoryBrowsePage({ params }: { params: Promise<{ categ
       return `Books by ${author?.name || categoryValue}`
     } else if (categoryType === 'language') {
       return `Books in ${categoryValue.toUpperCase()}`
+    } else if (categoryType === 'sub-genre') {
+      return `Books: ${categoryValue}`
     }
     return 'Browse'
   }

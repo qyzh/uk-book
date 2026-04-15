@@ -45,6 +45,7 @@ export async function GET(
         pages,
         publisher,
         genre,
+        sub_genre,
         summary,
         reading_status,
         language,
@@ -56,8 +57,11 @@ export async function GET(
       .eq('id', id)
       .single()
 
-    // If error with current_page, try again without it
-    if (result.error && result.error.message?.includes('current_page')) {
+    // If error with newer optional fields, try again without them
+    if (
+      result.error &&
+      (result.error.message?.includes('current_page') || result.error.message?.includes('sub_genre'))
+    ) {
       result = await supabase
         .from('books')
         .select(`
@@ -87,6 +91,7 @@ export async function GET(
     const bookWithFields = data ? {
       ...data,
       genre: (data as any).genre || 'fiction',
+      sub_genre: (data as any).sub_genre || '',
       summary: (data as any).summary || '',
       current_page: (data as any).current_page || null
     } : data
@@ -126,6 +131,7 @@ export async function PUT(
       reading_status, 
       language,
       genre,
+      sub_genre,
       summary,
       started_at,
       finished_at,
@@ -158,6 +164,10 @@ export async function PUT(
       updateData.summary = summary
     }
 
+    if (sub_genre) {
+      updateData.sub_genre = sub_genre
+    }
+
     let result: any = await supabase
       .from('books')
       .update(updateData)
@@ -171,6 +181,7 @@ export async function PUT(
         pages,
         publisher,
         genre,
+        sub_genre,
         summary,
         reading_status,
         language,
@@ -180,8 +191,16 @@ export async function PUT(
         authors(id, name)
       `)
 
-    // If error with genre/summary/current_page, try again without those fields
-    if (result.error && (result.error.message?.includes('genre') || result.error.message?.includes('summary') || result.error.message?.includes('current_page'))) {
+    // If error with optional fields, try again without those fields
+    if (
+      result.error &&
+      (
+        result.error.message?.includes('genre') ||
+        result.error.message?.includes('sub_genre') ||
+        result.error.message?.includes('summary') ||
+        result.error.message?.includes('current_page')
+      )
+    ) {
       const safeUpdateData = {
         title,
         author_id,
@@ -208,13 +227,10 @@ export async function PUT(
           published_year,
           pages,
           publisher,
-          genre,
-          summary,
           reading_status,
           language,
           started_at,
           finished_at,
-          current_page,
           authors(id, name)
         `)
     }
@@ -236,6 +252,7 @@ export async function PUT(
     const booksWithFields = (data || []).map((book: any) => ({
       ...book,
       genre: (book as any).genre || genre || 'fiction',
+      sub_genre: (book as any).sub_genre || sub_genre || '',
       summary: (book as any).summary || summary || '',
       current_page: (book as any).current_page || null
     }))

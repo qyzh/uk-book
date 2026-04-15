@@ -23,6 +23,7 @@ interface Book {
   publisher?: string
   summary?: string
   genre?: string
+  sub_genre?: string
   reading_status: string
   language: string
   started_at?: string
@@ -144,6 +145,13 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
                 <div>
                   <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">genre</div>
                   <div className="text-sm text-slate-300">{book.genre}</div>
+                </div>
+              )}
+
+              {book.sub_genre && (
+                <div>
+                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">sub-genre</div>
+                  <div className="text-sm text-slate-300">{book.sub_genre}</div>
                 </div>
               )}
 
