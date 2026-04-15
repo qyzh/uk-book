@@ -1,83 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import Image from 'next/image'
 import Navigation from '@/app/components/Navigation'
 import CurrentlyReading from '@/app/components/CurrentlyReading'
-
-interface Author {
-  id: string
-  name: string
-}
-
-interface Book {
-  id: string
-  title: string
-  isbn?: string
-  cover_url?: string
-  published_year?: number
-  pages?: number
-  publisher?: string
-  reading_status: string
-  language: string
-  authors: Author
-}
-
-interface Quote {
-  id: string
-  book_id: string
-  text: string
-  page_number?: number
-  is_favorite: boolean
-  books?: { id: string; title: string }
-}
+import { useBooks } from '@/lib/hooks/useBooks'
+import { useQuoteCarousel } from '@/lib/hooks/useQuoteCarousel'
 
 export default function HomePage() {
-  const [books, setBooks] = useState<Book[]>([])
-  const [quotes, setQuotes] = useState<Quote[]>([])
-  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const { books, loading } = useBooks()
+  const { quotes, favoriteQuotes, currentQuoteIndex, setCurrentQuoteIndex } = useQuoteCarousel()
 
-  useEffect(() => {
-    fetchBooks()
-    fetchQuotes()
-  }, [])
-
-  const fetchBooks = async () => {
-    try {
-      const response = await fetch('/api/books')
-      const { data } = await response.json()
-      setBooks(data || [])
-    } catch (error) {
-      console.error('Failed to fetch books:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchQuotes = async () => {
-    try {
-      const response = await fetch('/api/quotes')
-      const { data } = await response.json()
-      setQuotes(data || [])
-    } catch (error) {
-      console.error('Failed to fetch quotes:', error)
-    }
-  }
-
-  useEffect(() => {
-    if (quotes.length > 0) {
-      const interval = setInterval(() => {
-        setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length)
-      }, 6000)
-      return () => clearInterval(interval)
-    }
-  }, [quotes])
-
-  const favoriteQuotes = quotes.filter(q => q.is_favorite)
-  const recentBooks = books.slice(0, 6)
-  const completedBooks = books.filter(b => b.reading_status === 'completed')
+  const recentBooks = useMemo(() => books.slice(0, 6), [books])
+  const completedBooks = useMemo(
+    () => books.filter((book) => book.reading_status === 'completed'),
+    [books],
+  )
 
   if (loading) {
     return (

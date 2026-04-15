@@ -2,52 +2,14 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
-
-interface Author {
-  id: string
-  name: string
-}
-
-interface Book {
-  id: string
-  title: string
-  cover_url?: string
-  pages?: number
-  current_page?: number
-  reading_status: string
-  authors: Author
-}
+import { useCurrentlyReading } from '@/lib/hooks/useCurrentlyReading'
 
 interface CurrentlyReadingProps {
   minimal?: boolean
 }
 
 export default function CurrentlyReading({ minimal = false }: CurrentlyReadingProps) {
-  const [currentBook, setCurrentBook] = useState<Book | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchCurrentlyReading()
-  }, [])
-
-  const fetchCurrentlyReading = async () => {
-    try {
-      const response = await fetch('/api/books')
-      const { data } = await response.json()
-      
-      // Find first book with reading_status = 'reading'
-      const reading = data?.find((book: Book) => book.reading_status === 'reading')
-      
-      if (reading) {
-        setCurrentBook(reading)
-      }
-    } catch (error) {
-      console.error('Failed to fetch currently reading book:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { currentBook, loading } = useCurrentlyReading()
 
   if (loading) {
     return (
