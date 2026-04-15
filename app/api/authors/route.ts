@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { rateLimit, getClientIP } from '@/lib/utils/rate-limit'
 
 async function getServerSupabaseClient() {
   const cookieStore = await cookies()
@@ -27,7 +28,23 @@ async function getServerSupabaseClient() {
 }
 
 // GET - Fetch all authors
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const ip = getClientIP(request)
+  const { success, remaining, resetIn } = rateLimit(ip)
+  
+  if (!success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { 
+        status: 429,
+        headers: {
+          'X-RateLimit-Remaining': remaining.toString(),
+          'X-RateLimit-Reset': Math.ceil(resetIn / 1000).toString(),
+        }
+      }
+    )
+  }
+
   try {
     const supabase = await getServerSupabaseClient()
     const { data, error } = await supabase
