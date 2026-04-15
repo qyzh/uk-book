@@ -1,6 +1,10 @@
 export interface Author {
   id: string
   name: string
+  bio?: string
+  nationality?: string
+  birth_year?: number
+  photo_url?: string
 }
 
 export interface Book {
@@ -13,6 +17,7 @@ export interface Book {
   publisher?: string
   summary?: string
   genre?: string
+  sub_genre?: string
   reading_status: string
   language: string
   started_at?: string

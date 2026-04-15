@@ -71,7 +71,7 @@ export default function BookCard({ book }: BookCardProps) {
 
         <div className="flex items-center justify-between text-xs text-slate-600 pt-2 border-t border-slate-800">
           <span>{book.published_year || '—'}</span>
-          <span>{book.genre || 'unknown'}</span>
+          <span>{book.sub_genre || book.genre || 'unknown'}</span>
         </div>
       </div>
     </Link>

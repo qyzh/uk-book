@@ -41,6 +41,7 @@ export async function GET() {
         pages,
         publisher,
         genre,
+        sub_genre,
         summary,
         reading_status,
         language,
@@ -51,8 +52,11 @@ export async function GET() {
       `)
       .order('created_at', { ascending: false })
 
-    // If error with current_page, try again without it
-    if (result.error && result.error.message?.includes('current_page')) {
+    // If error with newer optional fields, retry with safe select
+    if (
+      result.error &&
+      (result.error.message?.includes('current_page') || result.error.message?.includes('sub_genre'))
+    ) {
       result = await supabase
         .from('books')
         .select(`
@@ -81,6 +85,7 @@ export async function GET() {
     const booksWithFields = (data || []).map((book: any) => ({
       ...book,
       genre: (book as any).genre || 'fiction',
+      sub_genre: (book as any).sub_genre || '',
       summary: (book as any).summary || '',
       current_page: (book as any).current_page || null
     }))
@@ -116,6 +121,7 @@ export async function POST(request: NextRequest) {
       reading_status, 
       language,
       genre,
+      sub_genre,
       summary,
       started_at,
       finished_at,
@@ -149,6 +155,10 @@ export async function POST(request: NextRequest) {
     if (genre) {
       insertData.genre = genre
     }
+
+    if (sub_genre) {
+      insertData.sub_genre = sub_genre
+    }
     
     // Try to include summary if provided
     if (summary) {
@@ -167,6 +177,7 @@ export async function POST(request: NextRequest) {
         pages,
         publisher,
         genre,
+        sub_genre,
         summary,
         reading_status,
         language,
@@ -176,8 +187,16 @@ export async function POST(request: NextRequest) {
         authors(id, name)
       `)
 
-    // If error with genre/summary/current_page, try again without those fields
-    if (result.error && (result.error.message?.includes('genre') || result.error.message?.includes('summary') || result.error.message?.includes('current_page'))) {
+    // If error with optional fields, try again without those fields
+    if (
+      result.error &&
+      (
+        result.error.message?.includes('genre') ||
+        result.error.message?.includes('sub_genre') ||
+        result.error.message?.includes('summary') ||
+        result.error.message?.includes('current_page')
+      )
+    ) {
       const safeInsertData = {
         title,
         author_id,
@@ -203,13 +222,10 @@ export async function POST(request: NextRequest) {
           published_year,
           pages,
           publisher,
-          genre,
-          summary,
           reading_status,
           language,
           started_at,
           finished_at,
-          current_page,
           authors(id, name)
         `)
     }
@@ -222,6 +238,7 @@ export async function POST(request: NextRequest) {
     const booksWithFields = (data || []).map((book: any) => ({
       ...book,
       genre: (book as any).genre || genre || 'fiction',
+      sub_genre: (book as any).sub_genre || sub_genre || '',
       summary: (book as any).summary || summary || '',
       current_page: (book as any).current_page || null
     }))
