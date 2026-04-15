@@ -1,7 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
-import { rateLimit, getClientIP } from '@/lib/utils/rate-limit'
 
 async function getServerSupabaseClient() {
   const cookieStore = await cookies()
@@ -27,43 +26,36 @@ async function getServerSupabaseClient() {
   )
 }
 
-// GET - Fetch all authors
+// GET - Fetch all notes or filter by book_id
 export async function GET(request: NextRequest) {
-  const ip = getClientIP(request)
-  const { success, remaining, resetIn } = rateLimit(ip)
-  
-  if (!success) {
-    return NextResponse.json(
-      { error: 'Too many requests. Please try again later.' },
-      { 
-        status: 429,
-        headers: {
-          'X-RateLimit-Remaining': remaining.toString(),
-          'X-RateLimit-Reset': Math.ceil(resetIn / 1000).toString(),
-        }
-      }
-    )
-  }
-
   try {
     const supabase = await getServerSupabaseClient()
-    const { data, error } = await supabase
-      .from('authors')
+    const { searchParams } = new URL(request.url)
+    const bookId = searchParams.get('book_id')
+
+    let query = supabase
+      .from('notes')
       .select('*')
-      .order('name', { ascending: true })
+      .order('created_at', { ascending: false })
+
+    if (bookId) {
+      query = query.eq('book_id', bookId)
+    }
+
+    const { data, error } = await query
 
     if (error) throw error
 
     return NextResponse.json({ data }, { status: 200 })
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to fetch authors' },
+      { error: error instanceof Error ? error.message : 'Failed to fetch notes' },
       { status: 500 }
     )
   }
 }
 
-// POST - Create a new author
+// POST - Create a new note
 export async function POST(request: NextRequest) {
   try {
     const supabase = await getServerSupabaseClient()
@@ -74,34 +66,31 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { name, bio, nationality, birth_year, photo_url } = body
+    const { book_id, content, note_type } = body
 
-    if (!name) {
+    if (!book_id || !content) {
       return NextResponse.json(
-        { error: 'Author name is required' },
+        { error: 'book_id and content are required' },
         { status: 400 }
       )
     }
 
     const { data, error } = await supabase
-      .from('authors')
-      .insert([
-        {
-          name,
-          bio,
-          nationality,
-          birth_year,
-          photo_url,
-        },
-      ])
+      .from('notes')
+      .insert({
+        book_id,
+        content,
+        note_type: note_type || 'general',
+      })
       .select()
+      .single()
 
     if (error) throw error
 
     return NextResponse.json({ data }, { status: 201 })
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create author' },
+      { error: error instanceof Error ? error.message : 'Failed to create note' },
       { status: 500 }
     )
   }

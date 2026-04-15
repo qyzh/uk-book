@@ -27,8 +27,10 @@ async function getServerSupabaseClient() {
   )
 }
 
-// GET - Fetch all authors
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ shortId: string }> }
+) {
   const ip = getClientIP(request)
   const { success, remaining, resetIn } = rateLimit(ip)
   
@@ -46,62 +48,34 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const { shortId } = await params
     const supabase = await getServerSupabaseClient()
-    const { data, error } = await supabase
-      .from('authors')
-      .select('*')
-      .order('name', { ascending: true })
+
+    // Fetch all books and find the one where id ends with shortId
+    const { data: books, error } = await supabase
+      .from('books')
+      .select('id')
+      .limit(1000)
 
     if (error) throw error
 
-    return NextResponse.json({ data }, { status: 200 })
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to fetch authors' },
-      { status: 500 }
-    )
-  }
-}
+    // Find book with matching short ID (last 4 characters)
+    const matchingBook = books?.find(book => book.id.endsWith(shortId))
 
-// POST - Create a new author
-export async function POST(request: NextRequest) {
-  try {
-    const supabase = await getServerSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const body = await request.json()
-    const { name, bio, nationality, birth_year, photo_url } = body
-
-    if (!name) {
+    if (!matchingBook) {
       return NextResponse.json(
-        { error: 'Author name is required' },
-        { status: 400 }
+        { error: 'Book not found' },
+        { status: 404 }
       )
     }
 
-    const { data, error } = await supabase
-      .from('authors')
-      .insert([
-        {
-          name,
-          bio,
-          nationality,
-          birth_year,
-          photo_url,
-        },
-      ])
-      .select()
-
-    if (error) throw error
-
-    return NextResponse.json({ data }, { status: 201 })
+    return NextResponse.json(
+      { id: matchingBook.id, shortId },
+      { status: 200 }
+    )
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create author' },
+      { error: error instanceof Error ? error.message : 'Failed to find book' },
       { status: 500 }
     )
   }

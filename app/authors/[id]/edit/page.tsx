@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navigation from '@/app/components/Navigation'
+import Loading from '@/app/components/Loading'
 
 interface AuthorPayload {
   id: string

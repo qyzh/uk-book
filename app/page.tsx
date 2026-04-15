@@ -5,25 +5,24 @@ import { useMemo } from 'react'
 import Image from 'next/image'
 import Navigation from '@/app/components/Navigation'
 import CurrentlyReading from '@/app/components/CurrentlyReading'
+import Loading from '@/app/components/Loading'
 import { useBooks } from '@/lib/hooks/useBooks'
 import { useQuoteCarousel } from '@/lib/hooks/useQuoteCarousel'
+import { getShortId } from '@/lib/utils/slug'
 
 export default function HomePage() {
   const { books, loading } = useBooks()
   const { quotes, favoriteQuotes, currentQuoteIndex, setCurrentQuoteIndex } = useQuoteCarousel()
 
-  const recentBooks = useMemo(() => books.slice(0, 6), [books])
+  const recentBooks = useMemo(() => books.filter(b => b.reading_status !== 'wishlist').slice(0, 6), [books])
+  const wishlistBooks = useMemo(() => books.filter((book) => book.reading_status === 'wishlist'), [books])
   const completedBooks = useMemo(
     () => books.filter((book) => book.reading_status === 'completed'),
     [books],
   )
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-slate-400">
-        loading library...
-      </div>
-    )
+    return <Loading text="loading library" fullPage />
   }
 
   return (
@@ -48,7 +47,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 text-slate-400 text-sm">
                   <span>—</span>
                   <Link
-                    href={`/books/${favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].book_id}`}
+                    href={`/books/${getShortId(favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].book_id)}`}
                     className="text-purple-300 hover:text-purple-200 transition"
                   >
                     {favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].books?.title || 'Unknown Book'}
@@ -60,11 +59,10 @@ export default function HomePage() {
                   <button
                     key={i}
                     onClick={() => setCurrentQuoteIndex(i)}
-                    className={`w-2 h-2 rounded-full transition ${
-                      i === currentQuoteIndex % favoriteQuotes.length
+                    className={`w-2 h-2 rounded-full transition ${i === currentQuoteIndex % favoriteQuotes.length
                         ? 'bg-purple-400'
                         : 'bg-slate-700 hover:bg-slate-600'
-                    }`}
+                      }`}
                   />
                 ))}
               </div>
@@ -100,7 +98,7 @@ export default function HomePage() {
               {recentBooks.map((book) => (
                 <Link
                   key={book.id}
-                  href={`/books/${book.id}`}
+                  href={`/books/${getShortId(book.id)}`}
                   className="group border border-slate-700 hover:border-purple-600 transition overflow-hidden hover:shadow-lg hover:shadow-purple-500/20"
                 >
                   <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden">
@@ -129,13 +127,12 @@ export default function HomePage() {
                     <div className="flex items-center justify-between text-xs text-slate-600">
                       <span>{book.published_year || '—'}</span>
                       <span
-                        className={`${
-                          book.reading_status === 'completed'
+                        className={`${book.reading_status === 'completed'
                             ? 'text-slate-400'
                             : book.reading_status === 'reading'
-                            ? 'text-purple-400'
-                            : 'text-slate-600'
-                        }`}
+                              ? 'text-purple-400'
+                              : 'text-slate-600'
+                          }`}
                       >
                         [{book.reading_status}]
                       </span>
@@ -147,20 +144,59 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* All Books Grid */}
-        {books.length > 6 && (
+        {/* Wishlist Section */}
+        {wishlistBooks.length > 0 && (
           <section>
             <h2 className="text-lg font-bold text-slate-300 mb-6 flex items-center gap-2">
-              <span className="text-purple-400">→</span> All Books ({books.length})
+              <span className="text-blue-400">→</span> Wishlist ({wishlistBooks.length})
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {books.slice(6).map((book) => (
+              {wishlistBooks.map((book) => (
                 <Link
                   key={book.id}
-                  href={`/books/${book.id}`}
-                  className="group border border-slate-700 hover:border-purple-500 transition"
+                  href={`/books/${getShortId(book.id)}`}
+                  className="group border border-slate-700 hover:border-blue-500 transition overflow-hidden"
                 >
-                  <div className="aspect-[3/4] bg-slate-900 relative">
+                  <div className="aspect-[3/4] overflow-hidden bg-slate-900 relative">
+                    {book.cover_url ? (
+                      <Image
+                        src={book.cover_url}
+                        alt={book.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-110 transition duration-500 opacity-80 hover:opacity-100"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+                        <div className="text-2xl">📖</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-2 bg-black">
+                    <h3 className="font-bold text-slate-300 text-xs line-clamp-2 group-hover:text-blue-300 transition">
+                      {book.title}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* All Books Grid */}
+        {books.filter(b => b.reading_status !== 'wishlist').length > 6 && (
+          <section>
+            <h2 className="text-lg font-bold text-slate-300 mb-6 flex items-center gap-2">
+              <span className="text-purple-400">→</span> All Books ({books.filter(b => b.reading_status !== 'wishlist').length})
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {books.filter(b => b.reading_status !== 'wishlist').slice(6).map((book) => (
+                <Link
+                  key={book.id}
+                  href={`/books/${getShortId(book.id)}`}
+                  className="group border border-slate-700 hover:border-purple-500 transition overflow-hidden"
+                >
+                  <div className="aspect-[3/4] overflow-hidden bg-slate-900 relative">
                     {book.cover_url ? (
                       <Image
                         src={book.cover_url}

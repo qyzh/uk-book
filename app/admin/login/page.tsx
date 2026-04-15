@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
+import Link from 'next/link'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -19,68 +20,87 @@ export default function LoginPage() {
 
         try {
             await signIn(email, password)
-            router.push('/admin') // Redirect ke admin dashboard
+            router.push('/admin')
         } catch (err: any) {
-            setError(err.message || 'Login gagal')
+            setError(err.message || 'Login failed')
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-                <div>
-                    <h2 className="text-3xl font-bold text-center">Admin Login</h2>
-                    <p className="mt-2 text-center text-gray-600">uk-books</p>
-                </div>
-
-                <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-                    {error && (
-                        <div className="bg-red-50 text-red-600 p-3 rounded text-sm">
-                            {error}
-                        </div>
-                    )}
-
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                                Email
-                            </label>
-                            <input
-                                id="email"
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
+        <div className="min-h-screen bg-black text-slate-100 flex flex-col" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
+            <main className="flex-1 flex items-center justify-center px-4">
+                <div className="w-full max-w-md">
+                    <div className="border border-slate-700 bg-slate-900 bg-opacity-40 p-8">
+                        <div className="text-center mb-8">
+                            <div className="text-slate-500 text-xs uppercase tracking-widest mb-2">ukbook</div>
+                            <h1 className="text-2xl font-bold text-slate-200">admin login</h1>
                         </div>
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                            />
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            {error && (
+                                <div className="border border-red-800 bg-red-900 bg-opacity-30 text-red-300 p-3 text-sm">
+                                    {error}
+                                </div>
+                            )}
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label htmlFor="email" className="block text-xs text-slate-500 uppercase tracking-wide mb-2">
+                                        Email
+                                    </label>
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        required
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full px-4 py-3 bg-black border border-slate-700 text-slate-200 focus:outline-none focus:border-purple-500 transition"
+                                        placeholder="admin@example.com"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="password" className="block text-xs text-slate-500 uppercase tracking-wide mb-2">
+                                        Password
+                                    </label>
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        required
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="w-full px-4 py-3 bg-black border border-slate-700 text-slate-200 focus:outline-none focus:border-purple-500 transition"
+                                        placeholder="••••••••"
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-3 border border-purple-600 text-purple-300 hover:bg-purple-600 hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loading ? 'authenticating...' : 'login'}
+                            </button>
+                        </form>
+
+                        <div className="mt-6 text-center">
+                            <Link
+                                href="/"
+                                className="text-slate-500 hover:text-slate-400 text-sm transition"
+                            >
+                                ← back to library
+                            </Link>
                         </div>
                     </div>
+                </div>
+            </main>
 
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                    >
-                        {loading ? 'Loading...' : 'Login'}
-                    </button>
-                </form>
-            </div>
+            <footer className="border-t border-slate-800 py-6 text-center text-slate-600 text-xs">
+                crafted with ♡ • {new Date().getFullYear()}
+            </footer>
         </div>
     )
 }

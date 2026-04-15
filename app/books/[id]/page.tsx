@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { use } from 'react'
 import Navigation from '@/app/components/Navigation'
+import Loading from '@/app/components/Loading'
+import BookShareButton from '@/app/components/BookShareButton'
 
 interface Author {
   id: string
@@ -45,45 +47,77 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
   const [book, setBook] = useState<Book | null>(null)
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(true)
+  const [bookNotFound, setBookNotFound] = useState(false)
 
   useEffect(() => {
     if (!id) return
 
-    const fetchBook = async () => {
+    const fetchBook = async (bookId: string) => {
       try {
-        const response = await fetch(`/api/books/${id}`)
+        const response = await fetch(`/api/books/${bookId}`)
+        if (!response.ok) {
+          setBookNotFound(true)
+          return false
+        }
         const { data } = await response.json()
         setBook(data)
+        return true
       } catch (error) {
         console.error('Failed to fetch book:', error)
+        setBookNotFound(true)
+        return false
       }
     }
 
-    const fetchQuotes = async () => {
+    const fetchQuotes = async (bookId: string) => {
       try {
-        const response = await fetch(`/api/quotes?book_id=${id}`)
+        const response = await fetch(`/api/quotes?book_id=${bookId}`)
         const { data } = await response.json()
         setQuotes(data || [])
       } catch (error) {
         console.error('Failed to fetch quotes:', error)
-      } finally {
-        setLoading(false)
       }
     }
 
-    fetchBook()
-    fetchQuotes()
+    const resolveShortId = async (shortId: string) => {
+      try {
+        const response = await fetch(`/api/books/short/${shortId}`)
+        if (response.ok) {
+          const { id: fullId } = await response.json()
+          return fullId
+        }
+      } catch {
+        // ignore
+      }
+      return null
+    }
+
+    const loadBook = async () => {
+      if (id.length === 4) {
+        const fullId = await resolveShortId(id)
+        if (fullId) {
+          window.history.replaceState(null, '', `/books/${fullId}`)
+          await Promise.all([fetchBook(fullId), fetchQuotes(fullId)])
+          setLoading(false)
+          return
+        } else {
+          setBookNotFound(true)
+          setLoading(false)
+          return
+        }
+      }
+      await Promise.all([fetchBook(id), fetchQuotes(id)])
+      setLoading(false)
+    }
+
+    loadBook()
   }, [id])
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center text-slate-400" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
-        loading...
-      </div>
-    )
+    return <Loading text="loading book" fullPage />
   }
 
-  if (!book) {
+  if (bookNotFound || !book) {
     return (
       <div className="min-h-screen bg-black text-slate-300" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
         <Navigation />
@@ -120,6 +154,14 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
                   <div className="text-6xl">📖</div>
                 </div>
               )}
+            </div>
+
+            {/* Share Button */}
+            <div className="flex justify-center">
+              <BookShareButton
+                book={book}
+                status={book.reading_status === 'completed' ? 'completed' : book.reading_status === 'reading' ? 'reading' : book.reading_status === 'wishlist' ? 'wishlist' : 'to-read'}
+              />
             </div>
 
             {/* Book Metadata Card */}

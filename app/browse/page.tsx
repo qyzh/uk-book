@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import Navigation from '@/app/components/Navigation'
 import BookCard from '@/app/components/BookCard'
+import Loading from '@/app/components/Loading'
 import { useBooks } from '@/lib/hooks/useBooks'
 
 export default function BrowsePage() {
@@ -67,14 +68,7 @@ export default function BrowsePage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-slate-400" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
-        <Navigation />
-        <div className="flex items-center justify-center py-32">
-          loading library...
-        </div>
-      </div>
-    )
+    return <Loading text="loading library" fullPage />
   }
 
   return (
