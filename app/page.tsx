@@ -13,7 +13,8 @@ export default function HomePage() {
   const { books, loading } = useBooks()
   const { quotes, favoriteQuotes, currentQuoteIndex, setCurrentQuoteIndex } = useQuoteCarousel()
 
-  const recentBooks = useMemo(() => books.slice(0, 6), [books])
+  const recentBooks = useMemo(() => books.filter(b => b.reading_status !== 'wishlist').slice(0, 6), [books])
+  const wishlistBooks = useMemo(() => books.filter((book) => book.reading_status === 'wishlist'), [books])
   const completedBooks = useMemo(
     () => books.filter((book) => book.reading_status === 'completed'),
     [books],
@@ -142,14 +143,53 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* All Books Grid */}
-        {books.length > 6 && (
+        {/* Wishlist Section */}
+        {wishlistBooks.length > 0 && (
           <section>
             <h2 className="text-lg font-bold text-slate-300 mb-6 flex items-center gap-2">
-              <span className="text-purple-400">→</span> All Books ({books.length})
+              <span className="text-blue-400">→</span> Wishlist ({wishlistBooks.length})
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {books.slice(6).map((book) => (
+              {wishlistBooks.map((book) => (
+                <Link
+                  key={book.id}
+                  href={`/books/${book.id}`}
+                  className="group border border-slate-700 hover:border-blue-500 transition overflow-hidden"
+                >
+                  <div className="aspect-[3/4] overflow-hidden bg-slate-900 relative">
+                    {book.cover_url ? (
+                      <Image
+                        src={book.cover_url}
+                        alt={book.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-110 transition duration-500 opacity-80 hover:opacity-100"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+                        <div className="text-2xl">📖</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-2 bg-black">
+                    <h3 className="font-bold text-slate-300 text-xs line-clamp-2 group-hover:text-blue-300 transition">
+                      {book.title}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* All Books Grid */}
+        {books.filter(b => b.reading_status !== 'wishlist').length > 6 && (
+          <section>
+            <h2 className="text-lg font-bold text-slate-300 mb-6 flex items-center gap-2">
+              <span className="text-purple-400">→</span> All Books ({books.filter(b => b.reading_status !== 'wishlist').length})
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {books.filter(b => b.reading_status !== 'wishlist').slice(6).map((book) => (
                 <Link
                   key={book.id}
                   href={`/books/${book.id}`}

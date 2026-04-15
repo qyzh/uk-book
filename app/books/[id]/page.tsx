@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { use } from 'react'
 import Navigation from '@/app/components/Navigation'
 import Loading from '@/app/components/Loading'
+import BookShareButton from '@/app/components/BookShareButton'
 
 interface Author {
   id: string
@@ -117,6 +118,14 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
                   <div className="text-6xl">📖</div>
                 </div>
               )}
+            </div>
+
+            {/* Share Button */}
+            <div className="flex justify-center">
+              <BookShareButton
+                book={book}
+                status={book.reading_status === 'completed' ? 'completed' : book.reading_status === 'reading' ? 'reading' : book.reading_status === 'wishlist' ? 'wishlist' : 'to-read'}
+              />
             </div>
 
             {/* Book Metadata Card */}
