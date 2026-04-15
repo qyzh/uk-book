@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 import { GENRES, SUB_GENRES } from '@/lib/constants/library'
 import Loading from '@/app/components/Loading'
+import Image from 'next/image'
 
 interface Author {
     id: string
@@ -46,17 +47,29 @@ interface Quote {
     books?: { id: string; title: string }
 }
 
+interface Note {
+    id: string
+    book_id: string
+    content: string
+    note_type: string
+    created_at: string
+    updated_at: string
+}
+
+type TabType = 'books' | 'quotes' | 'notes' | 'authors'
+
 export default function AdminPage() {
     const { user, signOut } = useAuth()
     const router = useRouter()
+    const [activeTab, setActiveTab] = useState<TabType>('books')
     const [books, setBooks] = useState<Book[]>([])
     const [authors, setAuthors] = useState<Author[]>([])
     const [quotes, setQuotes] = useState<Quote[]>([])
+    const [notes, setNotes] = useState<Note[]>([])
     const [loading, setLoading] = useState(true)
+    const [showModal, setShowModal] = useState(false)
+    const [modalType, setModalType] = useState<'book' | 'quote' | 'note' | 'author'>('book')
     const [editingBook, setEditingBook] = useState<Book | null>(null)
-    const [showForm, setShowForm] = useState(false)
-    const [showAuthorForm, setShowAuthorForm] = useState(false)
-    const [showQuoteForm, setShowQuoteForm] = useState(false)
     const [formData, setFormData] = useState({
         title: '',
         author_id: '',
@@ -69,14 +82,24 @@ export default function AdminPage() {
         reading_status: 'to-read',
         language: 'id',
         genre: 'fiction',
-        sub_genre: '',
+        sub_genres: [] as string[],
         started_at: '',
         finished_at: '',
         current_page: '',
     })
+    const [newSubGenre, setNewSubGenre] = useState('')
+    const [customSubGenres, setCustomSubGenres] = useState<string[]>([])
     const [coverFile, setCoverFile] = useState<File | null>(null)
     const [coverPreview, setCoverPreview] = useState<string>('')
     const [uploadingCover, setUploadingCover] = useState(false)
+    const [authorPhotoFile, setAuthorPhotoFile] = useState<File | null>(null)
+    const [authorPhotoPreview, setAuthorPhotoPreview] = useState<string>('')
+    const [uploadingAuthorPhoto, setUploadingAuthorPhoto] = useState(false)
+    const [noteData, setNoteData] = useState({
+        book_id: '',
+        content: '',
+        note_type: 'general',
+    })
     const [authorData, setAuthorData] = useState({
         name: '',
         bio: '',
@@ -95,11 +118,11 @@ export default function AdminPage() {
         fetchBooks()
         fetchAuthors()
         fetchQuotes()
+        fetchNotes()
     }, [])
 
     const fetchBooks = async () => {
         try {
-            setLoading(true)
             const response = await fetch('/api/books')
             const { data } = await response.json()
             setBooks(data || [])
@@ -130,6 +153,16 @@ export default function AdminPage() {
         }
     }
 
+    const fetchNotes = async () => {
+        try {
+            const response = await fetch('/api/notes')
+            const { data } = await response.json()
+            setNotes(data || [])
+        } catch (error) {
+            console.error('Failed to fetch notes:', error)
+        }
+    }
+
     const handleLogout = async () => {
         await signOut()
         router.push('/')
@@ -147,61 +180,121 @@ export default function AdminPage() {
         reader.readAsDataURL(file)
     }
 
+    const handleAuthorPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        setAuthorPhotoFile(file)
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            setAuthorPhotoPreview(reader.result as string)
+        }
+        reader.readAsDataURL(file)
+    }
+
     const uploadCoverToStorage = async (file: File): Promise<string> => {
         setUploadingCover(true)
         try {
             const supabase = createClient()
             const fileName = `${Date.now()}-${file.name}`
             const { error, data } = await supabase.storage
-                .from('book-covers')
+                .from('covers')
                 .upload(fileName, file)
 
             if (error) throw error
 
-            const { data: publicData } = supabase.storage
-                .from('book-covers')
-                .getPublicUrl(data.path)
-
-            return publicData.publicUrl
+            const { data: urlData } = supabase.storage.from('covers').getPublicUrl(fileName)
+            return urlData.publicUrl
         } catch (error) {
-            console.error('Error uploading cover:', error)
+            console.error('Upload failed:', error)
             throw error
         } finally {
             setUploadingCover(false)
         }
     }
 
-    const handleAddAuthor = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const uploadAuthorPhotoToStorage = async (file: File): Promise<string> => {
+        setUploadingAuthorPhoto(true)
         try {
-            const response = await fetch('/api/authors', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(authorData),
-            })
+            const supabase = createClient()
+            const fileName = `${Date.now()}-author-${file.name}`
+            const { error, data } = await supabase.storage
+                .from('covers')
+                .upload(fileName, file)
 
-            if (!response.ok) throw new Error('Failed to add author')
+            if (error) throw error
 
-            await fetchAuthors()
-            setShowAuthorForm(false)
-            setAuthorData({
-                name: '',
-                bio: '',
-                nationality: '',
-                birth_year: new Date().getFullYear(),
-                photo_url: '',
-            })
+            const { data: urlData } = supabase.storage.from('covers').getPublicUrl(fileName)
+            return urlData.publicUrl
         } catch (error) {
-            console.error('Error adding author:', error)
+            console.error('Upload failed:', error)
+            throw error
+        } finally {
+            setUploadingAuthorPhoto(false)
         }
+    }
+
+    const openModal = (type: 'book' | 'quote' | 'note' | 'author', book?: Book) => {
+        setModalType(type)
+        if (type === 'book' && book) {
+            setEditingBook(book)
+            setFormData({
+                title: book.title,
+                author_id: book.authors?.id || '',
+                isbn: book.isbn || '',
+                cover_url: book.cover_url || '',
+                published_year: book.published_year || new Date().getFullYear(),
+                pages: book.pages?.toString() || '',
+                publisher: book.publisher || '',
+                summary: book.summary || '',
+                reading_status: book.reading_status || 'to-read',
+                language: book.language || 'id',
+                genre: book.genre || 'fiction',
+                sub_genres: book.sub_genre ? book.sub_genre.split(',').map(s => s.trim()).filter(Boolean) : [],
+                started_at: book.started_at || '',
+                finished_at: book.finished_at || '',
+                current_page: book.current_page?.toString() || '',
+            })
+            setCoverPreview(book.cover_url || '')
+        } else {
+            resetForm()
+        }
+        setShowModal(true)
+    }
+
+    const resetForm = () => {
+        setEditingBook(null)
+        setFormData({
+            title: '',
+            author_id: '',
+            isbn: '',
+            cover_url: '',
+            published_year: new Date().getFullYear(),
+            pages: '',
+            publisher: '',
+            summary: '',
+            reading_status: 'to-read',
+            language: 'id',
+            genre: 'fiction',
+            sub_genres: [],
+            started_at: '',
+            finished_at: '',
+            current_page: '',
+        })
+        setNewSubGenre('')
+        setCoverFile(null)
+        setCoverPreview('')
+        setAuthorPhotoFile(null)
+        setAuthorPhotoPreview('')
+        setNoteData({ book_id: '', content: '', note_type: 'general' })
+        setAuthorData({ name: '', bio: '', nationality: '', birth_year: new Date().getFullYear(), photo_url: '' })
+        setQuoteData({ book_id: '', text: '', page_number: '', is_favorite: false })
     }
 
     const handleAddBook = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
             let coverUrl = formData.cover_url
-
-            // Upload cover image if selected
             if (coverFile) {
                 coverUrl = await uploadCoverToStorage(coverFile)
             }
@@ -214,13 +307,14 @@ export default function AdminPage() {
                     cover_url: coverUrl,
                     published_year: formData.published_year ? parseInt(formData.published_year.toString()) : null,
                     pages: formData.pages ? parseInt(formData.pages.toString()) : null,
+                    sub_genre: formData.sub_genres.join(', '),
                 }),
             })
 
             if (!response.ok) throw new Error('Failed to add book')
 
             await fetchBooks()
-            setShowForm(false)
+            setShowModal(false)
             resetForm()
         } catch (error) {
             console.error('Error adding book:', error)
@@ -239,16 +333,14 @@ export default function AdminPage() {
                     ...formData,
                     published_year: formData.published_year ? parseInt(formData.published_year.toString()) : null,
                     pages: formData.pages ? parseInt(formData.pages.toString()) : null,
+                    sub_genre: formData.sub_genres.join(', '),
                 }),
             })
 
-            if (!response.ok) {
-                const errorData = await response.json()
-                throw new Error(errorData.error || 'Failed to update book')
-            }
+            if (!response.ok) throw new Error('Failed to update book')
 
             await fetchBooks()
-            setEditingBook(null)
+            setShowModal(false)
             resetForm()
         } catch (error) {
             console.error('Error updating book:', error)
@@ -256,15 +348,10 @@ export default function AdminPage() {
     }
 
     const handleDeleteBook = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this book?')) return
-
+        if (!confirm('Delete this book?')) return
         try {
-            const response = await fetch(`/api/books/${id}`, {
-                method: 'DELETE',
-            })
-
+            const response = await fetch(`/api/books/${id}`, { method: 'DELETE' })
             if (!response.ok) throw new Error('Failed to delete book')
-
             await fetchBooks()
         } catch (error) {
             console.error('Error deleting book:', error)
@@ -277,17 +364,12 @@ export default function AdminPage() {
             const response = await fetch('/api/quotes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...quoteData,
-                    page_number: quoteData.page_number ? parseInt(quoteData.page_number) : null,
-                }),
+                body: JSON.stringify(quoteData),
             })
-
             if (!response.ok) throw new Error('Failed to add quote')
-
             await fetchQuotes()
-            setShowQuoteForm(false)
-            setQuoteData({ book_id: '', text: '', page_number: '', is_favorite: false })
+            setShowModal(false)
+            resetForm()
         } catch (error) {
             console.error('Error adding quote:', error)
         }
@@ -295,17 +377,11 @@ export default function AdminPage() {
 
     const handleToggleFavorite = async (quote: Quote) => {
         try {
-            const response = await fetch(`/api/quotes/${quote.id}`, {
+            await fetch(`/api/quotes/${quote.id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...quote,
-                    is_favorite: !quote.is_favorite,
-                }),
+                body: JSON.stringify({ is_favorite: !quote.is_favorite }),
             })
-
-            if (!response.ok) throw new Error('Failed to toggle favorite')
-
             await fetchQuotes()
         } catch (error) {
             console.error('Error toggling favorite:', error)
@@ -314,653 +390,734 @@ export default function AdminPage() {
 
     const handleDeleteQuote = async (id: string) => {
         if (!confirm('Delete this quote?')) return
-
         try {
-            const response = await fetch(`/api/quotes/${id}`, {
-                method: 'DELETE',
-            })
-
+            const response = await fetch(`/api/quotes/${id}`, { method: 'DELETE' })
             if (!response.ok) throw new Error('Failed to delete quote')
-
             await fetchQuotes()
         } catch (error) {
             console.error('Error deleting quote:', error)
         }
     }
 
-    const handleEdit = (book: Book) => {
-        setEditingBook(book)
-        setFormData({
-            title: book.title,
-            author_id: book.authors?.id || '',
-            isbn: book.isbn || '',
-            cover_url: book.cover_url || '',
-            published_year: book.published_year || new Date().getFullYear(),
-            pages: book.pages?.toString() || '',
-            publisher: book.publisher || '',
-            summary: book.summary || '',
-            reading_status: book.reading_status || 'to-read',
-            language: book.language || 'id',
-            genre: book.genre || 'fiction',
-            sub_genre: book.sub_genre || '',
-            started_at: book.started_at || '',
-            finished_at: book.finished_at || '',
-            current_page: book.current_page?.toString() || '',
-        })
-        setShowForm(true)
+    const handleAddNote = async (e: React.FormEvent) => {
+        e.preventDefault()
+        try {
+            const response = await fetch('/api/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(noteData),
+            })
+            if (!response.ok) throw new Error('Failed to add note')
+            await fetchNotes()
+            setShowModal(false)
+            resetForm()
+        } catch (error) {
+            console.error('Error adding note:', error)
+        }
     }
 
-    const resetForm = () => {
-        setFormData({
-            title: '',
-            author_id: '',
-            isbn: '',
-            cover_url: '',
-            published_year: new Date().getFullYear(),
-            pages: '',
-            publisher: '',
-            summary: '',
-            reading_status: 'to-read',
-            language: 'id',
-            genre: 'fiction',
-            sub_genre: '',
-            started_at: '',
-            finished_at: '',
-            current_page: '',
-        })
-        setCoverFile(null)
-        setCoverPreview('')
-        setEditingBook(null)
-        setShowForm(false)
+    const handleDeleteNote = async (id: string) => {
+        if (!confirm('Delete this note?')) return
+        try {
+            const response = await fetch(`/api/notes/${id}`, { method: 'DELETE' })
+            if (!response.ok) throw new Error('Failed to delete note')
+            await fetchNotes()
+        } catch (error) {
+            console.error('Error deleting note:', error)
+        }
+    }
+
+    const handleAddAuthor = async (e: React.FormEvent) => {
+        e.preventDefault()
+        try {
+            let photoUrl = authorData.photo_url
+            if (authorPhotoFile) {
+                photoUrl = await uploadAuthorPhotoToStorage(authorPhotoFile)
+            }
+
+            const response = await fetch('/api/authors', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...authorData, photo_url: photoUrl }),
+            })
+            if (!response.ok) throw new Error('Failed to add author')
+            await fetchAuthors()
+            setShowModal(false)
+            resetForm()
+        } catch (error) {
+            console.error('Error adding author:', error)
+        }
+    }
+
+    if (loading) {
+        return <Loading text="loading admin" fullPage />
+    }
+
+    const tabs = [
+        { id: 'books' as const, label: 'Books', count: books.length, color: 'purple' },
+        { id: 'quotes' as const, label: 'Quotes', count: quotes.length, color: 'yellow' },
+        { id: 'notes' as const, label: 'Notes', count: notes.length, color: 'amber' },
+        { id: 'authors' as const, label: 'Authors', count: authors.length, color: 'slate' },
+    ]
+
+    const tabToModalType: Record<string, 'book' | 'quote' | 'note' | 'author'> = {
+        books: 'book',
+        quotes: 'quote',
+        notes: 'note',
+        authors: 'author',
     }
 
     return (
-        <div className="min-h-screen bg-black text-slate-100 font-mono" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
-            {/* Terminal Header */}
-            <div className="border-b border-slate-700 bg-black bg-opacity-60 sticky top-0 z-50">
-                <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                        <div className="text-slate-300 text-lg font-bold">➜<Link href="/"> uk-books</Link></div>
-                        <div className="text-slate-600 text-xs">admin@terminal</div>
-                    </div>
-                    <div className="flex items-center gap-4 text-xs">
-                        <span className="text-slate-500">{user?.email}</span>
+        <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
+            {/* Header */}
+            <header className="border-b border-slate-700 bg-slate-900 sticky top-0 z-40">
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                    <div className="flex items-center justify-between mb-4">
+                        <Link href="/" className="text-slate-200 hover:text-purple-300 transition text-lg font-bold">
+                            ← ukbook
+                        </Link>
                         <button
                             onClick={handleLogout}
-                            className="px-3 py-1 border border-slate-600 text-slate-400 hover:border-slate-400 hover:text-slate-200 transition font-bold"
+                            className="text-slate-400 hover:text-red-300 text-xs transition"
                         >
-                            exit
+                            logout
                         </button>
                     </div>
-                </div>
-            </div>
 
-            <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-                {/* Dashboard Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    {[
-                        { label: 'BOOKS', value: books.length, color: '#64748b' },
-                        { label: 'AUTHORS', value: authors.length, color: '#64748b' },
-                        { label: 'READING', value: books.filter(b => b.reading_status === 'reading').length, color: '#7c3aed' },
-                        { label: 'DONE', value: books.filter(b => b.reading_status === 'completed').length, color: '#64748b' },
-                    ].map((stat, i) => (
-                        <div
-                            key={i}
-                            className="border border-slate-700 bg-black bg-opacity-40 p-4 transition hover:bg-opacity-60"
-                            style={{
-                                borderColor: stat.color,
-                                boxShadow: `inset 0 0 1px ${stat.color}60`
-                            }}
-                        >
-                            <div className="text-xs font-bold tracking-wide text-slate-400" style={{ color: stat.color }}>
-                                {stat.label}
+                    {/* Tabs */}
+                    <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`px-4 py-2 text-xs font-bold transition whitespace-nowrap rounded ${
+                                    activeTab === tab.id
+                                        ? tab.color === 'purple' ? 'bg-purple-600 text-white' :
+                                          tab.color === 'yellow' ? 'bg-yellow-600 text-black' :
+                                          tab.color === 'amber' ? 'bg-amber-600 text-black' :
+                                          'bg-slate-600 text-white'
+                                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                }`}
+                            >
+                                {tab.label} ({tab.count})
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </header>
+
+            {/* Content */}
+            <main className="max-w-7xl mx-auto px-4 py-6">
+                {/* Books Tab */}
+                {activeTab === 'books' && (
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {[
+                                { label: 'Total', value: books.length, color: 'slate' },
+                                { label: 'Reading', value: books.filter(b => b.reading_status === 'reading').length, color: 'purple' },
+                                { label: 'Completed', value: books.filter(b => b.reading_status === 'completed').length, color: 'green' },
+                                { label: 'Wishlist', value: books.filter(b => b.reading_status === 'wishlist').length, color: 'blue' },
+                            ].map((stat, i) => (
+                                <div key={i} className={`border border-${stat.color}-700 bg-${stat.color}-900 bg-opacity-20 p-3 rounded`}>
+                                    <div className={`text-${stat.color}-400 text-xs font-bold`}>{stat.label}</div>
+                                    <div className="text-2xl font-bold text-slate-200">{stat.value}</div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {books.map((book) => (
+                                <div key={book.id} className="border border-slate-700 bg-slate-900 bg-opacity-50 rounded-lg overflow-hidden hover:border-purple-500 transition">
+                                    <div className="aspect-[3/4] relative bg-slate-800">
+                                        {book.cover_url ? (
+                                            <Image src={book.cover_url} alt={book.title} fill className="object-cover" />
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full text-slate-600">📖</div>
+                                        )}
+                                        <span className={`absolute top-2 right-2 px-2 py-1 text-xs font-bold rounded ${
+                                            book.reading_status === 'completed' ? 'bg-green-600 text-white' :
+                                            book.reading_status === 'reading' ? 'bg-purple-600 text-white' :
+                                            book.reading_status === 'wishlist' ? 'bg-blue-600 text-white' :
+                                            'bg-slate-600 text-white'
+                                        }`}>
+                                            {book.reading_status}
+                                        </span>
+                                    </div>
+                                    <div className="p-3">
+                                        <h3 className="font-bold text-slate-200 line-clamp-2 mb-1">{book.title}</h3>
+                                        <p className="text-slate-500 text-xs mb-2">{book.authors?.name}</p>
+                                        <div className="flex flex-wrap gap-1 mb-3">
+                                            {book.genre && (
+                                                <span className="px-2 py-0.5 bg-slate-700 text-slate-300 text-xs rounded">{book.genre}</span>
+                                            )}
+                                            {book.sub_genre?.split(',').map((sg, i) => (
+                                                <span key={i} className="px-2 py-0.5 bg-purple-900 bg-opacity-50 text-purple-300 text-xs rounded">{sg.trim()}</span>
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => openModal('book', book)}
+                                                className="flex-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded transition"
+                                            >
+                                                edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteBook(book.id)}
+                                                className="px-3 py-1.5 border border-red-800 hover:bg-red-900 text-red-400 text-xs font-bold rounded transition"
+                                            >
+                                                del
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Quotes Tab */}
+                {activeTab === 'quotes' && (
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="border border-yellow-700 bg-yellow-900 bg-opacity-20 p-3 rounded">
+                                <div className="text-yellow-400 text-xs font-bold">Total Quotes</div>
+                                <div className="text-2xl font-bold text-slate-200">{quotes.length}</div>
                             </div>
-                            <div className="text-2xl font-bold mt-2 text-slate-100">{stat.value}</div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                    {/* Books Management */}
-                    <div className="lg:col-span-2 border-2 border-slate-600 bg-black">
-                        <div className="border-b border-slate-600 px-4 py-2 flex justify-between items-center bg-slate-600 bg-opacity-5">
-                            <div className="text-slate-300 font-bold text-sm">$ books --manage</div>
-                            {!showForm && (
-                                <button
-                                    onClick={() => setShowForm(true)}
-                                    className="text-slate-300 hover:text-slate-200 font-bold text-xs border border-slate-600 px-2 py-1 transition"
-                                >
-                                    [+] new
-                                </button>
-                            )}
+                            <div className="border border-pink-700 bg-pink-900 bg-opacity-20 p-3 rounded">
+                                <div className="text-pink-400 text-xs font-bold">Favorites</div>
+                                <div className="text-2xl font-bold text-slate-200">{quotes.filter(q => q.is_favorite).length}</div>
+                            </div>
                         </div>
 
-                        {/* Add Book Form */}
-                        {showForm && (
-                            <div className="p-4 border-b border-slate-600 space-y-4 bg-black bg-opacity-50 max-h-[calc(100vh-200px)] overflow-y-auto">
-                                <div className="text-slate-300 text-xs font-bold">▶ add-book-form</div>
-                                <form onSubmit={editingBook ? handleEditBook : handleAddBook} className="space-y-4">
-                                    {/* Basic Info Section */}
-                                    <div className="border border-slate-700 p-3 space-y-2 bg-black bg-opacity-30">
-                                        <div className="text-slate-400 text-xs font-bold mb-2">▸ basic info</div>
+                        <div className="space-y-3">
+                            {quotes.map((quote) => (
+                                <div key={quote.id} className={`border-l-4 p-4 rounded-r bg-slate-900 bg-opacity-50 ${quote.is_favorite ? 'border-l-yellow-400' : 'border-l-slate-600'}`}>
+                                    <div className="flex justify-between items-start gap-3 mb-2">
+                                        <span className="text-purple-300 text-xs font-bold">{quote.books?.title}</span>
+                                        <button
+                                            onClick={() => handleToggleFavorite(quote)}
+                                            className={quote.is_favorite ? 'text-yellow-400' : 'text-slate-500 hover:text-yellow-400'}
+                                        >
+                                            {quote.is_favorite ? '★' : '☆'}
+                                        </button>
+                                    </div>
+                                    <p className="text-slate-300 italic mb-2">"{quote.text}"</p>
+                                    <div className="flex justify-between items-center">
+                                        {quote.page_number && <span className="text-slate-500 text-xs">page {quote.page_number}</span>}
+                                        <button
+                                            onClick={() => handleDeleteQuote(quote.id)}
+                                            className="text-red-400 hover:text-red-300 text-xs font-bold transition"
+                                        >
+                                            delete
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Notes Tab */}
+                {activeTab === 'notes' && (
+                    <div className="space-y-4">
+                        <div className="border border-amber-700 bg-amber-900 bg-opacity-20 p-3 rounded">
+                            <div className="text-amber-400 text-xs font-bold">Total Notes</div>
+                            <div className="text-2xl font-bold text-slate-200">{notes.length}</div>
+                        </div>
+
+                        <div className="space-y-3">
+                            {notes.map((note) => {
+                                const book = books.find(b => b.id === note.book_id)
+                                return (
+                                    <div key={note.id} className="border border-amber-800 bg-slate-900 p-4 rounded">
+                                        <div className="flex justify-between items-start gap-3 mb-2">
+                                            <div>
+                                                <span className="text-amber-300 text-xs font-bold">{book?.title || 'Unknown'}</span>
+                                                <span className={`ml-2 px-2 py-0.5 text-xs rounded ${
+                                                    note.note_type === 'summary' ? 'bg-blue-900 text-blue-300' :
+                                                    note.note_type === 'analysis' ? 'bg-purple-900 text-purple-300' :
+                                                    note.note_type === 'idea' ? 'bg-green-900 text-green-300' :
+                                                    'bg-slate-700 text-slate-300'
+                                                }`}>
+                                                    {note.note_type}
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDeleteNote(note.id)}
+                                                className="text-red-400 hover:text-red-300 text-xs font-bold transition"
+                                            >
+                                                delete
+                                            </button>
+                                        </div>
+                                        <p className="text-slate-300 whitespace-pre-wrap">{note.content}</p>
+                                        <span className="text-slate-600 text-xs mt-2 block">{new Date(note.created_at).toLocaleDateString()}</span>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Authors Tab */}
+                {activeTab === 'authors' && (
+                    <div className="space-y-4">
+                        <div className="border border-slate-700 bg-slate-900 bg-opacity-50 p-3 rounded">
+                            <div className="text-slate-400 text-xs font-bold">Total Authors</div>
+                            <div className="text-2xl font-bold text-slate-200">{authors.length}</div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {authors.map((author) => (
+                                <div key={author.id} className="border border-slate-700 bg-slate-900 bg-opacity-50 p-4 rounded-lg">
+                                    <div className="flex gap-3 mb-3">
+                                        <div className="w-16 h-20 bg-slate-800 relative overflow-hidden rounded flex-shrink-0">
+                                            {author.photo_url ? (
+                                                <Image src={author.photo_url} alt={author.name} fill className="object-cover" />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full text-slate-600">👤</div>
+                                            )}
+                                        </div>
                                         <div>
-                                            <label className="text-slate-200 text-xs font-bold block mb-1">title *</label>
+                                            <h3 className="font-bold text-slate-200">{author.name}</h3>
+                                            <p className="text-slate-500 text-xs">{author.nationality || 'Unknown'}</p>
+                                            {author.birth_year && <p className="text-slate-600 text-xs">b. {author.birth_year}</p>}
+                                        </div>
+                                    </div>
+                                    {author.bio && <p className="text-slate-400 text-xs line-clamp-3">{author.bio}</p>}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </main>
+
+            {/* Floating Add Button */}
+            <button
+                onClick={() => openModal(tabToModalType[activeTab])}
+                className="fixed bottom-6 right-6 w-14 h-14 bg-purple-600 hover:bg-purple-500 text-white rounded-full shadow-lg shadow-purple-500/30 flex items-center justify-center text-2xl font-bold transition"
+            >
+                +
+            </button>
+
+            {/* Modal */}
+            {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-slate-900 border border-slate-700 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                        <div className="sticky top-0 bg-slate-900 border-b border-slate-700 px-4 py-3 flex justify-between items-center">
+                            <h2 className="text-lg font-bold text-slate-200">
+                                {modalType === 'book' && (editingBook ? 'Edit Book' : 'Add Book')}
+                                {modalType === 'quote' && 'Add Quote'}
+                                {modalType === 'note' && 'Add Note'}
+                                {modalType === 'author' && 'Add Author'}
+                            </h2>
+                            <button
+                                onClick={() => { setShowModal(false); resetForm() }}
+                                className="text-slate-400 hover:text-slate-200 text-2xl"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div className="p-4 space-y-4">
+                            {/* Book Form */}
+                            {modalType === 'book' && (
+                                <form onSubmit={editingBook ? handleEditBook : handleAddBook} className="space-y-4">
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">title *</label>
+                                        <input
+                                            type="text"
+                                            value={formData.title}
+                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                            required
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">author *</label>
+                                        <select
+                                            value={formData.author_id}
+                                            onChange={(e) => setFormData({ ...formData, author_id: e.target.value })}
+                                            required
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                        >
+                                            <option value="">select author...</option>
+                                            {authors.map((author) => (
+                                                <option key={author.id} value={author.id}>{author.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">isbn</label>
                                             <input
                                                 type="text"
-                                                value={formData.title}
-                                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                                required
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 focus:ring-1 focus:ring-purple-600 outline-none font-mono rounded"
-                                                placeholder="book title..."
+                                                value={formData.isbn}
+                                                onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-slate-200 text-xs font-bold block mb-1">author *</label>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">year</label>
+                                            <input
+                                                type="number"
+                                                value={formData.published_year}
+                                                onChange={(e) => setFormData({ ...formData, published_year: parseInt(e.target.value) || 0 })}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">pages</label>
+                                            <input
+                                                type="number"
+                                                value={formData.pages}
+                                                onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">publisher</label>
+                                            <input
+                                                type="text"
+                                                value={formData.publisher}
+                                                onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        <div>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">language</label>
                                             <select
-                                                value={formData.author_id}
-                                                onChange={(e) => setFormData({ ...formData, author_id: e.target.value })}
-                                                required
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 focus:ring-1 focus:ring-purple-600 outline-none font-mono rounded"
+                                                value={formData.language}
+                                                onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
                                             >
-                                                <option value="" className="bg-black text-slate-200">select author...</option>
-                                                {authors.map((author) => (
-                                                    <option key={author.id} value={author.id} className="bg-black text-slate-200">
-                                                        {author.name}
-                                                    </option>
-                                                ))}
+                                                <option value="id">id</option>
+                                                <option value="en">en</option>
                                             </select>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label className="text-slate-200 text-xs font-bold block mb-1">isbn</label>
-                                                <input
-                                                    type="text"
-                                                    value={formData.isbn}
-                                                    onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                    placeholder="isbn..."
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-slate-200 text-xs font-bold block mb-1">year</label>
-                                                <input
-                                                    type="number"
-                                                    value={formData.published_year}
-                                                    onChange={(e) => setFormData({ ...formData, published_year: parseInt(e.target.value) || 0 })}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label className="text-slate-200 text-xs font-bold block mb-1">pages</label>
-                                                <input
-                                                    type="number"
-                                                    value={formData.pages}
-                                                    onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                    placeholder="0"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-slate-200 text-xs font-bold block mb-1">publisher</label>
-                                                <input
-                                                    type="text"
-                                                    value={formData.publisher}
-                                                    onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                    placeholder="publisher..."
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Summary Section - Full Width */}
-                                    <div className="border border-slate-700 p-3 space-y-2 bg-black bg-opacity-30">
-                                        <div className="text-slate-400 text-xs font-bold mb-2">▸ summary</div>
-                                        <textarea
-                                            value={formData.summary}
-                                            onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded resize-vertical"
-                                            placeholder="book summary (long text)..."
-                                            rows={6}
-                                        />
-                                        <div className="text-slate-500 text-xs">{formData.summary.length} characters</div>
-                                    </div>
-
-                                    {/* Classification Section */}
-                                    <div className="border border-slate-700 p-3 space-y-2 bg-black bg-opacity-30">
-                                        <div className="text-slate-400 text-xs font-bold mb-2">▸ classification</div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                            <div>
-                                                <label className="text-slate-200 text-xs font-bold block mb-1">language</label>
-                                                <select
-                                                    value={formData.language}
-                                                    onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                >
-                                                    <option value="id" className="bg-black">id</option>
-                                                    <option value="en" className="bg-black">en</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="text-slate-200 text-xs font-bold block mb-1">genre</label>
-                                                <select
-                                                    value={formData.genre}
-                                                    onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                >
-                                                    {GENRES.map((genre) => (
-                                                        <option key={genre} value={genre} className="bg-black">
-                                                            {genre}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="text-slate-200 text-xs font-bold block mb-1">sub-genre</label>
-                                                <select
-                                                    value={formData.sub_genre}
-                                                    onChange={(e) => setFormData({ ...formData, sub_genre: e.target.value })}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                >
-                                                    <option value="" className="bg-black">none</option>
-                                                    {SUB_GENRES.map((subGenre) => (
-                                                        <option key={subGenre} value={subGenre} className="bg-black">
-                                                            {subGenre}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Reading Status Section */}
-                                    <div className="border border-slate-700 p-3 space-y-2 bg-black bg-opacity-30">
-                                        <div className="text-slate-400 text-xs font-bold mb-2">▸ reading status</div>
                                         <div>
-                                            <label className="text-slate-200 text-xs font-bold block mb-1">status</label>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">genre</label>
+                                            <select
+                                                value={formData.genre}
+                                                onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            >
+                                                {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">status</label>
                                             <select
                                                 value={formData.reading_status}
                                                 onChange={(e) => setFormData({ ...formData, reading_status: e.target.value })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
                                             >
-                                                <option value="to-read" className="bg-black">to-read</option>
-                                                <option value="reading" className="bg-black">reading</option>
-                                                <option value="completed" className="bg-black">completed</option>
-                                                <option value="wishlist" className="bg-black">wishlist</option>
-                                            </select>
-                                        </div>
-
-                                        {(formData.reading_status === 'reading' || formData.reading_status === 'completed') && (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                <div>
-                                                    <label className="text-slate-200 text-xs font-bold block mb-1">started</label>
-                                                    <input
-                                                        type="date"
-                                                        value={formData.started_at}
-                                                        onChange={(e) => setFormData({ ...formData, started_at: e.target.value })}
-                                                        className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                    />
-                                                </div>
-                                                {formData.reading_status === 'completed' && (
-                                                    <div>
-                                                        <label className="text-slate-200 text-xs font-bold block mb-1">finished</label>
-                                                        <input
-                                                            type="date"
-                                                            value={formData.finished_at}
-                                                            onChange={(e) => setFormData({ ...formData, finished_at: e.target.value })}
-                                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {formData.reading_status === 'reading' && (
-                                            <div>
-                                                <label className="text-slate-200 text-xs font-bold block mb-1">current page</label>
-                                                <input
-                                                    type="number"
-                                                    value={formData.current_page}
-                                                    onChange={(e) => setFormData({ ...formData, current_page: e.target.value })}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs focus:border-purple-400 outline-none font-mono rounded"
-                                                    placeholder="0"
-                                                    min="0"
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Cover Image Section */}
-                                    <div className="border border-slate-700 p-3 space-y-2 bg-black bg-opacity-30">
-                                        <div className="text-slate-400 text-xs font-bold mb-2">▸ cover image</div>
-                                        <div className="flex gap-3 items-start flex-col sm:flex-row">
-                                            <div className="flex-1">
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleCoverUpload}
-                                                    disabled={uploadingCover}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-xs cursor-pointer file:cursor-pointer file:bg-purple-600 file:border-0 file:px-3 file:py-1 file:text-black file:font-bold file:text-xs rounded"
-                                                />
-                                                {uploadingCover && <p className="text-purple-300 text-xs mt-1 font-bold">⟳ uploading...</p>}
-                                            </div>
-                                            {coverPreview && (
-                                                <div className="w-24 h-32 border border-slate-500 bg-black overflow-hidden flex-shrink-0 rounded">
-                                                    <img src={coverPreview} alt="Preview" className="w-full h-full object-cover" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Submit Buttons */}
-                                    <div className="flex gap-2 pt-2 border-t border-slate-700">
-                                        <button
-                                            type="submit"
-                                            className="px-4 py-2 border border-purple-500 text-purple-300 hover:bg-purple-600 hover:text-black transition font-bold text-xs rounded"
-                                        >
-                                            {editingBook ? '⟳ update' : '✓ save'}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={resetForm}
-                                            className="px-4 py-2 border border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300 transition font-bold text-xs rounded"
-                                        >
-                                            ✕ cancel
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
-
-                        {/* Books List */}
-                        {loading ? (
-                            <Loading text="loading books" />
-                        ) : books.length === 0 ? (
-                            <div className="p-4 text-slate-500 text-xs">
-                                <span className="text-slate-600">root@terminal:</span> no books found. use <span className="text-slate-300">[+] new</span> to add
-                            </div>
-                        ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-xs">
-                                    <thead>
-                                        <tr className="border-b border-slate-600 bg-slate-600 bg-opacity-5">
-                                            <th className="px-3 py-2 text-left text-slate-300 font-bold">TITLE</th>
-                                            <th className="px-3 py-2 text-left text-slate-300 font-bold">AUTHOR</th>
-                                            <th className="px-3 py-2 text-left text-slate-300 font-bold">YEAR</th>
-                                            <th className="px-3 py-2 text-left text-slate-300 font-bold">SUB-GENRE</th>
-                                            <th className="px-3 py-2 text-left text-slate-300 font-bold">STATUS</th>
-                                            <th className="px-3 py-2 text-right text-slate-300 font-bold">ACTIONS</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {books.map((book, idx) => (
-                                            <tr
-                                                key={book.id}
-                                                className="border-b border-slate-600 border-opacity-30 hover:bg-slate-600 hover:bg-opacity-5 transition"
-                                            >
-                                                <td className="px-3 py-2 text-slate-200">{book.title}</td>
-                                                <td className="px-3 py-2 text-slate-400">{book.authors?.name || '-'}</td>
-                                                <td className="px-3 py-2 text-slate-500">{book.published_year || '-'}</td>
-                                                <td className="px-3 py-2 text-slate-500">{book.sub_genre || '-'}</td>
-                                                <td className="px-3 py-2">
-                                                    <span className={`text-xs font-bold ${book.reading_status === 'completed' ? 'text-slate-400' :
-                                                        book.reading_status === 'reading' ? 'text-purple-300' :
-                                                            'text-slate-500'
-                                                        }`}>
-                                                        [{book.reading_status}]
-                                                    </span>
-                                                </td>
-                                                <td className="px-3 py-2 text-right space-x-1">
-                                                    <button
-                                                        onClick={() => handleEdit(book)}
-                                                        className="text-purple-300 hover:text-purple-200 font-bold transition"
-                                                    >
-                                                        edit
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteBook(book.id)}
-                                                        className="text-slate-600 hover:text-slate-400 font-bold transition"
-                                                    >
-                                                        del
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Quotes Management */}
-                    <div className="border-2 border-purple-700 bg-black lg:col-span-4">
-                        <div className="border-b border-purple-700 px-4 py-2 flex justify-between items-center bg-purple-700 bg-opacity-5">
-                            <div className="text-purple-300 font-bold text-sm">$ quotes --loved</div>
-                            {!showQuoteForm && (
-                                <button
-                                    onClick={() => setShowQuoteForm(true)}
-                                    className="text-purple-300 hover:text-purple-200 font-bold text-xs border border-purple-700 px-2 py-1 transition"
-                                >
-                                    [+] new
-                                </button>
-                            )}
-                        </div>
-
-                        {/* Add Quote Form */}
-                        {showQuoteForm && (
-                            <div className="p-4 border-b border-purple-700 space-y-3 bg-black bg-opacity-50">
-                                <div className="text-purple-300 text-xs font-bold">▶ capture-quote</div>
-                                <form onSubmit={handleAddQuote} className="space-y-3">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="text-purple-200 text-xs font-bold block mb-1">book *</label>
-                                            <select
-                                                value={quoteData.book_id}
-                                                onChange={(e) => setQuoteData({ ...quoteData, book_id: e.target.value })}
-                                                required
-                                                className="w-full px-2 py-1 bg-black border border-purple-700 text-purple-200 text-xs focus:border-yellow-300 outline-none font-mono"
-                                            >
-                                                <option value="" className="bg-black">select book...</option>
-                                                {books.map((book) => (
-                                                    <option key={book.id} value={book.id} className="bg-black">
-                                                        {book.title}
-                                                    </option>
-                                                ))}
+                                                <option value="to-read">to-read</option>
+                                                <option value="reading">reading</option>
+                                                <option value="completed">completed</option>
+                                                <option value="wishlist">wishlist</option>
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-purple-200 text-xs font-bold block mb-1">page</label>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">current page</label>
                                             <input
                                                 type="number"
-                                                value={quoteData.page_number}
-                                                onChange={(e) => setQuoteData({ ...quoteData, page_number: e.target.value })}
-                                                className="w-full px-2 py-1 bg-black border border-purple-700 text-purple-200 text-xs outline-none font-mono"
-                                                placeholder="page number..."
+                                                value={formData.current_page}
+                                                onChange={(e) => setFormData({ ...formData, current_page: e.target.value })}
+                                                disabled={formData.reading_status === 'to-read' || formData.reading_status === 'wishlist'}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none disabled:opacity-50"
                                             />
                                         </div>
                                     </div>
+
+                                    {(formData.reading_status === 'reading' || formData.reading_status === 'completed') && (
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="text-slate-400 text-xs font-bold block mb-1">started</label>
+                                                <input
+                                                    type="date"
+                                                    value={formData.started_at}
+                                                    onChange={(e) => setFormData({ ...formData, started_at: e.target.value })}
+                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                />
+                                            </div>
+                                            {formData.reading_status === 'completed' && (
+                                                <div>
+                                                    <label className="text-slate-400 text-xs font-bold block mb-1">finished</label>
+                                                    <input
+                                                        type="date"
+                                                        value={formData.finished_at}
+                                                        onChange={(e) => setFormData({ ...formData, finished_at: e.target.value })}
+                                                        className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                     <div>
-                                        <label className="text-purple-200 text-xs font-bold block mb-1">quote *</label>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">sub-genres</label>
+                                        <div className="space-y-2">
+                                            <div className="flex flex-wrap gap-2">
+                                                {formData.sub_genres.map((sg, i) => (
+                                                    <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-purple-900 bg-opacity-50 border border-purple-600 text-purple-200 text-xs rounded">
+                                                        {sg}
+                                                        <button type="button" onClick={() => setFormData({ ...formData, sub_genres: formData.sub_genres.filter((_, idx) => idx !== i) })} className="text-purple-400 hover:text-purple-200">×</button>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <select
+                                                value=""
+                                                onChange={(e) => {
+                                                    if (e.target.value && !formData.sub_genres.includes(e.target.value)) {
+                                                        setFormData({ ...formData, sub_genres: [...formData.sub_genres, e.target.value as typeof formData.sub_genres[number]] })
+                                                    }
+                                                }}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            >
+                                                <option value="">+ add existing...</option>
+                                                {SUB_GENRES.filter(sg => !formData.sub_genres.includes(sg)).map((sg) => (
+                                                    <option key={sg} value={sg}>{sg}</option>
+                                                ))}
+                                            </select>
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={newSubGenre}
+                                                    onChange={(e) => setNewSubGenre(e.target.value)}
+                                                    placeholder="new sub-genre..."
+                                                    className="flex-1 px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const trimmed = newSubGenre.trim()
+                                                        if (trimmed && !formData.sub_genres.includes(trimmed)) {
+                                                            setFormData({ ...formData, sub_genres: [...formData.sub_genres, trimmed] })
+                                                            if (!(SUB_GENRES as readonly string[]).includes(trimmed)) {
+                                                                setCustomSubGenres([...customSubGenres, trimmed])
+                                                            }
+                                                            setNewSubGenre('')
+                                                        }
+                                                    }}
+                                                    className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded"
+                                                >
+                                                    add
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">summary</label>
+                                        <textarea
+                                            value={formData.summary}
+                                            onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                                            rows={4}
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none resize-y"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">cover image</label>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleCoverUpload}
+                                            disabled={uploadingCover}
+                                            className="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:bg-purple-600 file:border-0 file:text-white file:rounded file:cursor-pointer"
+                                        />
+                                        {uploadingCover && <p className="text-purple-300 text-xs mt-1">uploading...</p>}
+                                        {coverPreview && (
+                                            <div className="mt-2 w-20 h-28 bg-slate-800 relative overflow-hidden rounded">
+                                                <img src={coverPreview} alt="Preview" className="w-full h-full object-cover" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded transition">
+                                        {editingBook ? 'update book' : 'save book'}
+                                    </button>
+                                </form>
+                            )}
+
+                            {/* Quote Form */}
+                            {modalType === 'quote' && (
+                                <form onSubmit={handleAddQuote} className="space-y-4">
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">book *</label>
+                                        <select
+                                            value={quoteData.book_id}
+                                            onChange={(e) => setQuoteData({ ...quoteData, book_id: e.target.value })}
+                                            required
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                        >
+                                            <option value="">select book...</option>
+                                            {books.map((book) => (
+                                                <option key={book.id} value={book.id}>{book.title}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">page</label>
+                                        <input
+                                            type="number"
+                                            value={quoteData.page_number}
+                                            onChange={(e) => setQuoteData({ ...quoteData, page_number: e.target.value })}
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">quote *</label>
                                         <textarea
                                             value={quoteData.text}
                                             onChange={(e) => setQuoteData({ ...quoteData, text: e.target.value })}
                                             required
-                                            className="w-full px-2 py-1 bg-black border border-purple-700 text-purple-200 text-xs outline-none font-mono"
-                                            placeholder="the quote you loved..."
-                                            rows={3}
+                                            rows={4}
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none resize-y"
+                                            placeholder="the quote..."
                                         />
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="checkbox"
+                                            id="favorite"
                                             checked={quoteData.is_favorite}
                                             onChange={(e) => setQuoteData({ ...quoteData, is_favorite: e.target.checked })}
-                                            className="cursor-pointer"
+                                            className="w-4 h-4"
                                         />
-                                        <label className="text-purple-200 text-xs font-bold">mark as favorite</label>
+                                        <label htmlFor="favorite" className="text-slate-400 text-sm">mark as favorite</label>
                                     </div>
-                                    <div className="flex gap-2 pt-2">
-                                        <button
-                                            type="submit"
-                                            className="px-3 py-1 border border-slate-500 text-slate-300 hover:bg-slate-500 hover:text-black transition font-bold text-xs"
-                                        >
-                                            save
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowQuoteForm(false)}
-                                            className="px-3 py-1 border border-slate-600 text-slate-400 hover:border-slate-500 hover:text-slate-300 transition font-bold text-xs"
-                                        >
-                                            cancel
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        )}
-
-                        {/* Quotes List */}
-                        {quotes.length === 0 ? (
-                            <div className="p-4 text-slate-600 text-xs">
-                                <span className="text-slate-600">root@terminal:</span> no quotes yet. capture one with <span className="text-purple-300">[+] new</span>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                                {quotes.map((quote) => (
-                                    <div
-                                        key={quote.id}
-                                        className={`p-3 border-l-4 hover:bg-opacity-5 hover:bg-purple-700 transition text-xs ${quote.is_favorite ? 'border-l-yellow-400 bg-purple-700 bg-opacity-5' : 'border-l-gray-600'
-                                            }`}
-                                    >
-                                        <div className="flex justify-between items-start gap-2 mb-1">
-                                            <div className="text-purple-200 font-bold truncate flex-1">
-                                                {quote.books?.title}
-                                            </div>
-                                            <button
-                                                onClick={() => handleToggleFavorite(quote)}
-                                                className={`flex-shrink-0 ${quote.is_favorite ? 'text-purple-400 hover:text-purple-300' : 'text-slate-500 hover:text-purple-300'} transition`}
-                                                title="mark as favorite"
-                                            >
-                                                {quote.is_favorite ? '❤' : '♡'}
-                                            </button>
-                                        </div>
-                                        <div className="text-slate-300 mb-2 line-clamp-2 italic">"{quote.text}"</div>
-                                        <div className="flex gap-2 items-center text-slate-600 mb-2">
-                                            {quote.page_number && <span>pg {quote.page_number}</span>}
-                                        </div>
-                                        <button
-                                            onClick={() => handleDeleteQuote(quote.id)}
-                                            className="text-red-400 hover:text-red-300 font-bold transition text-xs"
-                                        >
-                                            [delete]
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Authors Sidebar */}
-                    <div className="border-2 border-slate-500 bg-black h-fit lg:col-span-1">
-                        <div className="border-b border-slate-500 px-4 py-2 bg-slate-500 bg-opacity-5 flex justify-between items-center">
-                            <div className="text-slate-300 font-bold text-sm">$ authors</div>
-                            <div className="flex items-center gap-2">
-                                <Link
-                                    href="/authors"
-                                    className="text-slate-300 hover:text-slate-200 font-bold text-xs border border-slate-500 px-2 py-1 transition"
-                                >
-                                    list
-                                </Link>
-                                <Link
-                                    href="/authors/add"
-                                    className="text-slate-300 hover:text-slate-200 font-bold text-xs border border-slate-500 px-2 py-1 transition"
-                                >
-                                    new
-                                </Link>
-                                {!showAuthorForm && (
-                                    <button
-                                        onClick={() => setShowAuthorForm(true)}
-                                        className="text-slate-300 hover:text-slate-200 font-bold text-xs border border-slate-500 px-2 py-1 transition"
-                                    >
-                                        [+]
+                                    <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded transition">
+                                        save quote
                                     </button>
-                                )}
-                            </div>
-                        </div>
+                                </form>
+                            )}
 
-                        {/* Add Author Form */}
-                        {showAuthorForm && (
-                            <div className="p-3 border-b border-slate-500 space-y-2 bg-black bg-opacity-50">
-                                <form onSubmit={handleAddAuthor} className="space-y-2">
+                            {/* Note Form */}
+                            {modalType === 'note' && (
+                                <form onSubmit={handleAddNote} className="space-y-4">
                                     <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">book *</label>
+                                        <select
+                                            value={noteData.book_id}
+                                            onChange={(e) => setNoteData({ ...noteData, book_id: e.target.value })}
+                                            required
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                        >
+                                            <option value="">select book...</option>
+                                            {books.map((book) => (
+                                                <option key={book.id} value={book.id}>{book.title}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">type</label>
+                                        <select
+                                            value={noteData.note_type}
+                                            onChange={(e) => setNoteData({ ...noteData, note_type: e.target.value })}
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                        >
+                                            <option value="general">general</option>
+                                            <option value="summary">summary</option>
+                                            <option value="analysis">analysis</option>
+                                            <option value="idea">idea</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">note *</label>
+                                        <textarea
+                                            value={noteData.content}
+                                            onChange={(e) => setNoteData({ ...noteData, content: e.target.value })}
+                                            required
+                                            rows={6}
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none resize-y"
+                                            placeholder="your notes..."
+                                        />
+                                    </div>
+                                    <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded transition">
+                                        save note
+                                    </button>
+                                </form>
+                            )}
+
+                            {/* Author Form */}
+                            {modalType === 'author' && (
+                                <form onSubmit={handleAddAuthor} className="space-y-4">
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">name *</label>
                                         <input
                                             type="text"
                                             value={authorData.name}
                                             onChange={(e) => setAuthorData({ ...authorData, name: e.target.value })}
                                             required
-                                            className="w-full px-2 py-1 bg-black border border-slate-500 text-slate-300 text-xs outline-none font-mono"
-                                            placeholder="name..."
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
                                         />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">nationality</label>
+                                            <input
+                                                type="text"
+                                                value={authorData.nationality}
+                                                onChange={(e) => setAuthorData({ ...authorData, nationality: e.target.value })}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-slate-400 text-xs font-bold block mb-1">birth year</label>
+                                            <input
+                                                type="number"
+                                                value={authorData.birth_year}
+                                                onChange={(e) => setAuthorData({ ...authorData, birth_year: parseInt(e.target.value) || 0 })}
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            />
+                                        </div>
                                     </div>
                                     <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">photo</label>
                                         <input
-                                            type="text"
-                                            value={authorData.nationality}
-                                            onChange={(e) => setAuthorData({ ...authorData, nationality: e.target.value })}
-                                            className="w-full px-2 py-1 bg-black border border-slate-500 text-slate-300 text-xs outline-none font-mono"
-                                            placeholder="nationality..."
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleAuthorPhotoUpload}
+                                            disabled={uploadingAuthorPhoto}
+                                            className="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:bg-purple-600 file:border-0 file:text-white file:rounded file:cursor-pointer"
+                                        />
+                                        {uploadingAuthorPhoto && <p className="text-purple-300 text-xs mt-1">uploading...</p>}
+                                        <input
+                                            type="url"
+                                            value={authorData.photo_url}
+                                            onChange={(e) => setAuthorData({ ...authorData, photo_url: e.target.value })}
+                                            placeholder="or paste image URL..."
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none mt-2"
+                                        />
+                                        {(authorPhotoPreview || authorData.photo_url) && (
+                                            <div className="mt-2 w-16 h-20 bg-slate-800 relative overflow-hidden rounded">
+                                                <img 
+                                                    src={authorPhotoPreview || authorData.photo_url} 
+                                                    alt="Preview" 
+                                                    className="w-full h-full object-cover" 
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="text-slate-400 text-xs font-bold block mb-1">bio</label>
+                                        <textarea
+                                            value={authorData.bio}
+                                            onChange={(e) => setAuthorData({ ...authorData, bio: e.target.value })}
+                                            rows={4}
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none resize-y"
                                         />
                                     </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            type="submit"
-                                            className="flex-1 px-2 py-1 border border-slate-500 text-slate-300 hover:bg-slate-500 hover:text-black transition font-bold text-xs"
-                                        >
-                                            add
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowAuthorForm(false)}
-                                            className="flex-1 px-2 py-1 border border-slate-500 text-slate-400 hover:bg-slate-500 hover:text-black transition font-bold text-xs"
-                                        >
-                                            esc
-                                        </button>
-                                    </div>
+                                    <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded transition">
+                                        save author
+                                    </button>
                                 </form>
-                            </div>
-                        )}
-
-                        {/* Authors List */}
-                        <div className="max-h-96 overflow-y-auto">
-                            {authors.map((author) => (
-                                <div
-                                    key={author.id}
-                                    className="px-4 py-2 border-b border-slate-500 border-opacity-30 hover:bg-slate-500 hover:bg-opacity-5 transition text-xs"
-                                >
-                                    <div className="flex items-center justify-between gap-2">
-                                        <div className="text-slate-300 font-bold">{author.name}</div>
-                                        <Link
-                                            href={`/authors/${author.id}/edit`}
-                                            className="text-slate-500 hover:text-slate-300 border border-slate-600 px-1.5 py-0.5 text-[10px] transition"
-                                        >
-                                            edit
-                                        </Link>
-                                    </div>
-                                    {author.nationality && (
-                                        <div className="text-slate-500 text-xs">◆ {author.nationality}</div>
-                                    )}
-                                </div>
-                            ))}
-                            {authors.length === 0 && (
-                                <div className="p-4 text-slate-600 text-xs">
-                                    no authors yet...
-                                </div>
                             )}
                         </div>
                     </div>
                 </div>
-            </main>
+            )}
         </div>
     )
 }

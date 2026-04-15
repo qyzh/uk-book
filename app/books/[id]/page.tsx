@@ -57,15 +57,15 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
         const response = await fetch(`/api/books/${bookId}`)
         if (!response.ok) {
           setBookNotFound(true)
-          setLoading(false)
-          return
+          return false
         }
         const { data } = await response.json()
         setBook(data)
+        return true
       } catch (error) {
         console.error('Failed to fetch book:', error)
         setBookNotFound(true)
-        setLoading(false)
+        return false
       }
     }
 
@@ -76,8 +76,6 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
         setQuotes(data || [])
       } catch (error) {
         console.error('Failed to fetch quotes:', error)
-      } finally {
-        setLoading(false)
       }
     }
 
@@ -99,8 +97,8 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
         const fullId = await resolveShortId(id)
         if (fullId) {
           window.history.replaceState(null, '', `/books/${fullId}`)
-          fetchBook(fullId)
-          fetchQuotes(fullId)
+          await Promise.all([fetchBook(fullId), fetchQuotes(fullId)])
+          setLoading(false)
           return
         } else {
           setBookNotFound(true)
@@ -108,8 +106,8 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
           return
         }
       }
-      fetchBook(id)
-      fetchQuotes(id)
+      await Promise.all([fetchBook(id), fetchQuotes(id)])
+      setLoading(false)
     }
 
     loadBook()
