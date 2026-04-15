@@ -1,65 +1,257 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import Navigation from '@/app/components/Navigation'
+import CurrentlyReading from '@/app/components/CurrentlyReading'
+
+interface Author {
+  id: string
+  name: string
+}
+
+interface Book {
+  id: string
+  title: string
+  isbn?: string
+  cover_url?: string
+  published_year?: number
+  pages?: number
+  publisher?: string
+  reading_status: string
+  language: string
+  authors: Author
+}
+
+interface Quote {
+  id: string
+  book_id: string
+  text: string
+  page_number?: number
+  is_favorite: boolean
+  books?: { id: string; title: string }
+}
+
+export default function HomePage() {
+  const [books, setBooks] = useState<Book[]>([])
+  const [quotes, setQuotes] = useState<Quote[]>([])
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchBooks()
+    fetchQuotes()
+  }, [])
+
+  const fetchBooks = async () => {
+    try {
+      const response = await fetch('/api/books')
+      const { data } = await response.json()
+      setBooks(data || [])
+    } catch (error) {
+      console.error('Failed to fetch books:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchQuotes = async () => {
+    try {
+      const response = await fetch('/api/quotes')
+      const { data } = await response.json()
+      setQuotes(data || [])
+    } catch (error) {
+      console.error('Failed to fetch quotes:', error)
+    }
+  }
+
+  useEffect(() => {
+    if (quotes.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length)
+      }, 6000)
+      return () => clearInterval(interval)
+    }
+  }, [quotes])
+
+  const favoriteQuotes = quotes.filter(q => q.is_favorite)
+  const recentBooks = books.slice(0, 6)
+  const completedBooks = books.filter(b => b.reading_status === 'completed')
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-slate-400">
+        loading library...
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
+      <Navigation />
+
+      <main className="max-w-7xl mx-auto px-4 py-12 space-y-16">
+        {/* Currently Reading Feature */}
+        <section>
+          <CurrentlyReading />
+        </section>
+
+        {/* Hero / Featured Quote */}
+        {favoriteQuotes.length > 0 && (
+          <section className="py-12">
+            <div className="border border-slate-700 bg-gradient-to-br from-black to-slate-900 p-8 transition-all duration-500">
+              <div className="text-slate-500 text-xs mb-4">✦ favorite quote</div>
+              <blockquote className="text-xl md:text-2xl text-slate-200 leading-relaxed mb-6 italic">
+                "{favoriteQuotes[currentQuoteIndex % favoriteQuotes.length]?.text}"
+              </blockquote>
+              {favoriteQuotes[currentQuoteIndex % favoriteQuotes.length]?.books && (
+                <div className="flex items-center gap-2 text-slate-400 text-sm">
+                  <span>—</span>
+                  <Link
+                    href={`/books/${favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].book_id}`}
+                    className="text-purple-300 hover:text-purple-200 transition"
+                  >
+                    {favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].books?.title || 'Unknown Book'}
+                  </Link>
+                </div>
+              )}
+              <div className="mt-4 flex gap-2">
+                {favoriteQuotes.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentQuoteIndex(i)}
+                    className={`w-2 h-2 rounded-full transition ${
+                      i === currentQuoteIndex % favoriteQuotes.length
+                        ? 'bg-purple-400'
+                        : 'bg-slate-700 hover:bg-slate-600'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Stats */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'total books', value: books.length },
+            { label: 'completed', value: completedBooks.length },
+            { label: 'total quotes', value: quotes.length },
+            { label: 'favorites', value: favoriteQuotes.length },
+          ].map((stat, i) => (
+            <div
+              key={i}
+              className="border border-slate-700 bg-slate-900 bg-opacity-40 p-4 text-center hover:bg-opacity-60 transition"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+              <div className="text-slate-500 text-xs uppercase tracking-wide">{stat.label}</div>
+              <div className="text-3xl font-bold text-slate-200 mt-2">{stat.value}</div>
+            </div>
+          ))}
+        </section>
+
+        {/* Recent Books */}
+        {recentBooks.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold text-slate-300 mb-6 flex items-center gap-2">
+              <span className="text-purple-400">→</span> Library
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {recentBooks.map((book) => (
+                <Link
+                  key={book.id}
+                  href={`/books/${book.id}`}
+                  className="group border border-slate-700 hover:border-purple-600 transition overflow-hidden hover:shadow-lg hover:shadow-purple-500/20"
+                >
+                  <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden">
+                    {book.cover_url ? (
+                      <Image
+                        src={book.cover_url}
+                        alt={book.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700">
+                        <div className="text-center px-4">
+                          <div className="text-3xl mb-2">📖</div>
+                          <div className="text-slate-500 text-xs text-center line-clamp-2">{book.title}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 bg-black">
+                    <h3 className="font-bold text-slate-200 line-clamp-2 mb-1 group-hover:text-purple-300 transition">
+                      {book.title}
+                    </h3>
+                    <p className="text-slate-500 text-sm mb-3">{book.authors?.name}</p>
+                    <div className="flex items-center justify-between text-xs text-slate-600">
+                      <span>{book.published_year || '—'}</span>
+                      <span
+                        className={`${
+                          book.reading_status === 'completed'
+                            ? 'text-slate-400'
+                            : book.reading_status === 'reading'
+                            ? 'text-purple-400'
+                            : 'text-slate-600'
+                        }`}
+                      >
+                        [{book.reading_status}]
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* All Books Grid */}
+        {books.length > 6 && (
+          <section>
+            <h2 className="text-lg font-bold text-slate-300 mb-6 flex items-center gap-2">
+              <span className="text-purple-400">→</span> All Books ({books.length})
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {books.slice(6).map((book) => (
+                <Link
+                  key={book.id}
+                  href={`/books/${book.id}`}
+                  className="group border border-slate-700 hover:border-purple-500 transition"
+                >
+                  <div className="aspect-[3/4] bg-slate-900 relative">
+                    {book.cover_url ? (
+                      <Image
+                        src={book.cover_url}
+                        alt={book.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-110 transition duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+                        <div className="text-2xl">📖</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-2 bg-black">
+                    <h3 className="font-bold text-slate-300 text-xs line-clamp-2 group-hover:text-purple-300 transition">
+                      {book.title}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Footer */}
+        <footer className="border-t border-slate-700 pt-8 text-center text-slate-500 text-xs pb-8">
+          <p>crafted with ♡ • {new Date().getFullYear()}</p>
+        </footer>
       </main>
     </div>
-  );
+  )
 }
