@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { generateQuoteImage, downloadImage } from '@/lib/utils/quote-image'
 
 interface QuoteShareButtonProps {
   quoteText: string
@@ -15,6 +14,7 @@ export default function QuoteShareButton({ quoteText, bookTitle, author }: Quote
   const handleShare = async () => {
     setIsLoading(true)
     try {
+      const { generateQuoteImage, downloadImage } = await import('@/lib/utils/quote-image')
       const blob = await generateQuoteImage({
         text: quoteText,
         bookTitle,

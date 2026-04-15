@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { generateBookImage, downloadImage } from '@/lib/utils/quote-image'
 import type { Book } from '@/lib/types/library'
 
 interface BookShareButtonProps {
@@ -15,6 +14,7 @@ export default function BookShareButton({ book, status = 'to-read' }: BookShareB
   const handleShare = async () => {
     setIsLoading(true)
     try {
+      const { generateBookImage, downloadImage } = await import('@/lib/utils/quote-image')
       const blob = await generateBookImage({
         title: book.title,
         author: book.authors?.name,

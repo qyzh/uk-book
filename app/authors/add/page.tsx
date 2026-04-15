@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navigation from '@/app/components/Navigation'
@@ -120,7 +121,7 @@ export default function AddAuthorPage() {
             />
             {formData.photo_url && (
               <div className="mt-3 w-24 h-32 border border-slate-700 relative overflow-hidden">
-                <img src={formData.photo_url} alt="Author preview" className="w-full h-full object-cover" />
+                <Image src={formData.photo_url} alt="Author preview" fill className="object-cover" />
               </div>
             )}
           </div>

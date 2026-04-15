@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Navigation from '@/app/components/Navigation'
 import Loading from '@/app/components/Loading'
 import type { Author } from '@/lib/types/library'
@@ -59,7 +60,7 @@ export default function AuthorsPage() {
               <article key={author.id} className="border border-slate-700 bg-slate-900 bg-opacity-30 p-4 flex gap-4">
                 <div className="w-20 h-24 bg-slate-900 border border-slate-700 relative overflow-hidden flex-shrink-0">
                   {author.photo_url ? (
-                    <img src={author.photo_url} alt={author.name} className="w-full h-full object-cover" />
+                    <Image src={author.photo_url} alt={author.name} fill className="object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-slate-600 text-xs">no photo</div>
                   )}
