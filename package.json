@@ -1,6 +1,7 @@
 {
-  "name": "uk-book",
+  "name": "ukbook",
   "version": "0.1.0",
+  "description": "Rak Buku Online - Track your reading journey",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -7,7 +7,7 @@ export default function Navigation() {
         <div className="flex items-center justify-between">
           {/* Logo/Home */}
           <Link href="/" className="text-slate-300 text-lg font-bold hover:text-slate-200 transition">
-            ➜ bookshelf
+            ➜ ukbook
           </Link>
 
           {/* Navigation Links */}

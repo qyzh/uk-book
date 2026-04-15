@@ -1,6 +1,8 @@
-# UK Book Tracker
+# ukbook - Rak Buku Online
 
-A modern book tracking application built with Next.js 16, Supabase, and Tailwind CSS.
+A modern book tracking application to manage your reading collection and track your reading journey.
+
+**ukbook** (Rak Buku Online) adalah aplikasi pelacakan buku untuk mengelola koleksi bacaan Anda.
 
 ## Features
 
