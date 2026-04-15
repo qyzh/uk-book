@@ -111,7 +111,7 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
                   alt={book.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"
-                  className="object-cover"
+                  className="object-contain"
                   priority
                 />
               ) : (
@@ -221,8 +221,8 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
                 {book.title}
               </h1>
               <div className="space-y-3">
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-2">by</div>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-xs text-slate-500 uppercase tracking-wide">by</p>
                   <p className="text-lg text-purple-300">{book.authors?.name}</p>
                 </div>
 
@@ -242,7 +242,7 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
 
                 {book.summary && (
                   <div>
-                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-2">summary</div>
+                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-2">blurb</div>
                     <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{book.summary}</p>
                   </div>
                 )}
