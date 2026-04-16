@@ -495,7 +495,7 @@ export default function AdminPage() {
     }
 
     const tabs = [
-        { id: 'books' as const, label: 'Books', count: books.length, color: 'purple' },
+        { id: 'books' as const, label: 'Books', count: books.filter(b => b.reading_status !== 'wishlist').length, color: 'purple' },
         { id: 'quotes' as const, label: 'Quotes', count: quotes.length, color: 'yellow' },
         { id: 'notes' as const, label: 'Notes', count: notes.length, color: 'amber' },
         { id: 'authors' as const, label: 'Authors', count: authors.length, color: 'slate' },
@@ -555,7 +555,7 @@ export default function AdminPage() {
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {[
-                                { label: 'Total', value: books.length, color: 'slate' },
+                                { label: 'Total', value: books.filter(b => b.reading_status !== 'wishlist').length, color: 'slate' },
                                 { label: 'Reading', value: books.filter(b => b.reading_status === 'reading').length, color: 'purple' },
                                 { label: 'Completed', value: books.filter(b => b.reading_status === 'completed').length, color: 'green' },
                                 { label: 'Wishlist', value: books.filter(b => b.reading_status === 'wishlist').length, color: 'blue' },

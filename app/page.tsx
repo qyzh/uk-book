@@ -73,7 +73,7 @@ export default function HomePage() {
         {/* Stats */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'total books', value: books.length },
+            { label: 'total books', value: books.filter(b => b.reading_status !== 'wishlist').length },
             { label: 'completed', value: completedBooks.length },
             { label: 'total quotes', value: quotes.length },
             { label: 'favorites', value: favoriteQuotes.length },
