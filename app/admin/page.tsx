@@ -8,6 +8,10 @@ import Link from 'next/link'
 import { GENRES, SUB_GENRES } from '@/lib/constants/library'
 import Loading from '@/app/components/Loading'
 import Image from 'next/image'
+import { toast } from '@/lib/toast'
+import { 
+    Edit2, Trash2, Plus, X, LogOut, Star, Loader2
+} from 'lucide-react'
 
 interface Author {
     id: string
@@ -113,6 +117,7 @@ export default function AdminPage() {
         page_number: '',
         is_favorite: false,
     })
+    const [submitting, setSubmitting] = useState(false)
 
     useEffect(() => {
         fetchBooks()
@@ -198,12 +203,12 @@ export default function AdminPage() {
             const supabase = createClient()
             const fileName = `${Date.now()}-${file.name}`
             const { error, data } = await supabase.storage
-                .from('covers')
+                .from('book-covers')
                 .upload(fileName, file)
 
             if (error) throw error
 
-            const { data: urlData } = supabase.storage.from('covers').getPublicUrl(fileName)
+            const { data: urlData } = supabase.storage.from('book-covers').getPublicUrl(fileName)
             return urlData.publicUrl
         } catch (error) {
             console.error('Upload failed:', error)
@@ -219,12 +224,12 @@ export default function AdminPage() {
             const supabase = createClient()
             const fileName = `${Date.now()}-author-${file.name}`
             const { error, data } = await supabase.storage
-                .from('covers')
+                .from('book-covers')
                 .upload(fileName, file)
 
             if (error) throw error
 
-            const { data: urlData } = supabase.storage.from('covers').getPublicUrl(fileName)
+            const { data: urlData } = supabase.storage.from('book-covers').getPublicUrl(fileName)
             return urlData.publicUrl
         } catch (error) {
             console.error('Upload failed:', error)
@@ -293,6 +298,8 @@ export default function AdminPage() {
 
     const handleAddBook = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (submitting) return
+        setSubmitting(true)
         try {
             let coverUrl = formData.cover_url
             if (coverFile) {
@@ -313,17 +320,23 @@ export default function AdminPage() {
 
             if (!response.ok) throw new Error('Failed to add book')
 
+            toast.success('Book added successfully')
             await fetchBooks()
             setShowModal(false)
             resetForm()
         } catch (error) {
             console.error('Error adding book:', error)
+            toast.error('Failed to add book', error instanceof Error ? error.message : 'Please try again')
+        } finally {
+            setSubmitting(false)
         }
     }
 
     const handleEditBook = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!editingBook) return
+        if (submitting) return
+        setSubmitting(true)
 
         try {
             const response = await fetch(`/api/books/${editingBook.id}`, {
@@ -339,11 +352,15 @@ export default function AdminPage() {
 
             if (!response.ok) throw new Error('Failed to update book')
 
+            toast.success('Book updated successfully')
             await fetchBooks()
             setShowModal(false)
             resetForm()
         } catch (error) {
             console.error('Error updating book:', error)
+            toast.error('Failed to update book', error instanceof Error ? error.message : 'Please try again')
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -352,14 +369,18 @@ export default function AdminPage() {
         try {
             const response = await fetch(`/api/books/${id}`, { method: 'DELETE' })
             if (!response.ok) throw new Error('Failed to delete book')
+            toast.success('Book deleted successfully')
             await fetchBooks()
         } catch (error) {
             console.error('Error deleting book:', error)
+            toast.error('Failed to delete book')
         }
     }
 
     const handleAddQuote = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (submitting) return
+        setSubmitting(true)
         try {
             const response = await fetch('/api/quotes', {
                 method: 'POST',
@@ -367,11 +388,15 @@ export default function AdminPage() {
                 body: JSON.stringify(quoteData),
             })
             if (!response.ok) throw new Error('Failed to add quote')
+            toast.success('Quote added successfully')
             await fetchQuotes()
             setShowModal(false)
             resetForm()
         } catch (error) {
             console.error('Error adding quote:', error)
+            toast.error('Failed to add quote')
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -393,14 +418,18 @@ export default function AdminPage() {
         try {
             const response = await fetch(`/api/quotes/${id}`, { method: 'DELETE' })
             if (!response.ok) throw new Error('Failed to delete quote')
+            toast.success('Quote deleted successfully')
             await fetchQuotes()
         } catch (error) {
             console.error('Error deleting quote:', error)
+            toast.error('Failed to delete quote')
         }
     }
 
     const handleAddNote = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (submitting) return
+        setSubmitting(true)
         try {
             const response = await fetch('/api/notes', {
                 method: 'POST',
@@ -408,11 +437,15 @@ export default function AdminPage() {
                 body: JSON.stringify(noteData),
             })
             if (!response.ok) throw new Error('Failed to add note')
+            toast.success('Note added successfully')
             await fetchNotes()
             setShowModal(false)
             resetForm()
         } catch (error) {
             console.error('Error adding note:', error)
+            toast.error('Failed to add note')
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -421,14 +454,18 @@ export default function AdminPage() {
         try {
             const response = await fetch(`/api/notes/${id}`, { method: 'DELETE' })
             if (!response.ok) throw new Error('Failed to delete note')
+            toast.success('Note deleted successfully')
             await fetchNotes()
         } catch (error) {
             console.error('Error deleting note:', error)
+            toast.error('Failed to delete note')
         }
     }
 
     const handleAddAuthor = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (submitting) return
+        setSubmitting(true)
         try {
             let photoUrl = authorData.photo_url
             if (authorPhotoFile) {
@@ -441,11 +478,15 @@ export default function AdminPage() {
                 body: JSON.stringify({ ...authorData, photo_url: photoUrl }),
             })
             if (!response.ok) throw new Error('Failed to add author')
+            toast.success('Author added successfully')
             await fetchAuthors()
             setShowModal(false)
             resetForm()
         } catch (error) {
             console.error('Error adding author:', error)
+            toast.error('Failed to add author')
+        } finally {
+            setSubmitting(false)
         }
     }
 
@@ -478,9 +519,10 @@ export default function AdminPage() {
                         </Link>
                         <button
                             onClick={handleLogout}
-                            className="text-slate-400 hover:text-red-300 text-xs transition"
+                            className="text-slate-400 hover:text-red-300 transition p-2 rounded hover:bg-slate-800"
+                            title="logout"
                         >
-                            logout
+                            <LogOut className="w-4 h-4" />
                         </button>
                     </div>
 
@@ -530,7 +572,7 @@ export default function AdminPage() {
                                 <div key={book.id} className="border border-slate-700 bg-slate-900 bg-opacity-50 rounded-lg overflow-hidden hover:border-purple-500 transition">
                                     <div className="aspect-[3/4] relative bg-slate-800">
                                         {book.cover_url ? (
-                                            <Image src={book.cover_url} alt={book.title} fill className="object-cover" />
+                                            <Image src={book.cover_url} alt={book.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
                                         ) : (
                                             <div className="flex items-center justify-center h-full text-slate-600">📖</div>
                                         )}
@@ -557,15 +599,16 @@ export default function AdminPage() {
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => openModal('book', book)}
-                                                className="flex-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded transition"
+                                                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded transition"
                                             >
-                                                edit
+                                                <Edit2 className="w-3 h-3" /> edit
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteBook(book.id)}
-                                                className="px-3 py-1.5 border border-red-800 hover:bg-red-900 text-red-400 text-xs font-bold rounded transition"
+                                                className="p-1.5 border border-red-800 hover:bg-red-900 text-red-400 rounded transition"
+                                                title="delete"
                                             >
-                                                del
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </div>
@@ -597,8 +640,9 @@ export default function AdminPage() {
                                         <button
                                             onClick={() => handleToggleFavorite(quote)}
                                             className={quote.is_favorite ? 'text-yellow-400' : 'text-slate-500 hover:text-yellow-400'}
+                                            title={quote.is_favorite ? 'remove from favorites' : 'add to favorites'}
                                         >
-                                            {quote.is_favorite ? '★' : '☆'}
+                                            <Star className={`w-4 h-4 ${quote.is_favorite ? 'fill-current' : ''}`} />
                                         </button>
                                     </div>
                                     <p className="text-slate-300 italic mb-2">"{quote.text}"</p>
@@ -606,9 +650,10 @@ export default function AdminPage() {
                                         {quote.page_number && <span className="text-slate-500 text-xs">page {quote.page_number}</span>}
                                         <button
                                             onClick={() => handleDeleteQuote(quote.id)}
-                                            className="text-red-400 hover:text-red-300 text-xs font-bold transition"
+                                            className="text-red-400 hover:text-red-300 transition p-1 rounded hover:bg-red-900/30"
+                                            title="delete"
                                         >
-                                            delete
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
@@ -644,9 +689,10 @@ export default function AdminPage() {
                                             </div>
                                             <button
                                                 onClick={() => handleDeleteNote(note.id)}
-                                                className="text-red-400 hover:text-red-300 text-xs font-bold transition"
+                                                className="text-red-400 hover:text-red-300 transition p-1 rounded hover:bg-red-900/30"
+                                                title="delete"
                                             >
-                                                delete
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                         <p className="text-slate-300 whitespace-pre-wrap">{note.content}</p>
@@ -672,7 +718,7 @@ export default function AdminPage() {
                                     <div className="flex gap-3 mb-3">
                                         <div className="w-16 h-20 bg-slate-800 relative overflow-hidden rounded flex-shrink-0">
                                             {author.photo_url ? (
-                                                <Image src={author.photo_url} alt={author.name} fill className="object-cover" />
+                                                <Image src={author.photo_url} alt={author.name} fill sizes="64px" className="object-cover" />
                                             ) : (
                                                 <div className="flex items-center justify-center h-full text-slate-600">👤</div>
                                             )}
@@ -694,9 +740,10 @@ export default function AdminPage() {
             {/* Floating Add Button */}
             <button
                 onClick={() => openModal(tabToModalType[activeTab])}
-                className="fixed bottom-6 right-6 w-14 h-14 bg-purple-600 hover:bg-purple-500 text-white rounded-full shadow-lg shadow-purple-500/30 flex items-center justify-center text-2xl font-bold transition"
+                className="fixed bottom-6 right-6 w-14 h-14 bg-purple-600 hover:bg-purple-500 text-white rounded-full shadow-lg shadow-purple-500/30 flex items-center justify-center transition"
+                title="add new"
             >
-                +
+                <Plus className="w-6 h-6" />
             </button>
 
             {/* Modal */}
@@ -712,9 +759,9 @@ export default function AdminPage() {
                             </h2>
                             <button
                                 onClick={() => { setShowModal(false); resetForm() }}
-                                className="text-slate-400 hover:text-slate-200 text-2xl"
+                                className="text-slate-400 hover:text-slate-200 transition p-1 rounded hover:bg-slate-800"
                             >
-                                ×
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
 
@@ -864,7 +911,9 @@ export default function AdminPage() {
                                                 {formData.sub_genres.map((sg, i) => (
                                                     <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-purple-900 bg-opacity-50 border border-purple-600 text-purple-200 text-xs rounded">
                                                         {sg}
-                                                        <button type="button" onClick={() => setFormData({ ...formData, sub_genres: formData.sub_genres.filter((_, idx) => idx !== i) })} className="text-purple-400 hover:text-purple-200">×</button>
+                                                        <button type="button" onClick={() => setFormData({ ...formData, sub_genres: formData.sub_genres.filter((_, idx) => idx !== i) })} className="text-purple-400 hover:text-purple-200 p-0.5 rounded hover:bg-purple-800">
+                                                            <X className="w-3 h-3" />
+                                                        </button>
                                                     </span>
                                                 ))}
                                             </div>
@@ -934,8 +983,8 @@ export default function AdminPage() {
                                             </div>
                                         )}
                                     </div>
-                                    <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded transition">
-                                        {editingBook ? 'update book' : 'save book'}
+                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
+                                        {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> saving...</> : editingBook ? 'update book' : 'save book'}
                                     </button>
                                 </form>
                             )}
@@ -987,8 +1036,8 @@ export default function AdminPage() {
                                         />
                                         <label htmlFor="favorite" className="text-slate-400 text-sm">mark as favorite</label>
                                     </div>
-                                    <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded transition">
-                                        save quote
+                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
+                                        {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> saving...</> : 'save quote'}
                                     </button>
                                 </form>
                             )}
@@ -1034,8 +1083,8 @@ export default function AdminPage() {
                                             placeholder="your notes..."
                                         />
                                     </div>
-                                    <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded transition">
-                                        save note
+                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
+                                        {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> saving...</> : 'save note'}
                                     </button>
                                 </form>
                             )}
@@ -1109,8 +1158,8 @@ export default function AdminPage() {
                                             className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none resize-y"
                                         />
                                     </div>
-                                    <button type="submit" className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded transition">
-                                        save author
+                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
+                                        {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> saving...</> : 'save author'}
                                     </button>
                                 </form>
                             )}

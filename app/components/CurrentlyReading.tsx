@@ -40,6 +40,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
                 alt={currentBook.title}
                 fill
                 sizes="200px"
+                loading="eager"
                 className="object-cover group-hover:scale-105 transition duration-500"
               />
             ) : (
@@ -108,6 +109,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
                   alt={currentBook.title}
                   fill
                   sizes="200px"
+                  loading="eager"
                   className="object-cover group-hover/cover:scale-110 transition duration-700"
                 />
               ) : (
