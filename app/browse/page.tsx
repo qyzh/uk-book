@@ -6,13 +6,16 @@ import Navigation from '@/app/components/Navigation'
 import BookCard from '@/app/components/BookCard'
 import Loading from '@/app/components/Loading'
 import { useBooks } from '@/lib/hooks/useBooks'
+import { GENRES } from '@/lib/constants/library'
 
 export default function BrowsePage() {
   const { books, loading } = useBooks()
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all')
   const [selectedAuthor, setSelectedAuthor] = useState<string>('all')
+  const [selectedGenre, setSelectedGenre] = useState<string>('all')
   const [selectedSubGenre, setSelectedSubGenre] = useState<string>('all')
+  const [readingYear, setReadingYear] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('title')
 
   const authors = useMemo(
@@ -28,24 +31,49 @@ export default function BrowsePage() {
       ),
     [books],
   )
+  const readingYears = useMemo(() => {
+    const years = new Set<number>()
+    books.forEach((book) => {
+      if (book.started_at) {
+        years.add(new Date(book.started_at).getFullYear())
+      }
+      if (book.finished_at) {
+        years.add(new Date(book.finished_at).getFullYear())
+      }
+    })
+    return Array.from(years).sort((a, b) => b - a)
+  }, [books])
 
   const filteredBooks = useMemo(() => {
     let filtered = [...books]
 
     if (selectedStatus !== 'all') {
-      filtered = filtered.filter(b => b.reading_status === selectedStatus)
+      filtered = filtered.filter((b) => b.reading_status === selectedStatus)
     }
 
     if (selectedLanguage !== 'all') {
-      filtered = filtered.filter(b => b.language === selectedLanguage)
+      filtered = filtered.filter((b) => b.language === selectedLanguage)
     }
 
     if (selectedAuthor !== 'all') {
-      filtered = filtered.filter(b => b.authors?.id === selectedAuthor)
+      filtered = filtered.filter((b) => b.authors?.id === selectedAuthor)
+    }
+
+    if (selectedGenre !== 'all') {
+      filtered = filtered.filter((b) => b.genre === selectedGenre)
     }
 
     if (selectedSubGenre !== 'all') {
       filtered = filtered.filter((b) => b.sub_genre === selectedSubGenre)
+    }
+
+    if (readingYear !== 'all') {
+      const year = parseInt(readingYear)
+      filtered = filtered.filter((b) => {
+        const startedYear = b.started_at ? new Date(b.started_at).getFullYear() : null
+        const finishedYear = b.finished_at ? new Date(b.finished_at).getFullYear() : null
+        return startedYear === year || finishedYear === year
+      })
     }
 
     if (sortBy === 'title') {
@@ -57,13 +85,15 @@ export default function BrowsePage() {
     }
 
     return filtered
-  }, [books, selectedStatus, selectedLanguage, selectedAuthor, selectedSubGenre, sortBy])
+  }, [books, selectedStatus, selectedLanguage, selectedAuthor, selectedGenre, selectedSubGenre, readingYear, sortBy])
 
   const resetFilters = () => {
     setSelectedStatus('all')
     setSelectedLanguage('all')
     setSelectedAuthor('all')
+    setSelectedGenre('all')
     setSelectedSubGenre('all')
+    setReadingYear('all')
     setSortBy('title')
   }
 
@@ -76,18 +106,15 @@ export default function BrowsePage() {
       <Navigation />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
         <div className="mb-12">
           <h1 className="text-3xl font-bold text-slate-200 mb-2">Explore Library</h1>
           <p className="text-slate-500 text-sm">{filteredBooks.length} book{filteredBooks.length !== 1 ? 's' : ''} found</p>
         </div>
 
-        {/* Filters */}
         <div className="border border-slate-700 bg-slate-900 bg-opacity-30 p-6 mb-8 space-y-4">
           <div className="text-slate-400 text-sm font-bold mb-4">→ filters</div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-            {/* Status Filter */}
             <div>
               <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">status</label>
               <select
@@ -97,14 +124,25 @@ export default function BrowsePage() {
               >
                 <option value="all">all statuses</option>
                 {statuses.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
+                  <option key={status} value={status}>{status}</option>
                 ))}
               </select>
             </div>
 
-            {/* Language Filter */}
+            <div>
+              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">genre</label>
+              <select
+                value={selectedGenre}
+                onChange={(e) => setSelectedGenre(e.target.value)}
+                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
+              >
+                <option value="all">all genres</option>
+                {GENRES.map((genre) => (
+                  <option key={genre} value={genre}>{genre}</option>
+                ))}
+              </select>
+            </div>
+
             <div>
               <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">language</label>
               <select
@@ -114,16 +152,13 @@ export default function BrowsePage() {
               >
                 <option value="all">all languages</option>
                 {languages.map((lang) => (
-                  <option key={lang} value={lang}>
-                    {lang.toUpperCase()}
-                  </option>
+                  <option key={lang} value={lang}>{lang.toUpperCase()}</option>
                 ))}
               </select>
             </div>
 
-            {/* Author Filter */}
             <div>
-              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">author</label>
+              <label className="text-xs text-slate-500 uppercase block mb-2">author</label>
               <select
                 value={selectedAuthor}
                 onChange={(e) => setSelectedAuthor(e.target.value)}
@@ -131,14 +166,11 @@ export default function BrowsePage() {
               >
                 <option value="all">all authors</option>
                 {authors.map((author) => (
-                  <option key={author?.id} value={author?.id || ''}>
-                    {author?.name}
-                  </option>
+                  <option key={author?.id} value={author?.id || ''}>{author?.name}</option>
                 ))}
               </select>
             </div>
 
-            {/* Sort Filter */}
             <div>
               <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">sub-genre</label>
               <select
@@ -148,14 +180,27 @@ export default function BrowsePage() {
               >
                 <option value="all">all sub-genres</option>
                 {subGenres.map((subGenre) => (
-                  <option key={subGenre} value={subGenre}>
-                    {subGenre}
-                  </option>
+                  <option key={subGenre} value={subGenre}>{subGenre}</option>
                 ))}
               </select>
             </div>
 
-            {/* Sort Filter */}
+            <div>
+              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">read in year</label>
+              <select
+                value={readingYear}
+                onChange={(e) => setReadingYear(e.target.value)}
+                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
+              >
+                <option value="all">any year</option>
+                {readingYears.map((year) => (
+                  <option key={year} value={year.toString()}>{year}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mt-4">
             <div>
               <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">sort by</label>
               <select
@@ -169,7 +214,6 @@ export default function BrowsePage() {
               </select>
             </div>
 
-            {/* Reset Button */}
             <div className="flex items-end">
               <button
                 onClick={resetFilters}
@@ -181,7 +225,6 @@ export default function BrowsePage() {
           </div>
         </div>
 
-        {/* Books Grid */}
         {filteredBooks.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredBooks.map((book) => (
@@ -194,11 +237,8 @@ export default function BrowsePage() {
           </div>
         )}
 
-        {/* Footer */}
         <footer className="border-t border-slate-700 mt-12 pt-8 pb-12 text-center text-slate-500 text-xs">
-          <Link href="/" className="hover:text-slate-400 transition">
-            [← back to home]
-          </Link>
+          <Link href="/" className="hover:text-slate-400 transition">[← back to home]</Link>
         </footer>
       </main>
     </div>

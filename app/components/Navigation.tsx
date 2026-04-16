@@ -15,6 +15,9 @@ export default function Navigation() {
             <Link href="/browse" className="text-slate-500 hover:text-slate-400 text-sm transition">
               explore
             </Link>
+            <Link href="/wishlist" className="text-slate-500 hover:text-slate-400 text-sm transition">
+              wishlist
+            </Link>
             <Link href="/quotes" className="text-slate-500 hover:text-slate-400 text-sm transition">
               quotes
             </Link>
@@ -32,6 +35,9 @@ export default function Navigation() {
               <div className="absolute right-4 mt-2 w-40 bg-black border border-slate-700 rounded">
                 <Link href="/browse" className="block px-4 py-2 text-slate-400 hover:text-slate-300 hover:bg-slate-900 text-sm">
                   explore
+                </Link>
+                <Link href="/wishlist" className="block px-4 py-2 text-slate-400 hover:text-slate-300 hover:bg-slate-900 text-sm border-t border-slate-700">
+                  wishlist
                 </Link>
                 <Link href="/quotes" className="block px-4 py-2 text-slate-400 hover:text-slate-300 hover:bg-slate-900 text-sm border-t border-slate-700">
                   quotes
