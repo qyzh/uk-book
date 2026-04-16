@@ -139,21 +139,25 @@ export default function BookPage({ params }: { params: Promise<{ id: string }> }
         <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Cover & Info */}
           <div className="md:col-span-1 space-y-6">
-            <div className="aspect-[3/4] bg-slate-900 border border-slate-700 relative overflow-hidden">
+            <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden rounded-r-2xl rounded-l-md border border-slate-700 border-l-[4px] border-l-slate-800 shadow-[10px_10px_30px_rgba(0,0,0,0.8),_0_0_20px_rgba(168,85,247,0.15)] group">
               {book.cover_url ? (
                 <Image
                   src={book.cover_url}
                   alt={book.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"
-                  className="object-contain"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
                   priority
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-                  <div className="text-6xl">📖</div>
+                  <div className="text-6xl text-slate-600">📖</div>
                 </div>
               )}
+              {/* Book Spine Highlight & Lighting Effects */}
+              <div className="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-black/40 via-white/10 to-transparent pointer-events-none mix-blend-overlay"></div>
+              <div className="absolute inset-y-0 left-0 w-[1px] bg-white/20 pointer-events-none mix-blend-overlay"></div>
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-r-2xl rounded-l-md pointer-events-none"></div>
             </div>
 
             {/* Share Button */}

@@ -95,7 +95,7 @@ export async function generateQuoteImage(data: QuoteImageData): Promise<Blob> {
   webLink.style.fontFamily = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif'
   webLink.style.color = '#71717a'
   webLink.style.letterSpacing = '1px'
-  webLink.innerHTML = 'uk-book.vercel.app'
+  webLink.innerHTML = 'buku.kyxis.my.id'
   
   container.appendChild(webLink)
 
@@ -273,7 +273,7 @@ export async function generateBookImage(data: BookImageData): Promise<Blob> {
   webLink.style.fontFamily = '"Inter", -apple-system, sans-serif'
   webLink.style.color = '#64748b' // Slate subtle grey
   webLink.style.letterSpacing = '2px'
-  webLink.innerHTML = 'uk-book.vercel.app'
+  webLink.innerHTML = 'buku.kyxis.my.id'
   bottomSection.appendChild(webLink)
 
   content.appendChild(bottomSection)

@@ -79,88 +79,111 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
   }
 
   return (
-    <div className="group relative overflow-hidden rounded-3xl border-2 border-purple-500/30 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 shadow-2xl hover:border-purple-400/50 transition duration-500">
-      {/* Decorative background elements */}
-      <div className="absolute -top-32 -right-32 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-black p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition duration-500">
+      {/* Decorative background ambient glow */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-900/10 rounded-full blur-[80px] pointer-events-none" />
 
-      <div className="relative z-10">
-        {/* Badge & Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full animate-pulse" />
-            <span className="text-xs uppercase tracking-widest font-bold text-purple-300">
+      <div className="relative z-10 flex flex-col-reverse md:flex-row gap-10 md:gap-16 items-center">
+        
+        {/* Left Side: Info */}
+        <div className="flex-1 w-full space-y-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-slate-400 uppercase mb-2">
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_10px_#a855f7]"></span>
               Currently Reading
-            </span>
-          </div>
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg animate-pulse">
-            IN PROGRESS
-          </div>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-8 mb-6">
-          {/* Book Cover */}
-          <Link href={`/books/${getShortId(currentBook.id)}`} className="group/cover">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-purple-500/30 group-hover/cover:ring-purple-400/60 transition">
-              {currentBook.cover_url ? (
-                <Image
-                  src={currentBook.cover_url}
-                  alt={currentBook.title}
-                  fill
-                  sizes="200px"
-                  loading="eager"
-                  className="object-cover group-hover/cover:scale-110 transition duration-700"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900">
-                  <span className="text-6xl">📖</span>
-                </div>
-              )}
             </div>
-          </Link>
 
-          {/* Book Info & Quote */}
-          <div className="flex flex-col justify-between space-y-4">
-            {/* Title & Author */}
-            <div>
-              <Link href={`/books/${getShortId(currentBook.id)}`} className="group/title">
-                <h2 className="font-serif text-3xl md:text-4xl font-bold text-slate-100 mb-2 group-hover/title:text-transparent group-hover/title:bg-gradient-to-r group-hover/title:from-purple-400 group-hover/title:to-pink-400 group-hover/title:bg-clip-text transition leading-tight">
-                  {currentBook.title}
-                </h2>
+            <Link href={`/books/${getShortId(currentBook.id)}`} className="block">
+              <h2 className="font-serif text-5xl md:text-6xl text-slate-100 hover:text-purple-300 transition-colors tracking-tight leading-tight">
+                {currentBook.title}
+              </h2>
+            </Link>
+            
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-400 text-lg">
+              <span>By <strong className="text-slate-200 font-medium">{currentBook.authors?.name}</strong></span>
+            </div>
+            
+            <div className="flex items-center gap-4 text-sm text-slate-500 font-medium">
+              {currentBook.pages ? (
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                  {currentBook.pages} pages
+                </span>
+              ) : null}
+              {currentBook.started_at ? (
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  Started {new Date(currentBook.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              ) : null}
+            </div>
+          </div>
+
+          {currentBook.summary && (
+            <p className="text-slate-400 leading-relaxed max-w-2xl text-sm md:text-base line-clamp-4">
+              {currentBook.summary}
+            </p>
+          )}
+
+          {/* Progress Section */}
+          <div className="pt-4 max-w-md space-y-5">
+            <div className="flex gap-4">
+              <Link href={`/books/${getShortId(currentBook.id)}`} className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-8 py-3 rounded shadow-lg transition tracking-widest text-xs flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                VIEW BOOK
               </Link>
-              <p className="text-slate-400 text-lg">{currentBook.authors?.name}</p>
             </div>
-
-            {/* Progress Section - Below Title */}
+            
             {currentBook.pages && currentBook.current_page && (
-              <div className="space-y-3 p-4 bg-gradient-to-r from-slate-800/50 to-slate-700/50 border border-purple-500/20 rounded-xl">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400 font-semibold">Reading Progress</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text">
-                      {progressPercent}%
-                    </span>
-                    <span className="text-xs text-slate-500">
-                      {currentBook.current_page}/{currentBook.pages}
-                    </span>
-                  </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-400 tracking-wider">
+                  <span>PROGRESS</span>
+                  <span className="text-purple-400 text-sm">{progressPercent}%</span>
                 </div>
-                <div className="w-full bg-slate-700 rounded-full h-2.5 overflow-hidden shadow-inner">
+                <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden shadow-inner">
                   <div
-                    className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-400 h-full rounded-full shadow-lg shadow-purple-500/50 transition-all duration-700"
+                    className="bg-gradient-to-r from-purple-600 to-purple-400 h-full rounded-full transition-all duration-1000 ease-out"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
-                <div className="text-xs text-slate-500 text-center">
-                  {currentBook.pages - (currentBook.current_page || 0)} pages remaining
+                <div className="flex justify-between text-xs text-slate-500 font-medium">
+                  <span>{currentBook.current_page} of {currentBook.pages} pages read</span>
+                  <span>{currentBook.pages - currentBook.current_page} remaining</span>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* End of content */}
+        {/* Right Side: Book Cover */}
+        <div className="w-[220px] md:w-[320px] shrink-0 mx-auto md:mx-0">
+          <Link href={`/books/${getShortId(currentBook.id)}`} className="block group/cover perspective-1000">
+            <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden rounded-r-[2rem] rounded-l-md border border-slate-700/50 border-l-[8px] border-l-slate-800 shadow-[20px_20px_40px_rgba(0,0,0,0.8),_0_0_20px_rgba(255,255,255,0.02)] group-hover/cover:shadow-[20px_20px_50px_rgba(0,0,0,0.9),_0_0_30px_rgba(168,85,247,0.15)] group-hover/cover:-translate-y-2 transition-all duration-500 ease-out preserve-3d group-hover/cover:rotate-y-[-5deg]">
+              {currentBook.cover_url ? (
+                <Image
+                  src={currentBook.cover_url}
+                  alt={currentBook.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 320px"
+                  loading="eager"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900">
+                  <span className="text-6xl text-slate-600">📖</span>
+                </div>
+              )}
+              {/* Premium Realistic Lighting overlays */}
+              <div className="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-black/60 via-white/10 to-transparent pointer-events-none mix-blend-overlay z-10"></div>
+              <div className="absolute inset-y-0 left-0 w-[1px] bg-white/30 pointer-events-none mix-blend-overlay z-10"></div>
+              <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-r-[2rem] rounded-l-md pointer-events-none z-10"></div>
+            </div>
+          </Link>
+        </div>
+        
       </div>
     </div>
   )

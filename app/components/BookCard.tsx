@@ -18,9 +18,9 @@ export default function BookCard({ book }: BookCardProps) {
   return (
     <Link
       href={`/books/${getShortId(book.id)}`}
-      className="group border border-slate-700 hover:border-purple-600 transition overflow-hidden hover:shadow-lg hover:shadow-purple-500/20"
+      className="group block transition duration-300 hover:-translate-y-1"
     >
-      <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden">
+      <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden rounded-r-2xl rounded-l-md border border-slate-700 border-l-[4px] border-l-slate-800 shadow-[5px_5px_15px_rgba(0,0,0,0.8),_0_0_15px_rgba(168,85,247,0.1)] group-hover:shadow-[5px_5px_20px_rgba(0,0,0,0.8),_0_0_20px_rgba(168,85,247,0.3)] transition-shadow">
         {book.cover_url ? (
           <Image
             src={book.cover_url}
@@ -30,15 +30,19 @@ export default function BookCard({ book }: BookCardProps) {
             className="object-cover group-hover:scale-105 transition duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
             <div className="text-center px-4">
               <div className="text-3xl mb-2">📖</div>
               <div className="text-slate-500 text-xs text-center line-clamp-2">{book.title}</div>
             </div>
           </div>
         )}
+        {/* Book Spine Highlight & Lighting Effects */}
+        <div className="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-black/40 via-white/10 to-transparent pointer-events-none mix-blend-overlay"></div>
+        <div className="absolute inset-y-0 left-0 w-[1px] bg-white/20 pointer-events-none mix-blend-overlay"></div>
+        <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-r-2xl rounded-l-md pointer-events-none"></div>
       </div>
-      <div className="p-4 bg-black">
+      <div className="pt-4 bg-transparent text-left">
         <h3 className="font-bold text-slate-200 line-clamp-2 mb-1 group-hover:text-purple-300 transition">
           {book.title}
         </h3>

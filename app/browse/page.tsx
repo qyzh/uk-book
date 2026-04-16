@@ -8,6 +8,25 @@ import Loading from '@/app/components/Loading'
 import { useBooks } from '@/lib/hooks/useBooks'
 import { GENRES } from '@/lib/constants/library'
 
+const SUBGENRE_MAP: Record<string, string> = {
+  'horor': 'Horror',
+  'histori': 'History',
+  'sains': 'Science',
+  'filosofi': 'Philosophy',
+  'self-develop': 'Self Development',
+  'self help': 'Self Development',
+  'economic': 'Economics',
+}
+
+const normalizeSubGenre = (genre: string): string => {
+  const g = genre.toLowerCase().trim()
+  if (!g) return ''
+  if (SUBGENRE_MAP[g]) return SUBGENRE_MAP[g]
+  return g.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
+
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
 export default function BrowsePage() {
   const { books, loading } = useBooks()
   const [selectedStatus, setSelectedStatus] = useState<string>('all')
@@ -16,6 +35,7 @@ export default function BrowsePage() {
   const [selectedGenre, setSelectedGenre] = useState<string>('all')
   const [selectedSubGenre, setSelectedSubGenre] = useState<string>('all')
   const [readingYear, setReadingYear] = useState<string>('all')
+  const [readingMonth, setReadingMonth] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('title')
 
   const authors = useMemo(
@@ -27,8 +47,15 @@ export default function BrowsePage() {
   const subGenres = useMemo(
     () =>
       Array.from(
-        new Set(books.map((b) => b.sub_genre).filter((value): value is string => Boolean(value))),
-      ),
+        new Set(
+          books
+            .flatMap((b) =>
+              b.sub_genre
+                ? b.sub_genre.split(',').map(normalizeSubGenre).filter(Boolean)
+                : []
+            )
+        )
+      ).sort((a, b) => a.localeCompare(b)),
     [books],
   )
   const readingYears = useMemo(() => {
@@ -42,6 +69,19 @@ export default function BrowsePage() {
       }
     })
     return Array.from(years).sort((a, b) => b - a)
+  }, [books])
+
+  const readingMonths = useMemo(() => {
+    const months = new Set<number>()
+    books.forEach((book) => {
+      if (book.started_at) {
+        months.add(new Date(book.started_at).getMonth() + 1)
+      }
+      if (book.finished_at) {
+        months.add(new Date(book.finished_at).getMonth() + 1)
+      }
+    })
+    return Array.from(months).sort((a, b) => a - b)
   }, [books])
 
   const filteredBooks = useMemo(() => {
@@ -64,7 +104,11 @@ export default function BrowsePage() {
     }
 
     if (selectedSubGenre !== 'all') {
-      filtered = filtered.filter((b) => b.sub_genre === selectedSubGenre)
+      filtered = filtered.filter((b) =>
+        b.sub_genre
+          ? b.sub_genre.split(',').map(normalizeSubGenre).includes(selectedSubGenre)
+          : false
+      )
     }
 
     if (readingYear !== 'all') {
@@ -76,16 +120,29 @@ export default function BrowsePage() {
       })
     }
 
+    if (readingMonth !== 'all') {
+      const monthIndex = parseInt(readingMonth) - 1
+      filtered = filtered.filter((b) => {
+        const startedMonth = b.started_at ? new Date(b.started_at).getMonth() : null
+        const finishedMonth = b.finished_at ? new Date(b.finished_at).getMonth() : null
+        return startedMonth === monthIndex || finishedMonth === monthIndex
+      })
+    }
+
     if (sortBy === 'title') {
       filtered.sort((a, b) => a.title.localeCompare(b.title))
     } else if (sortBy === 'author') {
       filtered.sort((a, b) => (a.authors?.name || '').localeCompare(b.authors?.name || ''))
-    } else if (sortBy === 'year') {
-      filtered.sort((a, b) => (b.published_year || 0) - (a.published_year || 0))
+    } else if (sortBy === 'date') {
+      filtered.sort((a, b) => {
+        const dateA = a.finished_at ? new Date(a.finished_at).getTime() : a.started_at ? new Date(a.started_at).getTime() : 0
+        const dateB = b.finished_at ? new Date(b.finished_at).getTime() : b.started_at ? new Date(b.started_at).getTime() : 0
+        return dateB - dateA
+      })
     }
 
     return filtered
-  }, [books, selectedStatus, selectedLanguage, selectedAuthor, selectedGenre, selectedSubGenre, readingYear, sortBy])
+  }, [books, selectedStatus, selectedLanguage, selectedAuthor, selectedGenre, selectedSubGenre, readingYear, readingMonth, sortBy])
 
   const resetFilters = () => {
     setSelectedStatus('all')
@@ -94,6 +151,7 @@ export default function BrowsePage() {
     setSelectedGenre('all')
     setSelectedSubGenre('all')
     setReadingYear('all')
+    setReadingMonth('all')
     setSortBy('title')
   }
 
@@ -202,6 +260,20 @@ export default function BrowsePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mt-4">
             <div>
+              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">read in month</label>
+              <select
+                value={readingMonth}
+                onChange={(e) => setReadingMonth(e.target.value)}
+                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
+              >
+                <option value="all">any month</option>
+                {readingMonths.map((m) => (
+                  <option key={m} value={m.toString()}>{MONTH_NAMES[m - 1]}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">sort by</label>
               <select
                 value={sortBy}
@@ -210,7 +282,7 @@ export default function BrowsePage() {
               >
                 <option value="title">title</option>
                 <option value="author">author</option>
-                <option value="year">year</option>
+                <option value="date">date read</option>
               </select>
             </div>
 
