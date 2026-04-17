@@ -148,7 +148,7 @@ export default function BrowsePage() {
     }
 
     return filtered
-  }, [books, selectedStatus, selectedLanguage, selectedAuthor, selectedGenre, selectedSubGenre, readingYear, readingMonth, sortBy])
+  }, [books, searchQuery, selectedStatus, selectedLanguage, selectedAuthor, selectedGenre, selectedSubGenre, readingYear, readingMonth, sortBy])
 
   const resetFilters = () => {
     setSelectedStatus('all')

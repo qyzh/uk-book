@@ -2,6 +2,43 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { rateLimit, getClientIP } from '@/lib/utils/rate-limit'
+import type { Book, Author } from '@/lib/types/library'
+
+interface BooksResponse {
+  id: string
+  title: string
+  isbn: string | null
+  cover_url: string | null
+  published_year: number | null
+  pages: number | null
+  publisher: string | null
+  genre: string | null
+  sub_genre: string | null
+  summary: string | null
+  reading_status: string
+  language: string
+  started_at: string | null
+  finished_at: string | null
+  current_page: number | null
+  authors: { id: string; name: string }[]
+}
+
+interface BooksResponseFallback {
+  id: string
+  title: string
+  isbn: string | null
+  cover_url: string | null
+  published_year: number | null
+  pages: number | null
+  publisher: string | null
+  genre: string | null
+  summary: string | null
+  reading_status: string
+  language: string
+  started_at: string | null
+  finished_at: string | null
+  authors: { id: string; name: string }[]
+}
 
 async function getServerSupabaseClient() {
   const cookieStore = await cookies()
@@ -47,7 +84,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = await getServerSupabaseClient()
-    let result: any = await supabase
+    let result: { data: BooksResponse[] | null; error: Error | null } = await supabase
       .from('books')
       .select(`
         id,
@@ -74,7 +111,7 @@ export async function GET(request: NextRequest) {
       result.error &&
       (result.error.message?.includes('current_page') || result.error.message?.includes('sub_genre'))
     ) {
-      result = await supabase
+      const fallback = await supabase
         .from('books')
         .select(`
           id,
@@ -93,18 +130,27 @@ export async function GET(request: NextRequest) {
           authors(id, name)
         `)
         .order('created_at', { ascending: false })
+      
+      result = {
+        data: fallback.data?.map(b => ({
+          ...b,
+          sub_genre: null,
+          current_page: null
+        })) || null,
+        error: fallback.error
+      }
     }
 
     const { data, error } = result
     if (error) throw error
 
     // Add default values for optional fields
-    const booksWithFields = (data || []).map((book: any) => ({
+    const booksWithFields = (data || []).map((book) => ({
       ...book,
-      genre: (book as any).genre || 'fiction',
-      sub_genre: (book as any).sub_genre || '',
-      summary: (book as any).summary || '',
-      current_page: (book as any).current_page || null
+      genre: book.genre || 'fiction',
+      sub_genre: book.sub_genre || '',
+      summary: book.summary || '',
+      current_page: book.current_page ?? null
     }))
 
     return NextResponse.json({ data: booksWithFields }, { status: 200 })
@@ -153,7 +199,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Build insert object with standard fields
-    const insertData: any = {
+    const insertData: Record<string, unknown> = {
       title,
       author_id,
       isbn,
@@ -182,7 +228,7 @@ export async function POST(request: NextRequest) {
       insertData.summary = summary
     }
 
-    let result: any = await supabase
+    let result: { data: BooksResponse[] | null; error: Error | null } = await supabase
       .from('books')
       .insert([insertData])
       .select(`
@@ -228,7 +274,7 @@ export async function POST(request: NextRequest) {
         finished_at: finished_at || null,
       }
 
-      result = await supabase
+      const fallback = await supabase
         .from('books')
         .insert([safeInsertData])
         .select(`
@@ -245,6 +291,17 @@ export async function POST(request: NextRequest) {
           finished_at,
           authors(id, name)
         `)
+
+      result = {
+        data: fallback.data?.map(b => ({
+          ...b,
+          sub_genre: null,
+          current_page: null,
+          genre: null,
+          summary: null
+        })) || null,
+        error: fallback.error
+      }
     }
 
     const { data, error } = result
@@ -252,12 +309,12 @@ export async function POST(request: NextRequest) {
     if (error) throw error
 
     // Add optional fields with default values if not in response
-    const booksWithFields = (data || []).map((book: any) => ({
+    const booksWithFields = (data || []).map((book) => ({
       ...book,
-      genre: (book as any).genre || genre || 'fiction',
-      sub_genre: (book as any).sub_genre || sub_genre || '',
-      summary: (book as any).summary || summary || '',
-      current_page: (book as any).current_page || null
+      genre: book.genre || genre || 'fiction',
+      sub_genre: book.sub_genre || sub_genre || '',
+      summary: book.summary || summary || '',
+      current_page: book.current_page ?? null
     }))
 
     return NextResponse.json({ data: booksWithFields }, { status: 201 })

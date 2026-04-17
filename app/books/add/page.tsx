@@ -12,7 +12,7 @@ interface Author {
 }
 
 export default function AddBookPage() {
-  const { user } = useAuth()
+  useAuth()
   const router = useRouter()
   const [authors, setAuthors] = useState<Author[]>([])
   const [loading, setLoading] = useState(false)
@@ -73,8 +73,8 @@ export default function AddBookPage() {
 
       const payload = {
         ...formData,
-        pages: formData.pages ? parseInt(formData.pages as any) : null,
-        published_year: formData.published_year ? parseInt(formData.published_year as any) : null,
+        pages: formData.pages ? parseInt(String(formData.pages)) : null,
+        published_year: formData.published_year ? parseInt(String(formData.published_year)) : null,
         started_at: formData.started_at || null,
         finished_at: formData.finished_at || null,
       }
