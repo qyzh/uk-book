@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Navigation from '@/app/components/Navigation'
 import CurrentlyReading from '@/app/components/CurrentlyReading'
 import Loading from '@/app/components/Loading'
+import RevealSection from '@/app/components/RevealSection'
 import { useBooks } from '@/lib/hooks/useBooks'
 import { useQuoteCarousel } from '@/lib/hooks/useQuoteCarousel'
 import { getShortId } from '@/lib/utils/slug'
@@ -31,13 +32,13 @@ export default function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 py-12 space-y-16">
         {/* Currently Reading Feature */}
-        <section>
+        <RevealSection as="section" variant="up" threshold={0.05}>
           <CurrentlyReading />
-        </section>
+        </RevealSection>
 
         {/* Hero / Featured Quote */}
         {favoriteQuotes.length > 0 && (
-          <section className="py-12">
+          <RevealSection as="section" variant="right" className="py-12">
             <div className="border border-slate-700 bg-gradient-to-br from-black to-slate-900 p-8 transition-all duration-500 flex flex-col min-h-[320px] relative overflow-hidden">
               {/* Giant Background Quote Icon */}
               <div className="absolute -top-4 left-4 text-slate-700 opacity-20 select-none pointer-events-none font-serif text-[240px] leading-none z-0">
@@ -79,11 +80,11 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-          </section>
+          </RevealSection>
         )}
 
         {/* Stats */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <RevealSection as="section" variant="up" delay={100} stagger className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'total books', value: books.filter(b => b.reading_status !== 'wishlist').length },
             { label: 'completed', value: completedBooks.length },
@@ -98,15 +99,15 @@ export default function HomePage() {
               <div className="text-3xl font-bold text-slate-200 mt-2">{stat.value}</div>
             </div>
           ))}
-        </section>
+        </RevealSection>
 
         {/* Recent Books */}
         {recentBooks.length > 0 && (
-          <section>
+          <RevealSection as="section" variant="up" threshold={0.05}>
             <h2 className="text-lg font-bold text-slate-300 mb-6 flex items-center gap-2">
               <span className="text-purple-400">→</span> Library
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal-stagger">
               {recentBooks.map((book) => (
                   <Link
                   key={book.id}
@@ -156,12 +157,12 @@ export default function HomePage() {
                 </Link>
               ))}
             </div>
-          </section>
+          </RevealSection>
         )}
 
         {/* Wishlist Section */}
         {wishlistBooks.length > 0 && (
-          <section>
+          <RevealSection as="section" variant="left" threshold={0.05}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold text-slate-300 flex items-center gap-2">
                 <span className="text-purple-400">→</span> Wishlist ({wishlistBooks.length})
@@ -172,7 +173,7 @@ export default function HomePage() {
                 </Link>
               )}
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 reveal-stagger">
               {wishlistBooks.slice(0, 4).map((book) => (
                   <Link
                   key={book.id}
@@ -205,12 +206,12 @@ export default function HomePage() {
                 </Link>
               ))}
             </div>
-          </section>
+          </RevealSection>
         )}
 
         {/* All Books Grid */}
         {books.filter(b => b.reading_status !== 'wishlist').length > 6 && (
-          <section>
+          <RevealSection as="section" variant="up" threshold={0.05}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold text-slate-300 flex items-center gap-2">
                 <span className="text-purple-400">→</span> All Books ({books.filter(b => b.reading_status !== 'wishlist').length})
@@ -221,7 +222,7 @@ export default function HomePage() {
                 </Link>
               )}
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 reveal-stagger">
               {books.filter(b => b.reading_status !== 'wishlist').slice(6, 14).map((book) => (
                   <Link
                   key={book.id}
@@ -254,13 +255,13 @@ export default function HomePage() {
                 </Link>
               ))}
             </div>
-          </section>
+          </RevealSection>
         )}
 
         {/* Footer */}
-        <footer className="border-t border-slate-700 pt-8 text-center text-slate-500 text-xs pb-8">
+        <RevealSection as="footer" variant="up" delay={200} className="border-t border-slate-700 pt-8 text-center text-slate-500 text-xs pb-8">
           <p>crafted with ♡ • {new Date().getFullYear()}</p>
-        </footer>
+        </RevealSection>
       </main>
     </div>
   )
