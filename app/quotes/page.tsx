@@ -107,7 +107,7 @@ export default function QuotesPage() {
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <blockquote className="text-slate-200 italic leading-relaxed">"{quote.text}"</blockquote>
+                  <blockquote className="text-slate-200 italic leading-relaxed">&ldquo;{quote.text}&rdquo;</blockquote>
                   {quote.is_favorite && <span className="text-purple-300 text-xs font-bold whitespace-nowrap">favorite</span>}
                 </div>
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">

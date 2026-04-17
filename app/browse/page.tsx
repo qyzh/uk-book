@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import { Search, XCircle } from 'lucide-react'
 import Navigation from '@/app/components/Navigation'
 import BookCard from '@/app/components/BookCard'
 import Loading from '@/app/components/Loading'
@@ -37,6 +38,7 @@ export default function BrowsePage() {
   const [readingYear, setReadingYear] = useState<string>('all')
   const [readingMonth, setReadingMonth] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('title')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const authors = useMemo(
     () => Array.from(new Map(books.map((b) => [b.authors?.id, b.authors])).values()),
@@ -86,6 +88,10 @@ export default function BrowsePage() {
 
   const filteredBooks = useMemo(() => {
     let filtered = [...books]
+
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(b => b.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    }
 
     if (selectedStatus !== 'all') {
       filtered = filtered.filter((b) => b.reading_status === selectedStatus)
@@ -153,6 +159,7 @@ export default function BrowsePage() {
     setReadingYear('all')
     setReadingMonth('all')
     setSortBy('title')
+    setSearchQuery('')
   }
 
   if (loading) {
@@ -164,136 +171,99 @@ export default function BrowsePage() {
       <Navigation />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-12">
-          <h1 className="text-3xl font-bold text-slate-200 mb-2">Explore Library</h1>
-          <p className="text-slate-500 text-sm">{filteredBooks.length} book{filteredBooks.length !== 1 ? 's' : ''} found</p>
-        </div>
-
-        <div className="border border-slate-700 bg-slate-900 bg-opacity-30 p-6 mb-8 space-y-4">
-          <div className="text-slate-400 text-sm font-bold mb-4">→ filters</div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-            <div>
-              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">status</label>
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
-              >
-                <option value="all">all statuses</option>
-                {statuses.map((status) => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">genre</label>
-              <select
-                value={selectedGenre}
-                onChange={(e) => setSelectedGenre(e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
-              >
-                <option value="all">all genres</option>
-                {GENRES.map((genre) => (
-                  <option key={genre} value={genre}>{genre}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">language</label>
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
-              >
-                <option value="all">all languages</option>
-                {languages.map((lang) => (
-                  <option key={lang} value={lang}>{lang.toUpperCase()}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs text-slate-500 uppercase block mb-2">author</label>
-              <select
-                value={selectedAuthor}
-                onChange={(e) => setSelectedAuthor(e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
-              >
-                <option value="all">all authors</option>
-                {authors.map((author) => (
-                  <option key={author?.id} value={author?.id || ''}>{author?.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">sub-genre</label>
-              <select
-                value={selectedSubGenre}
-                onChange={(e) => setSelectedSubGenre(e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
-              >
-                <option value="all">all sub-genres</option>
-                {subGenres.map((subGenre) => (
-                  <option key={subGenre} value={subGenre}>{subGenre}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">read in year</label>
-              <select
-                value={readingYear}
-                onChange={(e) => setReadingYear(e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
-              >
-                <option value="all">any year</option>
-                {readingYears.map((year) => (
-                  <option key={year} value={year.toString()}>{year}</option>
-                ))}
-              </select>
-            </div>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold text-slate-200">Explore Library</h1>
+            <div className="text-slate-500 text-sm">{filteredBooks.length} result{filteredBooks.length !== 1 ? 's' : ''}</div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mt-4">
-            <div>
-              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">read in month</label>
-              <select
-                value={readingMonth}
-                onChange={(e) => setReadingMonth(e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
-              >
-                <option value="all">any month</option>
-                {readingMonths.map((m) => (
-                  <option key={m} value={m.toString()}>{MONTH_NAMES[m - 1]}</option>
-                ))}
-              </select>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Search */}
+            <div className="relative w-full sm:w-auto">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search by name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full sm:w-64 bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-lg pl-9 pr-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition"
+              />
             </div>
 
-            <div>
-              <label className="text-xs text-slate-500 uppercase tracking-wide block mb-2">sort by</label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-300 text-sm outline-none hover:border-slate-600 transition"
-              >
-                <option value="title">title</option>
-                <option value="author">author</option>
-                <option value="date">date read</option>
-              </select>
-            </div>
+            {/* Status Dropdown */}
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer relative"
+              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+            >
+              <option value="all">All Status</option>
+              {statuses.map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
 
-            <div className="flex items-end">
+            {/* Genre Dropdown */}
+            <select
+              value={selectedGenre}
+              onChange={(e) => setSelectedGenre(e.target.value)}
+              className="bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden sm:block"
+              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+            >
+              <option value="all">Filter by genre</option>
+              {GENRES.map((genre) => (
+                <option key={genre} value={genre}>{genre}</option>
+              ))}
+            </select>
+
+            {/* Sub Genre Dropdown */}
+            <select
+              value={selectedSubGenre}
+              onChange={(e) => setSelectedSubGenre(e.target.value)}
+              className="bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden md:block"
+              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+            >
+              <option value="all">Filter by sub-genre</option>
+              {subGenres.map((subGenre) => (
+                <option key={subGenre} value={subGenre}>{subGenre}</option>
+              ))}
+            </select>
+
+            {/* Author Dropdown */}
+            <select
+              value={selectedAuthor}
+              onChange={(e) => setSelectedAuthor(e.target.value)}
+              className="bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden lg:block"
+              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+            >
+              <option value="all">Filter by author</option>
+              {authors.map((author) => (
+                <option key={author?.id} value={author?.id || ''}>{author?.name}</option>
+              ))}
+            </select>
+            
+            {/* Sort Dropdown */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden sm:block"
+              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+            >
+              <option value="title">Sort by title</option>
+              <option value="author">Sort by author</option>
+              <option value="date">Sort by date read</option>
+            </select>
+
+            {/* Reset Filters */}
+            {(searchQuery || selectedStatus !== 'all' || selectedGenre !== 'all' || selectedLanguage !== 'all' || selectedAuthor !== 'all' || selectedSubGenre !== 'all' || readingYear !== 'all' || readingMonth !== 'all' || sortBy !== 'title') && (
               <button
                 onClick={resetFilters}
-                className="w-full px-3 py-2 bg-black border border-slate-700 text-slate-400 hover:text-slate-300 hover:border-slate-600 text-sm transition font-bold"
+                className="flex items-center gap-1.5 text-slate-500 hover:text-slate-300 text-sm ml-2 transition"
               >
-                reset
+                <XCircle className="w-4 h-4" />
+                Reset filters
               </button>
-            </div>
+            )}
           </div>
         </div>
 

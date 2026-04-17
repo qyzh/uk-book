@@ -513,37 +513,46 @@ export default function AdminPage() {
             {/* Header */}
             <header className="border-b border-slate-700 bg-slate-900 sticky top-0 z-40">
                 <div className="max-w-7xl mx-auto px-4 py-4">
-                    <div className="flex items-center justify-between mb-4">
-                        <Link href="/" className="text-slate-200 hover:text-purple-300 transition text-lg font-bold">
-                            ← ukbook
+                    <div className="flex items-center justify-between mb-6">
+                        <Link href="/" className="text-slate-400 hover:text-purple-300 transition text-sm font-bold">
+                            ← back to ukbook
                         </Link>
                         <button
                             onClick={handleLogout}
-                            className="text-slate-400 hover:text-red-300 transition p-2 rounded hover:bg-slate-800"
+                            className="text-slate-400 hover:text-red-400 transition flex items-center gap-2 text-sm"
                             title="logout"
                         >
-                            <LogOut className="w-4 h-4" />
+                            <LogOut className="w-4 h-4" /> logout
                         </button>
                     </div>
 
-                    {/* Tabs */}
-                    <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
-                        {tabs.map((tab) => (
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-center justify-between">
+                            <h1 className="text-2xl font-bold text-slate-200 capitalize">{activeTab}</h1>
                             <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`px-4 py-2 text-xs font-bold transition whitespace-nowrap rounded ${
-                                    activeTab === tab.id
-                                        ? tab.color === 'purple' ? 'bg-purple-600 text-white' :
-                                          tab.color === 'yellow' ? 'bg-yellow-600 text-black' :
-                                          tab.color === 'amber' ? 'bg-amber-600 text-black' :
-                                          'bg-slate-600 text-white'
-                                        : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-                                }`}
+                                onClick={() => openModal(tabToModalType[activeTab])}
+                                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm rounded-lg transition font-semibold"
                             >
-                                {tab.label} ({tab.count})
+                                <Plus className="w-4 h-4" /> Create a {tabToModalType[activeTab]}
                             </button>
-                        ))}
+                        </div>
+
+                        {/* Tabs */}
+                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`px-4 py-2 text-sm transition whitespace-nowrap rounded-lg border ${
+                                        activeTab === tab.id
+                                            ? 'bg-slate-800 border-slate-600 text-slate-200 shadow-[inset_0_1px_4px_rgba(0,0,0,0.5)]'
+                                            : 'bg-transparent border-transparent text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
+                                    }`}
+                                >
+                                    {tab.label} <span className="opacity-50 ml-1">({tab.count})</span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </header>
@@ -645,7 +654,7 @@ export default function AdminPage() {
                                             <Star className={`w-4 h-4 ${quote.is_favorite ? 'fill-current' : ''}`} />
                                         </button>
                                     </div>
-                                    <p className="text-slate-300 italic mb-2">"{quote.text}"</p>
+                                    <p className="text-slate-300 italic mb-2">&ldquo;{quote.text}&rdquo;</p>
                                     <div className="flex justify-between items-center">
                                         {quote.page_number && <span className="text-slate-500 text-xs">page {quote.page_number}</span>}
                                         <button
@@ -736,15 +745,6 @@ export default function AdminPage() {
                     </div>
                 )}
             </main>
-
-            {/* Floating Add Button */}
-            <button
-                onClick={() => openModal(tabToModalType[activeTab])}
-                className="fixed bottom-6 right-6 w-14 h-14 bg-purple-600 hover:bg-purple-500 text-white rounded-full shadow-lg shadow-purple-500/30 flex items-center justify-center transition"
-                title="add new"
-            >
-                <Plus className="w-6 h-6" />
-            </button>
 
             {/* Modal */}
             {showModal && (

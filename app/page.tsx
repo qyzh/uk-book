@@ -32,7 +32,7 @@ export default function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 py-12 space-y-16">
         {/* Currently Reading Feature */}
-        <RevealSection as="section" variant="up" threshold={0.05}>
+        <RevealSection as="section" variant="up" threshold={0.05} className="empty:hidden">
           <CurrentlyReading />
         </RevealSection>
 
@@ -52,7 +52,7 @@ export default function HomePage() {
                 className="flex-grow flex flex-col justify-center py-6 relative z-10 animate-fade-in-up"
               >
                 <blockquote className="text-xl md:text-2xl text-slate-200 leading-relaxed mb-6 italic">
-                  "{favoriteQuotes[currentQuoteIndex % favoriteQuotes.length]?.text}"
+                  &ldquo;{favoriteQuotes[currentQuoteIndex % favoriteQuotes.length]?.text}&rdquo;
                 </blockquote>
                 {favoriteQuotes[currentQuoteIndex % favoriteQuotes.length]?.books && (
                   <div className="flex items-center gap-2 text-slate-400 text-sm not-italic mt-2">

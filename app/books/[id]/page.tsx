@@ -1,21 +1,42 @@
-'use client'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
+import BookPageClient, { type BookData } from './BookPageClient'
+import JsonLd from '@/app/components/JsonLd'
 
-import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { use } from 'react'
-import Navigation from '@/app/components/Navigation'
-import Loading from '@/app/components/Loading'
-import BookShareButton from '@/app/components/BookShareButton'
+const BASE_URL = 'https://buku.kyxis.my.id'
 
-interface Author {
-  id: string
-  name: string
-  bio?: string
-  nationality?: string
+// ─── Supabase helper ─────────────────────────────────────────────────────────
+
+async function getSupabase() {
+  const cookieStore = await cookies()
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // read-only context — ignore
+          }
+        },
+      },
+    }
+  )
 }
 
-interface Book {
+// ─── Server-side book fetch ───────────────────────────────────────────────────
+
+// Raw shape returned by Supabase (authors is array due to join)
+interface RawBook {
   id: string
   title: string
   isbn?: string
@@ -23,369 +44,173 @@ interface Book {
   published_year?: number
   pages?: number
   publisher?: string
-  summary?: string
   genre?: string
   sub_genre?: string
+  summary?: string
   reading_status: string
   language: string
   started_at?: string
   finished_at?: string
   current_page?: number
-  authors: Author
+  authors: { id: string; name: string; bio?: string; nationality?: string }[] | { id: string; name: string; bio?: string; nationality?: string }
 }
 
-interface Quote {
-  id: string
-  book_id: string
-  text: string
-  page_number?: number
-  is_favorite: boolean
+async function fetchBook(id: string): Promise<BookData | null> {
+  try {
+    const supabase = await getSupabase()
+    const { data, error } = await supabase
+      .from('books')
+      .select(`
+        id,
+        title,
+        isbn,
+        cover_url,
+        published_year,
+        pages,
+        publisher,
+        genre,
+        sub_genre,
+        summary,
+        reading_status,
+        language,
+        started_at,
+        finished_at,
+        current_page,
+        authors(id, name, bio, nationality)
+      `)
+      .eq('id', id)
+      .single()
+
+    if (error || !data) return null
+
+    const raw = data as unknown as RawBook
+    const author = Array.isArray(raw.authors) ? raw.authors[0] : raw.authors
+
+    return {
+      id: raw.id,
+      title: raw.title,
+      isbn: raw.isbn,
+      cover_url: raw.cover_url,
+      published_year: raw.published_year,
+      pages: raw.pages,
+      publisher: raw.publisher,
+      genre: raw.genre || 'fiction',
+      sub_genre: raw.sub_genre || '',
+      summary: raw.summary || '',
+      reading_status: raw.reading_status,
+      language: raw.language,
+      started_at: raw.started_at,
+      finished_at: raw.finished_at,
+      current_page: raw.current_page ?? undefined,
+      authors: author,
+    }
+  } catch {
+    return null
+  }
 }
 
-export default function BookPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
-  const [book, setBook] = useState<Book | null>(null)
-  const [quotes, setQuotes] = useState<Quote[]>([])
-  const [loading, setLoading] = useState(true)
-  const [bookNotFound, setBookNotFound] = useState(false)
+// ─── generateMetadata ─────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    if (!id) return
+export async function generateMetadata(
+  { params }: { params: Promise<{ id: string }> }
+): Promise<Metadata> {
+  const { id } = await params
 
-    const fetchBook = async (bookId: string) => {
-      try {
-        const response = await fetch(`/api/books/${bookId}`)
-        if (!response.ok) {
-          setBookNotFound(true)
-          return false
-        }
-        const { data } = await response.json()
-        setBook(data)
-        return true
-      } catch (error) {
-        console.error('Failed to fetch book:', error)
-        setBookNotFound(true)
-        return false
-      }
+  // Short IDs are resolved client-side; provide generic metadata for them
+  if (id.length === 4) {
+    return {
+      title: 'Book Details',
+      description: 'View book details, quotes, and reading progress.',
     }
-
-    const fetchQuotes = async (bookId: string) => {
-      try {
-        const response = await fetch(`/api/quotes?book_id=${bookId}`)
-        const { data } = await response.json()
-        setQuotes(data || [])
-      } catch (error) {
-        console.error('Failed to fetch quotes:', error)
-      }
-    }
-
-    const resolveShortId = async (shortId: string) => {
-      try {
-        const response = await fetch(`/api/books/short/${shortId}`)
-        if (response.ok) {
-          const { id: fullId } = await response.json()
-          return fullId
-        }
-      } catch {
-        // ignore
-      }
-      return null
-    }
-
-    const loadBook = async () => {
-      if (id.length === 4) {
-        const fullId = await resolveShortId(id)
-        if (fullId) {
-          window.history.replaceState(null, '', `/books/${fullId}`)
-          await Promise.all([fetchBook(fullId), fetchQuotes(fullId)])
-          setLoading(false)
-          return
-        } else {
-          setBookNotFound(true)
-          setLoading(false)
-          return
-        }
-      }
-      await Promise.all([fetchBook(id), fetchQuotes(id)])
-      setLoading(false)
-    }
-
-    loadBook()
-  }, [id])
-
-  if (loading) {
-    return <Loading text="loading book" fullPage />
   }
 
-  if (bookNotFound || !book) {
-    return (
-      <div className="min-h-screen bg-black text-slate-300" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
-        <Navigation />
-        <div className="flex items-center justify-center py-32 text-center">
-          <div className="text-slate-600">book not found</div>
-        </div>
-      </div>
-    )
+  const book = await fetchBook(id)
+
+  if (!book) {
+    return {
+      title: 'Book Not Found',
+      description: 'This book could not be found in the library.',
+      robots: { index: false, follow: false },
+    }
   }
 
-  const favoriteQuotes = quotes.filter(q => q.is_favorite)
+  const title = `${book.title}${book.authors?.name ? ` by ${book.authors.name}` : ''}`
+  const description =
+    book.summary ||
+    `${book.title}${book.authors?.name ? ` by ${book.authors.name}` : ''}. ${
+      book.genre ? `Genre: ${book.genre}. ` : ''
+    }${book.published_year ? `Published ${book.published_year}. ` : ''}${
+      book.pages ? `${book.pages} pages.` : ''
+    } Part of qyzh's personal reading library.`
+
+  const url = `${BASE_URL}/books/${id}`
+  const images = book.cover_url
+    ? [{ url: book.cover_url, width: 400, height: 600, alt: `Cover of ${book.title}` }]
+    : [{ url: '/og-image.png', width: 1200, height: 630, alt: book.title }]
+
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'book',
+      url,
+      title,
+      description,
+      images,
+      ...(book.isbn ? { isbn: book.isbn } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [images[0].url],
+    },
+  }
+}
+
+// ─── Page (Server Component) ──────────────────────────────────────────────────
+
+export default async function BookPage(
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+
+  // Short IDs are resolved client-side
+  if (id.length === 4) {
+    return <BookPageClient bookId={id} />
+  }
+
+  const book = await fetchBook(id)
+
+  if (!book) {
+    notFound()
+  }
+
+  // Build JSON-LD Book structured data
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: book.title,
+    author: book.authors?.name
+      ? { '@type': 'Person', name: book.authors.name }
+      : undefined,
+    isbn: book.isbn || undefined,
+    numberOfPages: book.pages || undefined,
+    publisher: book.publisher
+      ? { '@type': 'Organization', name: book.publisher }
+      : undefined,
+    datePublished: book.published_year ? `${book.published_year}` : undefined,
+    image: book.cover_url || undefined,
+    description: book.summary || undefined,
+    inLanguage: book.language || undefined,
+    url: `${BASE_URL}/books/${book.id}`,
+  }
 
   return (
-    <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
-      <Navigation />
-
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-12">
-        {/* Book Hero */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Cover & Info */}
-          <div className="md:col-span-1 space-y-6">
-            <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden rounded-r-2xl rounded-l-md border border-slate-700 border-l-[4px] border-l-slate-800 shadow-[10px_10px_30px_rgba(0,0,0,0.8),_0_0_20px_rgba(168,85,247,0.15)] group">
-              {book.cover_url ? (
-                <Image
-                  src={book.cover_url}
-                  alt={book.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 25vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  priority
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-                  <div className="text-6xl text-slate-600">📖</div>
-                </div>
-              )}
-              {/* Book Spine Highlight & Lighting Effects */}
-              <div className="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-black/40 via-white/10 to-transparent pointer-events-none mix-blend-overlay"></div>
-              <div className="absolute inset-y-0 left-0 w-[1px] bg-white/20 pointer-events-none mix-blend-overlay"></div>
-              <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-r-2xl rounded-l-md pointer-events-none"></div>
-            </div>
-
-            {/* Share Button */}
-            <div className="flex justify-center">
-              <BookShareButton
-                book={book}
-                status={book.reading_status === 'completed' ? 'completed' : book.reading_status === 'reading' ? 'reading' : book.reading_status === 'wishlist' ? 'wishlist' : 'to-read'}
-              />
-            </div>
-
-            {/* Book Metadata Card */}
-            <div className="border border-slate-700 bg-slate-900 bg-opacity-40 p-4 space-y-3">
-              <div>
-                <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">status</div>
-                <div
-                  className={`text-sm font-bold inline-block px-2 py-1 rounded ${
-                    book.reading_status === 'completed'
-                      ? 'bg-emerald-900 text-emerald-300'
-                      : book.reading_status === 'reading'
-                      ? 'bg-purple-900 text-purple-300 animate-pulse'
-                      : book.reading_status === 'wishlist'
-                      ? 'bg-blue-900 text-blue-300'
-                      : 'bg-slate-800 text-slate-300'
-                  }`}
-                >
-                  {book.reading_status}
-                </div>
-              </div>
-
-              {book.genre && (
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">genre</div>
-                  <div className="text-sm text-slate-300">{book.genre}</div>
-                </div>
-              )}
-
-              {book.sub_genre && (
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">sub-genre</div>
-                  <div className="text-sm text-slate-300">{book.sub_genre}</div>
-                </div>
-              )}
-
-              {book.started_at && (
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">started</div>
-                  <div className="text-sm text-slate-300">{new Date(book.started_at).toLocaleDateString('en-GB')}</div>
-                </div>
-              )}
-
-              {book.finished_at && (
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">finished</div>
-                  <div className="text-sm text-slate-300">{new Date(book.finished_at).toLocaleDateString('en-GB')}</div>
-                </div>
-              )}
-
-              {book.published_year && (
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">published</div>
-                  <div className="text-sm text-slate-300">{book.published_year}</div>
-                </div>
-              )}
-
-              {book.publisher && (
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">publisher</div>
-                  <div className="text-sm text-slate-300">{book.publisher}</div>
-                </div>
-              )}
-
-              {book.pages && (
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">pages</div>
-                  <div className="text-sm text-slate-300">{book.pages}</div>
-                </div>
-              )}
-
-              {book.reading_status === 'reading' && book.current_page && book.pages && (
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">progress</div>
-                  <div className="space-y-1">
-                    <div className="text-sm text-slate-300">
-                      Page {book.current_page} of {book.pages}
-                      {` (${Math.round((book.current_page / book.pages) * 100)}%)`}
-                    </div>
-                    <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-                      <div
-                        className="bg-gradient-to-r from-purple-500 to-purple-400 h-full rounded-full transition-all"
-                        style={{ width: `${(book.current_page / book.pages) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {book.isbn && (
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">isbn</div>
-                  <div className="text-sm text-slate-300 font-mono">{book.isbn}</div>
-                </div>
-              )}
-
-              <div>
-                <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">language</div>
-                <div className="text-sm text-slate-300">{book.language.toUpperCase()}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Title & Author */}
-          <div className="md:col-span-2 space-y-8">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-slate-100 mb-4 leading-tight">
-                {book.title}
-              </h1>
-              <div className="space-y-3">
-                <div className="flex items-baseline gap-2">
-                  <p className="text-xs text-slate-500 uppercase tracking-wide">by</p>
-                  <p className="text-lg text-purple-300">{book.authors?.name}</p>
-                </div>
-
-                {book.authors?.nationality && (
-                  <div>
-                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-2">author from</div>
-                    <p className="text-slate-300">{book.authors.nationality}</p>
-                  </div>
-                )}
-
-                {book.authors?.bio && (
-                  <div>
-                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-2">about author</div>
-                    <p className="text-slate-400 leading-relaxed">{book.authors.bio}</p>
-                  </div>
-                )}
-
-                {book.summary && (
-                  <div>
-                    <div className="text-xs text-slate-500 uppercase tracking-wide mb-2">blurb</div>
-                    <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">{book.summary}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="border border-slate-700 bg-slate-900 bg-opacity-40 p-3 text-center">
-                <div className="text-2xl font-bold text-slate-200">{quotes.length}</div>
-                <div className="text-xs text-slate-500 mt-1">quotes</div>
-              </div>
-              <div className="border border-slate-700 bg-slate-900 bg-opacity-40 p-3 text-center">
-                <div className="text-2xl font-bold text-slate-200">{favoriteQuotes.length}</div>
-                <div className="text-xs text-slate-500 mt-1">favorites</div>
-              </div>
-              <div className="border border-slate-700 bg-slate-900 bg-opacity-40 p-3 text-center">
-                <div className="text-2xl font-bold text-slate-200">{book.pages || '—'}</div>
-                <div className="text-xs text-slate-500 mt-1">pages</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Favorite Quotes Highlight */}
-        {favoriteQuotes.length > 0 && (
-          <section className="border-t border-slate-700 pt-12">
-            <h2 className="text-xl font-bold text-slate-300 mb-8 flex items-center gap-2">
-              <span className="text-purple-400">♡</span> Favorite Quotes ({favoriteQuotes.length})
-            </h2>
-            <div className="space-y-4">
-              {favoriteQuotes.map((quote) => (
-                <div
-                  key={quote.id}
-                  className="border-l-4 border-purple-600 bg-slate-900 bg-opacity-40 p-6 hover:bg-opacity-60 transition"
-                >
-                  <blockquote className="text-lg text-slate-200 italic leading-relaxed mb-3">
-                    "{quote.text}"
-                  </blockquote>
-                  {quote.page_number && (
-                    <div className="text-xs text-slate-500">page {quote.page_number}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* All Quotes */}
-        {quotes.length > 0 && (
-          <section className="border-t border-slate-700 pt-12">
-            <h2 className="text-xl font-bold text-slate-300 mb-8 flex items-center gap-2">
-              <span className="text-slate-500">→</span> All Quotes ({quotes.length})
-            </h2>
-            <div className="space-y-4">
-              {quotes.filter(q => !q.is_favorite).map((quote) => (
-                <div
-                  key={quote.id}
-                  className="border border-slate-700 bg-slate-900 bg-opacity-20 p-4 hover:bg-opacity-40 transition"
-                >
-                  <blockquote className="text-slate-200 italic leading-relaxed mb-2">
-                    "{quote.text}"
-                  </blockquote>
-                  {quote.page_number && (
-                    <div className="text-xs text-slate-500">page {quote.page_number}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* No Quotes */}
-        {quotes.length === 0 && (
-          <section className="border-t border-slate-700 pt-12 text-center">
-            <div className="text-slate-600 py-12">no quotes captured yet from this book</div>
-          </section>
-        )}
-
-        {/* Footer Navigation */}
-        <footer className="border-t border-slate-700 pt-8 pb-12 text-center">
-          <Link
-            href="/browse"
-            className="text-slate-500 hover:text-slate-400 text-sm transition"
-          >
-            [explore more books]
-          </Link>
-        </footer>
-      </main>
-    </div>
+    <>
+      <JsonLd data={jsonLd} />
+      <BookPageClient bookId={id} initialBook={book} />
+    </>
   )
 }

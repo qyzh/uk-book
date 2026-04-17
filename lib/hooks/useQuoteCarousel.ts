@@ -7,10 +7,11 @@ export function useQuoteCarousel(intervalMs = 6000) {
   const { quotes, loading, error } = useQuotes()
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0)
 
-  const favoriteQuotes = useMemo(
-    () => quotes.filter((quote) => quote.is_favorite),
-    [quotes],
-  )
+  const favoriteQuotes = useMemo(() => {
+    const favorites = quotes.filter((quote) => quote.is_favorite)
+    // Sort by id for deterministic order
+    return favorites.sort((a, b) => a.id.localeCompare(b.id)).slice(0, 5)
+  }, [quotes])
 
   useEffect(() => {
     if (favoriteQuotes.length === 0) return
