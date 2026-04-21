@@ -36,7 +36,7 @@ export default function Loading({ text = 'loading', fullPage = false }: LoadingP
   const content = (
     <div className="flex flex-col items-center justify-center gap-6 p-12 font-mono">
       <div className="flex flex-col items-center gap-2">
-        <div className="text-4xl text-purple-500 animate-pulse">{spinners[spinnerIdx]}</div>
+        <div className="text-4xl text-[#d97757] animate-pulse">{spinners[spinnerIdx]}</div>
         <div className="text-slate-400 text-sm tracking-widest uppercase">
           {text}
           <span className="inline-block w-8 text-left">{dots}</span>
@@ -45,7 +45,7 @@ export default function Loading({ text = 'loading', fullPage = false }: LoadingP
 
       <div className="w-64 h-1 bg-neutral-800 relative overflow-hidden">
         <div 
-          className="absolute top-0 left-0 h-full bg-purple-600 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(147,51,234,0.5)]"
+          className="absolute top-0 left-0 h-full bg-[#d97757] transition-all duration-300 ease-out shadow-[0_0_8px_rgba(217,119,87,0.5)]"
           style={{ width: `${progress}%` }}
         />
       </div>

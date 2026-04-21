@@ -9,7 +9,7 @@ interface BookCardProps {
 
 function getStatusStyles(status: string) {
   if (status === 'completed') return 'bg-emerald-900 text-emerald-300'
-  if (status === 'reading') return 'bg-purple-900 text-purple-300'
+  if (status === 'reading') return 'bg-[#d97757]/20 text-[#d97757]'
   if (status === 'wishlist') return 'bg-blue-900 text-blue-300'
   return 'bg-slate-800 text-slate-300'
 }
@@ -20,7 +20,7 @@ export default function BookCard({ book }: BookCardProps) {
       href={`/books/${getShortId(book.id)}`}
       className="group block transition duration-300 hover:-translate-y-1"
     >
-      <div className="aspect-[3/4] bg-black relative overflow-hidden rounded-r-2xl rounded-l-md border border-slate-700 border-l-[4px] border-l-slate-800 shadow-[5px_5px_15px_rgba(0,0,0,0.8),_0_0_15px_rgba(168,85,247,0.1)] group-hover:shadow-[5px_5px_20px_rgba(0,0,0,0.8),_0_0_20px_rgba(168,85,247,0.3)] transition-shadow">
+      <div className="aspect-[3/4] bg-black relative overflow-hidden rounded-r-2xl rounded-l-md border border-slate-700 border-l-[4px] border-l-slate-800 shadow-[5px_5px_15px_rgba(0,0,0,0.8),_0_0_15px_rgba(217,119,87,0.1)] group-hover:shadow-[5px_5px_20px_rgba(0,0,0,0.8),_0_0_20px_rgba(217,119,87,0.3)] transition-shadow">
         {book.cover_url ? (
           <Image
             src={book.cover_url}
@@ -43,7 +43,7 @@ export default function BookCard({ book }: BookCardProps) {
         <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-r-2xl rounded-l-md pointer-events-none"></div>
       </div>
       <div className="pt-4 bg-transparent text-left">
-        <h3 className="font-bold text-slate-200 line-clamp-2 mb-1 group-hover:text-purple-300 transition font-serif tracking-tight">
+        <h3 className="font-bold text-slate-200 line-clamp-2 mb-1 group-hover:text-[#d97757] transition font-serif tracking-tight">
           {book.title}
         </h3>
         <p className="text-slate-500 text-sm mb-2 line-clamp-1">{book.authors?.name}</p>
@@ -66,7 +66,7 @@ export default function BookCard({ book }: BookCardProps) {
               </div>
               <div className="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-purple-500 to-purple-400 h-full rounded-full"
+                  className="bg-gradient-to-r from-[#d97757] to-[#e09e72] h-full rounded-full"
                   style={{ width: `${(book.current_page / book.pages) * 100}%` }}
                 />
               </div>

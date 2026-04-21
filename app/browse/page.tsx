@@ -170,8 +170,8 @@ export default function BrowsePage() {
     <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
       <Navigation />
 
-      <main className="max-w-7xl mx-auto px-12 py-8">
-        <div className="mb-8">
+      <main className="py-8">
+        <div className="mb-8 max-w-7xl mx-auto px-12">
           <div className="flex items-center justify-between mb-4">
             <h1 className="font-serif tracking-tight text-2xl font-bold text-slate-200">Explore Library</h1>
             <div className="text-slate-500 text-sm">{filteredBooks.length} result{filteredBooks.length !== 1 ? 's' : ''}</div>
@@ -186,7 +186,7 @@ export default function BrowsePage() {
                 placeholder="Search by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full sm:w-64 bg-black border border-slate-700 text-slate-300 text-sm rounded-lg pl-9 pr-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition"
+                className="w-full sm:w-64 ukinput rounded-md text-sm pl-9 pr-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition"
               />
             </div>
 
@@ -194,8 +194,7 @@ export default function BrowsePage() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="bg-black border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer relative"
-              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+              className="ukselect rounded-md text-slate-300 text-sm px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer relative"
             >
               <option value="all">All Status</option>
               {statuses.map((status) => (
@@ -207,8 +206,7 @@ export default function BrowsePage() {
             <select
               value={selectedGenre}
               onChange={(e) => setSelectedGenre(e.target.value)}
-              className="bg-black border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden sm:block"
-              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+              className="ukselect rounded-md text-slate-300 text-sm px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden sm:block"
             >
               <option value="all">Filter by genre</option>
               {GENRES.map((genre) => (
@@ -220,8 +218,7 @@ export default function BrowsePage() {
             <select
               value={selectedSubGenre}
               onChange={(e) => setSelectedSubGenre(e.target.value)}
-              className="bg-black border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden md:block"
-              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+              className="ukselect rounded-md text-slate-300 text-sm px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden md:block"
             >
               <option value="all">Filter by sub-genre</option>
               {subGenres.map((subGenre) => (
@@ -233,8 +230,7 @@ export default function BrowsePage() {
             <select
               value={selectedAuthor}
               onChange={(e) => setSelectedAuthor(e.target.value)}
-              className="bg-black border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden lg:block"
-              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+              className="ukselect rounded-md text-slate-300 text-sm px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden lg:block"
             >
               <option value="all">Filter by author</option>
               {authors.map((author) => (
@@ -246,8 +242,7 @@ export default function BrowsePage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-black border border-slate-700 text-slate-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden sm:block"
-              style={{ background: 'var(--color-slate-900) url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%239c9793\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E") no-repeat right 0.5rem center / 1rem 1rem' }}
+              className="ukselect rounded-md text-slate-300 text-sm px-3 py-2 outline-none focus:border-slate-600 hover:border-slate-600 transition appearance-none pr-8 cursor-pointer hidden sm:block"
             >
               <option value="title">Sort by title</option>
               <option value="author">Sort by author</option>
@@ -268,18 +263,20 @@ export default function BrowsePage() {
         </div>
 
         {filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredBooks.map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))}
-          </div>
+          <section className='uksection border-y'>
+            <div className="p-12 max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {filteredBooks.map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
+            </div>
+          </section>
         ) : (
-          <div className="border border-slate-700 bg-black bg-opacity-30 p-12 text-center">
+          <div className="uksection border-y p-12 text-center">
             <div className="text-slate-600 text-sm">no books match your filters</div>
           </div>
         )}
 
-        <footer className="border-t border-slate-700 mt-12 pt-8 pb-12 text-center text-slate-500 text-xs">
+        <footer className="pt-8 pb-12 text-center text-slate-500 text-xs">
           <Link href="/" className="hover:text-slate-400 transition">[← back to home]</Link>
         </footer>
       </main>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Share2 } from 'lucide-react'
 import type { Book } from '@/lib/types/library'
 
 interface BookShareButtonProps {
@@ -36,20 +37,10 @@ export default function BookShareButton({ book, status = 'to-read' }: BookShareB
     <button
       onClick={handleShare}
       disabled={isLoading}
-      className="inline-flex items-center gap-2 px-3 py-1.5 text-xs rounded border border-slate-600 text-slate-300 hover:border-purple-500 hover:text-purple-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+      className="inline-flex items-center gap-2 px-3 py-1.5 text-xs rounded border ukborder text-slate-300 hover:border-[#d97757] hover:text-[#d97757] transition disabled:opacity-50 disabled:cursor-not-allowed"
       title="Download book as Instagram Story image"
     >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <circle cx="18" cy="5" r="3"></circle>
-        <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c-4.97 0-9-4.03-9-9s4.03-9 9-9m0 0a9 9 0 0 0-9 9"></path>
-      </svg>
+      <Share2 className="w-4 h-4" />
       {isLoading ? 'Creating...' : 'Share'}
     </button>
   )

@@ -24,9 +24,9 @@ export default function NotFound() {
           <div className="pt-6">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-slate-700 hover:border-purple-500 text-slate-300 hover:text-purple-300 transition rounded"
+              className="inline-flex items-center gap-2 px-6 py-3 border border-slate-700 hover:border-[#d97757] text-slate-300 hover:text-[#d97757] transition rounded"
             >
-              <span className="text-purple-400">←</span>
+              <span className="text-[#d97757]">←</span>
               back to library
             </Link>
           </div>

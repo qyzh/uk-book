@@ -142,7 +142,7 @@ export default function AddAuthorPage() {
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 border border-purple-600 text-purple-300 hover:bg-purple-700 hover:text-black transition text-sm font-bold disabled:opacity-50"
+              className="px-4 py-2 border border-[#d97757] text-[#e09e72] hover:bg-[#d97757]/30 hover:text-black transition text-sm font-bold disabled:opacity-50"
             >
               {loading ? 'saving...' : 'save author'}
             </button>

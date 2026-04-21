@@ -31,16 +31,16 @@ export default function HomePage() {
     <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
       <Navigation />
 
-      <main className="max-w-7xl mx-auto py-12 space-y-16">
+      <main className="py-12 space-y-16">
         {/* Currently Reading Feature */}
-        <RevealSection as="section" variant="up" threshold={0.05} className="px-12 empty:hidden">
+        <RevealSection as="section" variant="up" threshold={0.05} className="max-w-7xl mx-auto px-12 empty:hidden">
           <CurrentlyReading />
         </RevealSection>
 
         {/* Hero / Featured Quote */}
         {favoriteQuotes.length > 0 && (
           <RevealSection as="section" variant="right" className="py-12">
-            <div className="px-12 transition-all duration-500 flex flex-col min-h-[320px] relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-12 transition-all duration-500 flex flex-col min-h-[320px] relative overflow-hidden">
               {/* Giant Background Quote Icon */}
               <div className="absolute -top-4 left-4 text-slate-700 opacity-20 select-none pointer-events-none font-serif text-[240px] leading-none z-0">
                 &ldquo;
@@ -60,7 +60,7 @@ export default function HomePage() {
                     <span>—</span>
                     <Link
                       href={`/books/${getShortId(favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].book_id)}`}
-                      className="font-serif text-[#d97757] hover:text-purple-200 transition"
+                      className="font-serif text-[#d97757] hover:text-[#e09e72] transition"
                     >
                       {favoriteQuotes[currentQuoteIndex % favoriteQuotes.length].books?.title || 'Unknown Book'}
                     </Link>
@@ -74,7 +74,7 @@ export default function HomePage() {
                     key={i}
                     onClick={() => setCurrentQuoteIndex(i)}
                     className={`w-2 h-2 rounded-full transition ${i === currentQuoteIndex % favoriteQuotes.length
-                      ? 'bg-purple-400'
+                      ? 'bg-[#d97757]'
                       : 'bg-slate-700 hover:bg-slate-600'
                       }`}
                   />
@@ -85,7 +85,7 @@ export default function HomePage() {
         )}
 
         {/* Stats */}
-        <RevealSection as="section" variant="up" delay={100} stagger className="px-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <RevealSection as="section" variant="up" delay={100} stagger className="max-w-7xl mx-auto px-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'total books', value: books.filter(b => b.reading_status !== 'wishlist').length },
             { label: 'completed', value: completedBooks.length },
@@ -104,8 +104,8 @@ export default function HomePage() {
 
         {/* Library Section */}
         {recentBooks.length > 0 && (
-          <RevealSection as="section" variant="up" threshold={0.05}>
-            <div className="bg-[#1f1e1d] md:px-12 px-12 py-10 border-y border-[#30302e]">
+          <RevealSection as="section" variant="up" threshold={0.05} className='uksection border-y'>
+            <div className="max-w-7xl mx-auto px-12 py-10">
               <h2 className="text-4xl font-bold text-[#faf9f5] mb-6 flex items-center gap-2 font-serif">
                 <Library className="w-10 h-10 text-[#d97757]" /> Library
               </h2>
@@ -148,7 +148,7 @@ export default function HomePage() {
                           className={`${book.reading_status === 'completed'
                             ? 'text-slate-400'
                             : book.reading_status === 'reading'
-                              ? 'text-purple-400'
+                              ? 'text-[#d97757]'
                               : 'text-slate-600'
                             }`}
                         >
@@ -165,7 +165,7 @@ export default function HomePage() {
 
         {/* Wishlist Section */}
         {wishlistBooks.length > 0 && (
-          <RevealSection as="section" variant="left" threshold={0.05}>
+          <RevealSection as="section" variant="left" threshold={0.05} className='max-w-7xl mx-auto'>
             <div className="flex items-center justify-between px-12 mb-6">
               <h2 className="text-4xl font-bold text-[#faf9f5] flex items-center gap-2 font-serif">
                 <Bookmark className="w-10 h-10 text-[#d97757]" /> Wishlist ({wishlistBooks.length})
@@ -214,7 +214,7 @@ export default function HomePage() {
 
         {/* All Books Grid */}
         {books.filter(b => b.reading_status !== 'wishlist').length > 6 && (
-          <RevealSection as="section" variant="up" threshold={0.05}>
+          <RevealSection as="section" variant="up" threshold={0.05} className='max-w-7xl mx-auto'>
             <div className="flex items-center justify-between px-12 mb-6">
               <h2 className="text-4xl font-bold text-[#faf9f5] flex items-center gap-2 font-serif">
                 <LibraryBig className="w-10 h-10 text-[#d97757]" /> All Books ({books.filter(b => b.reading_status !== 'wishlist').length})
@@ -262,7 +262,7 @@ export default function HomePage() {
         )}
 
         {/* Footer */}
-        <RevealSection as="footer" variant="up" delay={200} className="border-t border-slate-700 pt-8 text-center text-slate-500 text-xs pb-8">
+        <RevealSection as="footer" variant="up" delay={200} className="border-t ukborder pt-8 text-center text-slate-500 text-xs pb-8">
           <p>crafted with ♡ • {new Date().getFullYear()}</p>
         </RevealSection>
       </main>

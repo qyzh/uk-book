@@ -514,7 +514,7 @@ export default function AdminPage() {
             <header className="border-b border-slate-700 bg-black sticky top-0 z-40">
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between mb-6">
-                        <Link href="/" className="text-slate-400 hover:text-purple-300 transition text-sm font-bold">
+                        <Link href="/" className="text-slate-400 hover:text-[#d97757] transition text-sm font-bold">
                             ← back to ukbook
                         </Link>
                         <button
@@ -578,7 +578,7 @@ export default function AdminPage() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {books.map((book) => (
-                                <div key={book.id} className="border border-slate-700 bg-black bg-opacity-50 rounded-lg overflow-hidden hover:border-purple-500 transition">
+                                <div key={book.id} className="border border-slate-700 bg-black bg-opacity-50 rounded-lg overflow-hidden hover:border-[#d97757] transition">
                                     <div className="aspect-[3/4] relative bg-neutral-800">
                                         {book.cover_url ? (
                                             <Image src={book.cover_url} alt={book.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
@@ -587,7 +587,7 @@ export default function AdminPage() {
                                         )}
                                         <span className={`absolute top-2 right-2 px-2 py-1 text-xs font-bold rounded ${
                                             book.reading_status === 'completed' ? 'bg-green-600 text-white' :
-                                            book.reading_status === 'reading' ? 'bg-purple-600 text-white' :
+                                            book.reading_status === 'reading' ? 'bg-[#d97757] text-white' :
                                             book.reading_status === 'wishlist' ? 'bg-blue-600 text-white' :
                                             'bg-slate-600 text-white'
                                         }`}>
@@ -602,13 +602,13 @@ export default function AdminPage() {
                                                 <span className="px-2 py-0.5 bg-slate-700 text-slate-300 text-xs rounded">{book.genre}</span>
                                             )}
                                             {book.sub_genre?.split(',').map((sg, i) => (
-                                                <span key={i} className="px-2 py-0.5 bg-purple-900 bg-opacity-50 text-purple-300 text-xs rounded">{sg.trim()}</span>
+                                                <span key={i} className="px-2 py-0.5 bg-[#d97757]/20 bg-opacity-50 text-[#d97757] text-xs rounded">{sg.trim()}</span>
                                             ))}
                                         </div>
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => openModal('book', book)}
-                                                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded transition"
+                                                className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 bg-[#d97757] hover:bg-[#e09e72] text-white text-xs font-bold rounded transition"
                                             >
                                                 <Edit2 className="w-3 h-3" /> edit
                                             </button>
@@ -645,7 +645,7 @@ export default function AdminPage() {
                             {quotes.map((quote) => (
                                 <div key={quote.id} className={`border-l-4 p-4 rounded-r bg-black bg-opacity-50 ${quote.is_favorite ? 'border-l-yellow-400' : 'border-l-slate-600'}`}>
                                     <div className="flex justify-between items-start gap-3 mb-2">
-                                        <span className="text-purple-300 text-xs font-bold">{quote.books?.title}</span>
+                                        <span className="text-[#d97757] text-xs font-bold">{quote.books?.title}</span>
                                         <button
                                             onClick={() => handleToggleFavorite(quote)}
                                             className={quote.is_favorite ? 'text-yellow-400' : 'text-slate-500 hover:text-yellow-400'}
@@ -689,7 +689,7 @@ export default function AdminPage() {
                                                 <span className="text-amber-300 text-xs font-bold">{book?.title || 'Unknown'}</span>
                                                 <span className={`ml-2 px-2 py-0.5 text-xs rounded ${
                                                     note.note_type === 'summary' ? 'bg-blue-900 text-blue-300' :
-                                                    note.note_type === 'analysis' ? 'bg-purple-900 text-purple-300' :
+                                                    note.note_type === 'analysis' ? 'bg-[#d97757]/20 text-[#d97757]' :
                                                     note.note_type === 'idea' ? 'bg-green-900 text-green-300' :
                                                     'bg-slate-700 text-slate-300'
                                                 }`}>
@@ -776,7 +776,7 @@ export default function AdminPage() {
                                             value={formData.title}
                                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                             required
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                         />
                                     </div>
                                     <div>
@@ -785,7 +785,7 @@ export default function AdminPage() {
                                             value={formData.author_id}
                                             onChange={(e) => setFormData({ ...formData, author_id: e.target.value })}
                                             required
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                         >
                                             <option value="">select author...</option>
                                             {authors.map((author) => (
@@ -800,7 +800,7 @@ export default function AdminPage() {
                                                 type="text"
                                                 value={formData.isbn}
                                                 onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             />
                                         </div>
                                         <div>
@@ -809,7 +809,7 @@ export default function AdminPage() {
                                                 type="number"
                                                 value={formData.published_year}
                                                 onChange={(e) => setFormData({ ...formData, published_year: parseInt(e.target.value) || 0 })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             />
                                         </div>
                                     </div>
@@ -820,7 +820,7 @@ export default function AdminPage() {
                                                 type="number"
                                                 value={formData.pages}
                                                 onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             />
                                         </div>
                                         <div>
@@ -829,7 +829,7 @@ export default function AdminPage() {
                                                 type="text"
                                                 value={formData.publisher}
                                                 onChange={(e) => setFormData({ ...formData, publisher: e.target.value })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             />
                                         </div>
                                     </div>
@@ -839,7 +839,7 @@ export default function AdminPage() {
                                             <select
                                                 value={formData.language}
                                                 onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             >
                                                 <option value="id">id</option>
                                                 <option value="en">en</option>
@@ -850,7 +850,7 @@ export default function AdminPage() {
                                             <select
                                                 value={formData.genre}
                                                 onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             >
                                                 {GENRES.map((g) => <option key={g} value={g}>{g}</option>)}
                                             </select>
@@ -860,7 +860,7 @@ export default function AdminPage() {
                                             <select
                                                 value={formData.reading_status}
                                                 onChange={(e) => setFormData({ ...formData, reading_status: e.target.value })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             >
                                                 <option value="to-read">to-read</option>
                                                 <option value="reading">reading</option>
@@ -875,7 +875,7 @@ export default function AdminPage() {
                                                 value={formData.current_page}
                                                 onChange={(e) => setFormData({ ...formData, current_page: e.target.value })}
                                                 disabled={formData.reading_status === 'to-read' || formData.reading_status === 'wishlist'}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none disabled:opacity-50"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none disabled:opacity-50"
                                             />
                                         </div>
                                     </div>
@@ -888,7 +888,7 @@ export default function AdminPage() {
                                                     type="date"
                                                     value={formData.started_at}
                                                     onChange={(e) => setFormData({ ...formData, started_at: e.target.value })}
-                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                    className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                                 />
                                             </div>
                                             {formData.reading_status === 'completed' && (
@@ -898,7 +898,7 @@ export default function AdminPage() {
                                                         type="date"
                                                         value={formData.finished_at}
                                                         onChange={(e) => setFormData({ ...formData, finished_at: e.target.value })}
-                                                        className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                        className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                                     />
                                                 </div>
                                             )}
@@ -909,9 +909,9 @@ export default function AdminPage() {
                                         <div className="space-y-2">
                                             <div className="flex flex-wrap gap-2">
                                                 {formData.sub_genres.map((sg, i) => (
-                                                    <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-purple-900 bg-opacity-50 border border-purple-600 text-purple-200 text-xs rounded">
+                                                    <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-[#d97757]/20 bg-opacity-50 border border-[#d97757] text-[#e09e72] text-xs rounded">
                                                         {sg}
-                                                        <button type="button" onClick={() => setFormData({ ...formData, sub_genres: formData.sub_genres.filter((_, idx) => idx !== i) })} className="text-purple-400 hover:text-purple-200 p-0.5 rounded hover:bg-purple-800">
+                                                        <button type="button" onClick={() => setFormData({ ...formData, sub_genres: formData.sub_genres.filter((_, idx) => idx !== i) })} className="text-[#d97757] hover:text-[#e09e72] p-0.5 rounded hover:bg-[#d97757]/30">
                                                             <X className="w-3 h-3" />
                                                         </button>
                                                     </span>
@@ -924,7 +924,7 @@ export default function AdminPage() {
                                                         setFormData({ ...formData, sub_genres: [...formData.sub_genres, e.target.value as typeof formData.sub_genres[number]] })
                                                     }
                                                 }}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             >
                                                 <option value="">+ add existing...</option>
                                                 {SUB_GENRES.filter(sg => !formData.sub_genres.includes(sg)).map((sg) => (
@@ -937,7 +937,7 @@ export default function AdminPage() {
                                                     value={newSubGenre}
                                                     onChange={(e) => setNewSubGenre(e.target.value)}
                                                     placeholder="new sub-genre..."
-                                                    className="flex-1 px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                    className="flex-1 px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                                 />
                                                 <button
                                                     type="button"
@@ -951,7 +951,7 @@ export default function AdminPage() {
                                                             setNewSubGenre('')
                                                         }
                                                     }}
-                                                    className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold rounded"
+                                                    className="px-4 py-2 bg-[#d97757] hover:bg-[#e09e72] text-white text-sm font-bold rounded"
                                                 >
                                                     add
                                                 </button>
@@ -964,7 +964,7 @@ export default function AdminPage() {
                                             value={formData.summary}
                                             onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
                                             rows={4}
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none resize-y"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none resize-y"
                                         />
                                     </div>
                                     <div>
@@ -974,16 +974,16 @@ export default function AdminPage() {
                                             accept="image/*"
                                             onChange={handleCoverUpload}
                                             disabled={uploadingCover}
-                                            className="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:bg-purple-600 file:border-0 file:text-white file:rounded file:cursor-pointer"
+                                            className="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:bg-[#d97757] file:border-0 file:text-white file:rounded file:cursor-pointer"
                                         />
-                                        {uploadingCover && <p className="text-purple-300 text-xs mt-1">uploading...</p>}
+                                        {uploadingCover && <p className="text-[#d97757] text-xs mt-1">uploading...</p>}
                                         {coverPreview && (
                                             <div className="mt-2 w-20 h-28 bg-neutral-800 relative overflow-hidden rounded">
                                                 <img src={coverPreview} alt="Preview" className="w-full h-full object-cover" />
                                             </div>
                                         )}
                                     </div>
-                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
+                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-[#d97757] hover:bg-[#e09e72] disabled:bg-[#d97757]/30 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
                                         {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> saving...</> : editingBook ? 'update book' : 'save book'}
                                     </button>
                                 </form>
@@ -998,7 +998,7 @@ export default function AdminPage() {
                                             value={quoteData.book_id}
                                             onChange={(e) => setQuoteData({ ...quoteData, book_id: e.target.value })}
                                             required
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                         >
                                             <option value="">select book...</option>
                                             {books.map((book) => (
@@ -1012,7 +1012,7 @@ export default function AdminPage() {
                                             type="number"
                                             value={quoteData.page_number}
                                             onChange={(e) => setQuoteData({ ...quoteData, page_number: e.target.value })}
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                         />
                                     </div>
                                     <div>
@@ -1022,7 +1022,7 @@ export default function AdminPage() {
                                             onChange={(e) => setQuoteData({ ...quoteData, text: e.target.value })}
                                             required
                                             rows={4}
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none resize-y"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none resize-y"
                                             placeholder="the quote..."
                                         />
                                     </div>
@@ -1036,7 +1036,7 @@ export default function AdminPage() {
                                         />
                                         <label htmlFor="favorite" className="text-slate-400 text-sm">mark as favorite</label>
                                     </div>
-                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
+                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-[#d97757] hover:bg-[#e09e72] disabled:bg-[#d97757]/30 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
                                         {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> saving...</> : 'save quote'}
                                     </button>
                                 </form>
@@ -1051,7 +1051,7 @@ export default function AdminPage() {
                                             value={noteData.book_id}
                                             onChange={(e) => setNoteData({ ...noteData, book_id: e.target.value })}
                                             required
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                         >
                                             <option value="">select book...</option>
                                             {books.map((book) => (
@@ -1064,7 +1064,7 @@ export default function AdminPage() {
                                         <select
                                             value={noteData.note_type}
                                             onChange={(e) => setNoteData({ ...noteData, note_type: e.target.value })}
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                         >
                                             <option value="general">general</option>
                                             <option value="summary">summary</option>
@@ -1079,11 +1079,11 @@ export default function AdminPage() {
                                             onChange={(e) => setNoteData({ ...noteData, content: e.target.value })}
                                             required
                                             rows={6}
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none resize-y"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none resize-y"
                                             placeholder="your notes..."
                                         />
                                     </div>
-                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
+                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-[#d97757] hover:bg-[#e09e72] disabled:bg-[#d97757]/30 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
                                         {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> saving...</> : 'save note'}
                                     </button>
                                 </form>
@@ -1099,7 +1099,7 @@ export default function AdminPage() {
                                             value={authorData.name}
                                             onChange={(e) => setAuthorData({ ...authorData, name: e.target.value })}
                                             required
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
@@ -1109,7 +1109,7 @@ export default function AdminPage() {
                                                 type="text"
                                                 value={authorData.nationality}
                                                 onChange={(e) => setAuthorData({ ...authorData, nationality: e.target.value })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             />
                                         </div>
                                         <div>
@@ -1118,7 +1118,7 @@ export default function AdminPage() {
                                                 type="number"
                                                 value={authorData.birth_year}
                                                 onChange={(e) => setAuthorData({ ...authorData, birth_year: parseInt(e.target.value) || 0 })}
-                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none"
+                                                className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none"
                                             />
                                         </div>
                                     </div>
@@ -1129,15 +1129,15 @@ export default function AdminPage() {
                                             accept="image/*"
                                             onChange={handleAuthorPhotoUpload}
                                             disabled={uploadingAuthorPhoto}
-                                            className="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:bg-purple-600 file:border-0 file:text-white file:rounded file:cursor-pointer"
+                                            className="w-full text-xs text-slate-400 file:mr-3 file:py-1 file:px-3 file:bg-[#d97757] file:border-0 file:text-white file:rounded file:cursor-pointer"
                                         />
-                                        {uploadingAuthorPhoto && <p className="text-purple-300 text-xs mt-1">uploading...</p>}
+                                        {uploadingAuthorPhoto && <p className="text-[#d97757] text-xs mt-1">uploading...</p>}
                                         <input
                                             type="url"
                                             value={authorData.photo_url}
                                             onChange={(e) => setAuthorData({ ...authorData, photo_url: e.target.value })}
                                             placeholder="or paste image URL..."
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none mt-2"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none mt-2"
                                         />
                                         {(authorPhotoPreview || authorData.photo_url) && (
                                             <div className="mt-2 w-16 h-20 bg-neutral-800 relative overflow-hidden rounded">
@@ -1155,10 +1155,10 @@ export default function AdminPage() {
                                             value={authorData.bio}
                                             onChange={(e) => setAuthorData({ ...authorData, bio: e.target.value })}
                                             rows={4}
-                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none resize-y"
+                                            className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-[#d97757] outline-none resize-y"
                                         />
                                     </div>
-                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
+                                    <button type="submit" disabled={submitting} className="w-full py-3 bg-[#d97757] hover:bg-[#e09e72] disabled:bg-[#d97757]/30 disabled:cursor-not-allowed text-white font-bold rounded transition flex items-center justify-center gap-2">
                                         {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> saving...</> : 'save author'}
                                     </button>
                                 </form>

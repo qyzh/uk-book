@@ -57,7 +57,7 @@ export default function LoginPage() {
                                         required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full px-4 py-3 bg-black border border-slate-700 text-slate-200 focus:outline-none focus:border-purple-500 transition"
+                                        className="w-full px-4 py-3 bg-black border border-slate-700 text-slate-200 focus:outline-none focus:border-[#d97757] transition"
                                         placeholder="admin@example.com"
                                     />
                                 </div>
@@ -72,7 +72,7 @@ export default function LoginPage() {
                                         required
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="w-full px-4 py-3 bg-black border border-slate-700 text-slate-200 focus:outline-none focus:border-purple-500 transition"
+                                        className="w-full px-4 py-3 bg-black border border-slate-700 text-slate-200 focus:outline-none focus:border-[#d97757] transition"
                                         placeholder="••••••••"
                                     />
                                 </div>
@@ -81,7 +81,7 @@ export default function LoginPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3 border border-purple-600 text-purple-300 hover:bg-purple-600 hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full py-3 border border-[#d97757] text-[#e09e72] hover:bg-[#d97757]/30 hover:text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {loading ? 'authenticating...' : 'login'}
                             </button>

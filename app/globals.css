@@ -1,18 +1,34 @@
 @import "tailwindcss";
 
 :root {
-  --background: #efebe8;
-  --foreground: #312f2e;
+  --background: #141413;
+  --foreground: #faf9f5;
+  --color-section: #1f1e1d;
+  --color-component: #1a1918;
+  --color-text-secondary: #87867f;
+  --color-accent: #d97757;
+  --color-border: #30302e;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-section: var(--color-section);
+  --color-component: var(--color-component);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-accent: var(--color-accent);
+  --color-border: var(--color-border);
+
+  /* Reading status badge colors */
+  --color-status-to-read: #6b7280;
+  --color-status-reading: #eab308;
+  --color-status-completed: #22c55e;
+  --color-status-wishlist: #3b82f6;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-serif: var(--font-newsreader);
 
-  /* Override default black to the deep warm charcoal from the image */
   --color-black: #141413;
 
   /* Adjust slate colors to match the warm grays of the image */
@@ -41,7 +57,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #141413;
-    --foreground: #e3e0dc;
+    --foreground: #faf9f5;
   }
 }
 
@@ -85,6 +101,44 @@ body {
 
 /* ── Scroll-reveal system ─────────────────────────────────── */
 
+/* ukbox */
+.uksection {
+  background-color: var(--color-section);
+  border-color: var(--color-border);
+}
+
+.ukbox {
+  background-color: var(--color-section);
+  border-color: var(--color-border);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.ukboxsecond {
+  background-color: var(--color-component);
+  border-color: var(--color-border);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.ukinput {
+  background-color: var(--color-section);
+  border-color: var(--color-border);
+}
+
+.ukselect {
+  background-color: var(--color-section);
+  border-color: var(--color-border);
+}
+
+.ukselect option {
+  background-color: var(--color-section);
+  border-color: var(--color-border);
+}
+
+.ukborder {
+  border-color: var(--color-border);
+}
 
 /* Base hidden state – applied before element enters viewport */
 .reveal {

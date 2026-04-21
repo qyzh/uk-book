@@ -51,12 +51,12 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
             )}
             {/* "Now Reading" Badge */}
             <div className="absolute top-2 right-2">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
+              <div className="bg-gradient-to-r from-[#d97757] to-[#e09e72] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
                 NOW READING
               </div>
             </div>
           </div>
-          <h3 className="font-serif text-sm font-bold text-slate-200 line-clamp-2 group-hover:text-purple-300 transition">
+          <h3 className="font-serif text-sm font-bold text-slate-200 line-clamp-2 group-hover:text-[#d97757] transition">
             {currentBook.title}
           </h3>
           <p className="text-xs text-slate-500 mb-2">{currentBook.authors?.name}</p>
@@ -64,11 +64,11 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-slate-600">
                 <span>Reading Progress</span>
-                <span className="font-mono text-purple-400">{progressPercent}%</span>
+                <span className="font-mono text-[#d97757]">{progressPercent}%</span>
               </div>
               <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-400 h-full rounded-full transition-all duration-700"
+                  className="bg-gradient-to-r from-[#d97757] to-[#e09e72] h-full rounded-full transition-all duration-700"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
@@ -82,8 +82,8 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
   return (
     <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-black p-8 md:p-12 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition duration-500">
       {/* Decorative background ambient glow */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-900/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-900/10 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#d97757]/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-[#d97757]/5 rounded-full blur-[80px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col-reverse md:flex-row gap-10 md:gap-16 items-center">
 
@@ -91,12 +91,12 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
         <div className="flex-1 w-full space-y-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-slate-400 uppercase mb-2">
-              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse shadow-[0_0_10px_#a855f7]"></span>
+              <span className="w-2 h-2 rounded-full bg-[#d97757] animate-pulse shadow-[0_0_10px_#d97757]"></span>
               Currently Reading
             </div>
 
             <Link href={`/books/${getShortId(currentBook.id)}`} className="block">
-              <h2 className="font-serif text-5xl md:text-6xl text-slate-100 hover:text-purple-300 transition-colors tracking-tight leading-tight">
+              <h2 className="font-serif text-5xl md:text-6xl text-slate-100 hover:text-[#d97757] transition-colors tracking-tight leading-tight">
                 {currentBook.title}
               </h2>
             </Link>
@@ -130,7 +130,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
           {/* Progress Section */}
           <div className="pt-4 max-w-md space-y-5">
             <div className="flex gap-4">
-              <Link href={`/books/${getShortId(currentBook.id)}`} className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-8 py-3 rounded shadow-lg transition tracking-widest text-xs flex items-center gap-2">
+              <Link href={`/books/${getShortId(currentBook.id)}`} className="bg-[#d97757] hover:bg-[#e09e72] text-white font-bold px-8 py-3 rounded shadow-lg transition tracking-widest text-xs flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
                 VIEW BOOK
               </Link>
@@ -140,11 +140,11 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-400 tracking-wider">
                   <span>PROGRESS</span>
-                  <span className="text-purple-400 text-sm">{progressPercent}%</span>
+                  <span className="text-[#d97757] text-sm">{progressPercent}%</span>
                 </div>
                 <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden shadow-inner">
                   <div
-                    className="bg-gradient-to-r from-purple-600 to-purple-400 h-full rounded-full transition-all duration-1000 ease-out"
+                    className="bg-gradient-to-r from-[#d97757] to-[#e09e72] h-full rounded-full transition-all duration-1000 ease-out"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>

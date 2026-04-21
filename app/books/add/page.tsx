@@ -102,7 +102,7 @@ export default function AddBookPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Add New Book</h1>
+          <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-900 mb-2">Add New Book</h1>
           <p className="text-slate-600 mb-8">Track your reading journey</p>
 
           {error && (

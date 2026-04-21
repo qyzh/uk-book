@@ -7,14 +7,14 @@ const icons = {
   success: <CheckCircle className="w-5 h-5 text-emerald-400" />,
   error: <XCircle className="w-5 h-5 text-red-400" />,
   warning: <AlertTriangle className="w-5 h-5 text-amber-400" />,
-  info: <Info className="w-5 h-5 text-purple-400" />,
+  info: <Info className="w-5 h-5 text-[#d97757]" />,
 }
 
 const borderColors = {
   success: 'border-l-emerald-500',
   error: 'border-l-red-500',
   warning: 'border-l-amber-500',
-  info: 'border-l-purple-500',
+  info: 'border-l-[#d97757]',
 }
 
 function ToastItem({ toast, onClose }: { toast: ToastType; onClose: () => void }) {
