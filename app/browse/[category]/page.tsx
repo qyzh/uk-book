@@ -72,7 +72,7 @@ export default function CategoryBrowsePage({ params }: { params: Promise<{ categ
           <Link href="/browse" className="text-slate-500 hover:text-slate-400 transition text-sm">
             [← browse all]
           </Link>
-          <h1 className="text-3xl font-bold text-slate-200">{getCategoryTitle()}</h1>
+          <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">{getCategoryTitle()}</h1>
         </div>
 
         <p className="text-slate-500 text-sm mb-8">{filteredBooks.length} book{filteredBooks.length !== 1 ? 's' : ''} found</p>
@@ -85,7 +85,7 @@ export default function CategoryBrowsePage({ params }: { params: Promise<{ categ
             ))}
           </div>
         ) : (
-          <div className="border border-slate-700 bg-slate-900 bg-opacity-30 p-12 text-center">
+          <div className="border border-slate-700 bg-black bg-opacity-30 p-12 text-center">
             <div className="text-slate-600 text-sm">no books found in this category</div>
           </div>
         )}

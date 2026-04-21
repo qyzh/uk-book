@@ -53,15 +53,15 @@ export default function QuotesPage() {
     <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
       <Navigation />
 
-      <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <main className="max-w-6xl mx-auto px-12 py-8 space-y-8">
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold text-slate-200">All Quotes</h1>
+          <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">All Quotes</h1>
           <p className="text-slate-500 text-sm">
             {filteredQuotes.length} quote{filteredQuotes.length !== 1 ? 's' : ''} shown • {favoriteCount} favorite{favoriteCount !== 1 ? 's' : ''}
           </p>
         </header>
 
-        <section className="border border-slate-700 bg-slate-900 bg-opacity-30 p-4 space-y-4">
+        <section className="border border-slate-700 bg-black bg-opacity-30 p-4 space-y-4">
           <div className="text-slate-400 text-sm font-bold">→ filters</div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <input
@@ -100,11 +100,10 @@ export default function QuotesPage() {
             {filteredQuotes.map((quote) => (
               <article
                 key={quote.id}
-                className={`border p-5 transition ${
-                  quote.is_favorite
+                className={`border p-5 transition ${quote.is_favorite
                     ? 'border-purple-600 bg-purple-900 bg-opacity-10'
-                    : 'border-slate-700 bg-slate-900 bg-opacity-20'
-                }`}
+                    : 'border-slate-700 bg-black bg-opacity-20'
+                  }`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <blockquote className="text-slate-200 italic leading-relaxed">&ldquo;{quote.text}&rdquo;</blockquote>
@@ -124,7 +123,7 @@ export default function QuotesPage() {
             ))}
           </section>
         ) : (
-          <section className="border border-slate-700 bg-slate-900 bg-opacity-30 p-12 text-center">
+          <section className="border border-slate-700 bg-black bg-opacity-30 p-12 text-center">
             <div className="text-slate-600 text-sm">no quotes match current filters</div>
           </section>
         )}

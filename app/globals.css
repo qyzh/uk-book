@@ -10,10 +10,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  
+  --font-serif: var(--font-newsreader);
+
   /* Override default black to the deep warm charcoal from the image */
-  --color-black: #312f2e;
-  
+  --color-black: #141413;
+
   /* Adjust slate colors to match the warm grays of the image */
   --color-slate-900: #3c3938;
   --color-slate-800: #484543;
@@ -24,21 +25,22 @@
   --color-slate-300: #cfccc9;
   --color-slate-200: #e3e0dc;
   --color-slate-100: #f2efeb;
-  
+
   /* Map purple (the accent) to the orange mascot color */
-  --color-purple-200: #f8cab8;
-  --color-purple-300: #f3ad92;
-  --color-purple-400: #ec8f6b;
-  --color-purple-500: #de7b5d; /* mascot orange */
-  --color-purple-600: #c66649;
-  --color-purple-700: #a45037;
-  --color-purple-800: #823d29;
-  --color-purple-900: #622a1b;
+  --color-purple-200: #f5cbb5;
+  --color-purple-300: #efb593;
+  --color-purple-400: #e09e72;
+  --color-purple-500: #d97757;
+  /* accent orange */
+  --color-purple-600: #b46347;
+  --color-purple-700: #8f4f38;
+  --color-purple-800: #6a3b29;
+  --color-purple-900: #45271a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #312f2e;
+    --background: #141413;
     --foreground: #e3e0dc;
   }
 }
@@ -54,6 +56,7 @@ body {
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -69,6 +72,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -81,6 +85,7 @@ body {
 
 /* ── Scroll-reveal system ─────────────────────────────────── */
 
+
 /* Base hidden state – applied before element enters viewport */
 .reveal {
   opacity: 0;
@@ -91,11 +96,25 @@ body {
 }
 
 /* Variants: different entrance directions */
-.reveal-up     { transform: translateY(40px); }
-.reveal-down   { transform: translateY(-40px); }
-.reveal-left   { transform: translateX(-40px); }
-.reveal-right  { transform: translateX(40px); }
-.reveal-scale  { transform: scale(0.94); }
+.reveal-up {
+  transform: translateY(40px);
+}
+
+.reveal-down {
+  transform: translateY(-40px);
+}
+
+.reveal-left {
+  transform: translateX(-40px);
+}
+
+.reveal-right {
+  transform: translateX(40px);
+}
+
+.reveal-scale {
+  transform: scale(0.94);
+}
 
 /* Visible state – toggled by JS once element enters viewport */
 .reveal.in-view {
@@ -104,18 +123,46 @@ body {
 }
 
 /* Stagger delays for grid children */
-.reveal-stagger > *:nth-child(1)  { transition-delay: 0ms;   }
-.reveal-stagger > *:nth-child(2)  { transition-delay: 80ms;  }
-.reveal-stagger > *:nth-child(3)  { transition-delay: 160ms; }
-.reveal-stagger > *:nth-child(4)  { transition-delay: 240ms; }
-.reveal-stagger > *:nth-child(5)  { transition-delay: 320ms; }
-.reveal-stagger > *:nth-child(6)  { transition-delay: 400ms; }
-.reveal-stagger > *:nth-child(7)  { transition-delay: 480ms; }
-.reveal-stagger > *:nth-child(8)  { transition-delay: 560ms; }
-.reveal-stagger > *:nth-child(n+9){ transition-delay: 640ms; }
+.reveal-stagger>*:nth-child(1) {
+  transition-delay: 0ms;
+}
+
+.reveal-stagger>*:nth-child(2) {
+  transition-delay: 80ms;
+}
+
+.reveal-stagger>*:nth-child(3) {
+  transition-delay: 160ms;
+}
+
+.reveal-stagger>*:nth-child(4) {
+  transition-delay: 240ms;
+}
+
+.reveal-stagger>*:nth-child(5) {
+  transition-delay: 320ms;
+}
+
+.reveal-stagger>*:nth-child(6) {
+  transition-delay: 400ms;
+}
+
+.reveal-stagger>*:nth-child(7) {
+  transition-delay: 480ms;
+}
+
+.reveal-stagger>*:nth-child(8) {
+  transition-delay: 560ms;
+}
+
+.reveal-stagger>*:nth-child(n+9) {
+  transition-delay: 640ms;
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .reveal-stagger > * {
+
+  .reveal,
+  .reveal-stagger>* {
     transition: none;
     opacity: 1;
     transform: none;

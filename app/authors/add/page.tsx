@@ -60,7 +60,7 @@ export default function AddAuthorPage() {
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         <header className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-200">Add Author</h1>
+          <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">Add Author</h1>
           <p className="text-slate-500 text-sm mt-2">Create full author profile: bio, picture, nationality, and birth year.</p>
         </header>
 
@@ -70,7 +70,7 @@ export default function AddAuthorPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="border border-slate-700 bg-slate-900 bg-opacity-30 p-5 space-y-5">
+        <form onSubmit={handleSubmit} className="border border-slate-700 bg-black bg-opacity-30 p-5 space-y-5">
           <div>
             <label className="text-xs text-slate-400 uppercase tracking-wide block mb-2">name *</label>
             <input

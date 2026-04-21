@@ -43,7 +43,7 @@ export default function AuthorsPage() {
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-8">
         <header className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-200">Authors</h1>
+            <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">Authors</h1>
             <p className="text-slate-500 text-sm mt-1">{authors.length} author{authors.length !== 1 ? 's' : ''}</p>
           </div>
           <Link
@@ -57,8 +57,8 @@ export default function AuthorsPage() {
         {authors.length > 0 ? (
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {authors.map((author) => (
-              <article key={author.id} className="border border-slate-700 bg-slate-900 bg-opacity-30 p-4 flex gap-4">
-                <div className="w-20 h-24 bg-slate-900 border border-slate-700 relative overflow-hidden flex-shrink-0">
+              <article key={author.id} className="border border-slate-700 bg-black bg-opacity-30 p-4 flex gap-4">
+                <div className="w-20 h-24 bg-black border border-slate-700 relative overflow-hidden flex-shrink-0">
                   {author.photo_url ? (
                     <Image src={author.photo_url} alt={author.name} fill className="object-cover" />
                   ) : (
@@ -87,7 +87,7 @@ export default function AuthorsPage() {
             ))}
           </section>
         ) : (
-          <section className="border border-slate-700 bg-slate-900 bg-opacity-30 p-12 text-center">
+          <section className="border border-slate-700 bg-black bg-opacity-30 p-12 text-center">
             <div className="text-slate-600 text-sm">no authors yet</div>
           </section>
         )}

@@ -22,11 +22,11 @@ export default function WishlistPage() {
     <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
       <Navigation />
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-12 py-8">
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-purple-400 text-xl">★</span>
-            <h1 className="text-3xl font-bold text-slate-200">My Wishlist</h1>
+            <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">My Wishlist</h1>
           </div>
           <p className="text-slate-500 text-sm">{wishlistBooks.length} book{wishlistBooks.length !== 1 ? 's' : ''} on my wishlist</p>
         </div>
@@ -38,7 +38,7 @@ export default function WishlistPage() {
             ))}
           </div>
         ) : (
-          <div className="border border-slate-700 bg-slate-900 bg-opacity-30 p-12 text-center">
+          <div className="border border-slate-700 bg-black bg-opacity-30 p-12 text-center">
             <div className="text-purple-400 text-4xl mb-4">☆</div>
             <div className="text-slate-500 text-sm mb-6">your wishlist is empty</div>
             <Link

@@ -43,7 +43,7 @@ export default function Loading({ text = 'loading', fullPage = false }: LoadingP
         </div>
       </div>
 
-      <div className="w-64 h-1 bg-slate-800 relative overflow-hidden">
+      <div className="w-64 h-1 bg-neutral-800 relative overflow-hidden">
         <div 
           className="absolute top-0 left-0 h-full bg-purple-600 transition-all duration-300 ease-out shadow-[0_0_8px_rgba(147,51,234,0.5)]"
           style={{ width: `${progress}%` }}

@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { BookOpen, Clock } from 'lucide-react'
 import Loading from '@/app/components/Loading'
 import { useCurrentlyReading } from '@/lib/hooks/useCurrentlyReading'
 import { getShortId } from '@/lib/utils/slug'
@@ -25,7 +26,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
     return null
   }
 
-  const progressPercent = currentBook.pages && currentBook.current_page 
+  const progressPercent = currentBook.pages && currentBook.current_page
     ? Math.round((currentBook.current_page / currentBook.pages) * 100)
     : 0
 
@@ -33,7 +34,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
     return (
       <Link href={`/books/${getShortId(currentBook.id)}`}>
         <div className="group cursor-pointer">
-          <div className="relative overflow-hidden rounded-xl mb-3 aspect-[3/4] bg-slate-900">
+          <div className="relative overflow-hidden rounded-xl mb-3 aspect-[3/4] bg-black">
             {currentBook.cover_url ? (
               <Image
                 src={currentBook.cover_url}
@@ -85,7 +86,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
       <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-blue-900/10 rounded-full blur-[80px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col-reverse md:flex-row gap-10 md:gap-16 items-center">
-        
+
         {/* Left Side: Info */}
         <div className="flex-1 w-full space-y-6">
           <div className="space-y-4">
@@ -99,21 +100,21 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
                 {currentBook.title}
               </h2>
             </Link>
-            
+
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-400 text-lg">
               <span>By <strong className="text-slate-200 font-medium">{currentBook.authors?.name}</strong></span>
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm text-slate-500 font-medium">
               {currentBook.pages ? (
                 <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                  <BookOpen className="w-4 h-4 opacity-70" />
                   {currentBook.pages} pages
                 </span>
               ) : null}
               {currentBook.started_at ? (
                 <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <Clock className="w-4 h-4 opacity-70" />
                   Started {new Date(currentBook.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               ) : null}
@@ -130,13 +131,11 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
           <div className="pt-4 max-w-md space-y-5">
             <div className="flex gap-4">
               <Link href={`/books/${getShortId(currentBook.id)}`} className="bg-purple-600 hover:bg-purple-500 text-white font-bold px-8 py-3 rounded shadow-lg transition tracking-widest text-xs flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
+                <BookOpen className="w-4 h-4" />
                 VIEW BOOK
               </Link>
             </div>
-            
+
             {currentBook.pages && currentBook.current_page && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-400 tracking-wider">
@@ -161,7 +160,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
         {/* Right Side: Book Cover */}
         <div className="w-[220px] md:w-[320px] shrink-0 mx-auto md:mx-0">
           <Link href={`/books/${getShortId(currentBook.id)}`} className="block group/cover perspective-1000">
-            <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden rounded-r-[2rem] rounded-l-md border border-slate-700/50 border-l-[8px] border-l-slate-800 shadow-[20px_20px_40px_rgba(0,0,0,0.8),_0_0_20px_rgba(255,255,255,0.02)] group-hover/cover:shadow-[20px_20px_50px_rgba(0,0,0,0.9),_0_0_30px_rgba(168,85,247,0.15)] group-hover/cover:-translate-y-2 transition-all duration-500 ease-out preserve-3d group-hover/cover:rotate-y-[-5deg]">
+            <div className="aspect-[3/4] bg-black relative overflow-hidden rounded-r-[2rem] rounded-l-md border border-slate-700/50 border-l-[8px] border-l-slate-800 shadow-[20px_20px_40px_rgba(0,0,0,0.8),_0_0_20px_rgba(255,255,255,0.02)] group-hover/cover:shadow-[20px_20px_50px_rgba(0,0,0,0.9),_0_0_30px_rgba(168,85,247,0.15)] group-hover/cover:-translate-y-2 transition-all duration-500 ease-out preserve-3d group-hover/cover:rotate-y-[-5deg]">
               {currentBook.cover_url ? (
                 <Image
                   src={currentBook.cover_url}
@@ -183,7 +182,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
             </div>
           </Link>
         </div>
-        
+
       </div>
     </div>
   )

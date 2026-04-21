@@ -20,7 +20,7 @@ export default function BookCard({ book }: BookCardProps) {
       href={`/books/${getShortId(book.id)}`}
       className="group block transition duration-300 hover:-translate-y-1"
     >
-      <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden rounded-r-2xl rounded-l-md border border-slate-700 border-l-[4px] border-l-slate-800 shadow-[5px_5px_15px_rgba(0,0,0,0.8),_0_0_15px_rgba(168,85,247,0.1)] group-hover:shadow-[5px_5px_20px_rgba(0,0,0,0.8),_0_0_20px_rgba(168,85,247,0.3)] transition-shadow">
+      <div className="aspect-[3/4] bg-black relative overflow-hidden rounded-r-2xl rounded-l-md border border-slate-700 border-l-[4px] border-l-slate-800 shadow-[5px_5px_15px_rgba(0,0,0,0.8),_0_0_15px_rgba(168,85,247,0.1)] group-hover:shadow-[5px_5px_20px_rgba(0,0,0,0.8),_0_0_20px_rgba(168,85,247,0.3)] transition-shadow">
         {book.cover_url ? (
           <Image
             src={book.cover_url}
@@ -43,7 +43,7 @@ export default function BookCard({ book }: BookCardProps) {
         <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-r-2xl rounded-l-md pointer-events-none"></div>
       </div>
       <div className="pt-4 bg-transparent text-left">
-        <h3 className="font-bold text-slate-200 line-clamp-2 mb-1 group-hover:text-purple-300 transition">
+        <h3 className="font-bold text-slate-200 line-clamp-2 mb-1 group-hover:text-purple-300 transition font-serif tracking-tight">
           {book.title}
         </h3>
         <p className="text-slate-500 text-sm mb-2 line-clamp-1">{book.authors?.name}</p>

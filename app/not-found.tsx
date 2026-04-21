@@ -11,11 +11,11 @@ export default function NotFound() {
           <div className="text-8xl font-bold text-slate-700">404</div>
           
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-slate-300">page not found</h1>
+            <h1 className="font-serif tracking-tight text-2xl font-bold text-slate-300">page not found</h1>
             <p className="text-slate-500">the page you&apos;re looking for doesn&apos;t exist</p>
           </div>
 
-          <div className="border border-slate-700 bg-slate-900 bg-opacity-40 p-6 rounded-lg">
+          <div className="border border-slate-700 bg-black bg-opacity-40 p-6 rounded-lg">
             <p className="text-slate-400 text-sm">
               maybe it was moved, deleted, or never existed
             </p>

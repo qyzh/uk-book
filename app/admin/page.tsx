@@ -511,7 +511,7 @@ export default function AdminPage() {
     return (
         <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
             {/* Header */}
-            <header className="border-b border-slate-700 bg-slate-900 sticky top-0 z-40">
+            <header className="border-b border-slate-700 bg-black sticky top-0 z-40">
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between mb-6">
                         <Link href="/" className="text-slate-400 hover:text-purple-300 transition text-sm font-bold">
@@ -528,7 +528,7 @@ export default function AdminPage() {
 
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
-                            <h1 className="text-2xl font-bold text-slate-200 capitalize">{activeTab}</h1>
+                            <h1 className="font-serif tracking-tight text-2xl font-bold text-slate-200 capitalize">{activeTab}</h1>
                             <button
                                 onClick={() => openModal(tabToModalType[activeTab])}
                                 className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm rounded-lg transition font-semibold"
@@ -545,8 +545,8 @@ export default function AdminPage() {
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`px-4 py-2 text-sm transition whitespace-nowrap rounded-lg border ${
                                         activeTab === tab.id
-                                            ? 'bg-slate-800 border-slate-600 text-slate-200 shadow-[inset_0_1px_4px_rgba(0,0,0,0.5)]'
-                                            : 'bg-transparent border-transparent text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
+                                            ? 'bg-neutral-800 border-slate-600 text-slate-200 shadow-[inset_0_1px_4px_rgba(0,0,0,0.5)]'
+                                            : 'bg-transparent border-transparent text-slate-500 hover:text-slate-300 hover:bg-neutral-800/50'
                                     }`}
                                 >
                                     {tab.label} <span className="opacity-50 ml-1">({tab.count})</span>
@@ -578,8 +578,8 @@ export default function AdminPage() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {books.map((book) => (
-                                <div key={book.id} className="border border-slate-700 bg-slate-900 bg-opacity-50 rounded-lg overflow-hidden hover:border-purple-500 transition">
-                                    <div className="aspect-[3/4] relative bg-slate-800">
+                                <div key={book.id} className="border border-slate-700 bg-black bg-opacity-50 rounded-lg overflow-hidden hover:border-purple-500 transition">
+                                    <div className="aspect-[3/4] relative bg-neutral-800">
                                         {book.cover_url ? (
                                             <Image src={book.cover_url} alt={book.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
                                         ) : (
@@ -643,7 +643,7 @@ export default function AdminPage() {
 
                         <div className="space-y-3">
                             {quotes.map((quote) => (
-                                <div key={quote.id} className={`border-l-4 p-4 rounded-r bg-slate-900 bg-opacity-50 ${quote.is_favorite ? 'border-l-yellow-400' : 'border-l-slate-600'}`}>
+                                <div key={quote.id} className={`border-l-4 p-4 rounded-r bg-black bg-opacity-50 ${quote.is_favorite ? 'border-l-yellow-400' : 'border-l-slate-600'}`}>
                                     <div className="flex justify-between items-start gap-3 mb-2">
                                         <span className="text-purple-300 text-xs font-bold">{quote.books?.title}</span>
                                         <button
@@ -683,7 +683,7 @@ export default function AdminPage() {
                             {notes.map((note) => {
                                 const book = books.find(b => b.id === note.book_id)
                                 return (
-                                    <div key={note.id} className="border border-amber-800 bg-slate-900 p-4 rounded">
+                                    <div key={note.id} className="border border-amber-800 bg-black p-4 rounded">
                                         <div className="flex justify-between items-start gap-3 mb-2">
                                             <div>
                                                 <span className="text-amber-300 text-xs font-bold">{book?.title || 'Unknown'}</span>
@@ -716,16 +716,16 @@ export default function AdminPage() {
                 {/* Authors Tab */}
                 {activeTab === 'authors' && (
                     <div className="space-y-4">
-                        <div className="border border-slate-700 bg-slate-900 bg-opacity-50 p-3 rounded">
+                        <div className="border border-slate-700 bg-black bg-opacity-50 p-3 rounded">
                             <div className="text-slate-400 text-xs font-bold">Total Authors</div>
                             <div className="text-2xl font-bold text-slate-200">{authors.length}</div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {authors.map((author) => (
-                                <div key={author.id} className="border border-slate-700 bg-slate-900 bg-opacity-50 p-4 rounded-lg">
+                                <div key={author.id} className="border border-slate-700 bg-black bg-opacity-50 p-4 rounded-lg">
                                     <div className="flex gap-3 mb-3">
-                                        <div className="w-16 h-20 bg-slate-800 relative overflow-hidden rounded flex-shrink-0">
+                                        <div className="w-16 h-20 bg-neutral-800 relative overflow-hidden rounded flex-shrink-0">
                                             {author.photo_url ? (
                                                 <Image src={author.photo_url} alt={author.name} fill sizes="64px" className="object-cover" />
                                             ) : (
@@ -749,8 +749,8 @@ export default function AdminPage() {
             {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4 overflow-y-auto">
-                    <div className="bg-slate-900 border border-slate-700 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                        <div className="sticky top-0 bg-slate-900 border-b border-slate-700 px-4 py-3 flex justify-between items-center">
+                    <div className="bg-black border border-slate-700 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                        <div className="sticky top-0 bg-black border-b border-slate-700 px-4 py-3 flex justify-between items-center">
                             <h2 className="text-lg font-bold text-slate-200">
                                 {modalType === 'book' && (editingBook ? 'Edit Book' : 'Add Book')}
                                 {modalType === 'quote' && 'Add Quote'}
@@ -759,7 +759,7 @@ export default function AdminPage() {
                             </h2>
                             <button
                                 onClick={() => { setShowModal(false); resetForm() }}
-                                className="text-slate-400 hover:text-slate-200 transition p-1 rounded hover:bg-slate-800"
+                                className="text-slate-400 hover:text-slate-200 transition p-1 rounded hover:bg-neutral-800"
                             >
                                 <X className="w-5 h-5" />
                             </button>
@@ -978,7 +978,7 @@ export default function AdminPage() {
                                         />
                                         {uploadingCover && <p className="text-purple-300 text-xs mt-1">uploading...</p>}
                                         {coverPreview && (
-                                            <div className="mt-2 w-20 h-28 bg-slate-800 relative overflow-hidden rounded">
+                                            <div className="mt-2 w-20 h-28 bg-neutral-800 relative overflow-hidden rounded">
                                                 <img src={coverPreview} alt="Preview" className="w-full h-full object-cover" />
                                             </div>
                                         )}
@@ -1140,7 +1140,7 @@ export default function AdminPage() {
                                             className="w-full px-3 py-2 bg-black border border-slate-600 text-slate-200 text-sm rounded focus:border-purple-500 outline-none mt-2"
                                         />
                                         {(authorPhotoPreview || authorData.photo_url) && (
-                                            <div className="mt-2 w-16 h-20 bg-slate-800 relative overflow-hidden rounded">
+                                            <div className="mt-2 w-16 h-20 bg-neutral-800 relative overflow-hidden rounded">
                                                 <img 
                                                     src={authorPhotoPreview || authorData.photo_url} 
                                                     alt="Preview" 

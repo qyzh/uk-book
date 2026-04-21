@@ -33,10 +33,10 @@ export default function LoginPage() {
         <div className="min-h-screen bg-black text-slate-100 flex flex-col" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
             <main className="flex-1 flex items-center justify-center px-4">
                 <div className="w-full max-w-md">
-                    <div className="border border-slate-700 bg-slate-900 bg-opacity-40 p-8">
+                    <div className="border border-slate-700 bg-black bg-opacity-40 p-8">
                         <div className="text-center mb-8">
                             <div className="text-slate-500 text-xs uppercase tracking-widest mb-2">ukbook</div>
-                            <h1 className="text-2xl font-bold text-slate-200">admin login</h1>
+                            <h1 className="font-serif tracking-tight text-2xl font-bold text-slate-200">admin login</h1>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
