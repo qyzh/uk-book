@@ -1,7 +1,7 @@
 'use client'
 
 import { ToastProvider } from '@/lib/hooks/useToast'
-import Toast from '@/components/Toast'
+import Toast from "./Toast"
 
 export default function ToastLayout({ children }: { children: React.ReactNode }) {
   return (
