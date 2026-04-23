@@ -40,6 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+#AI
+.claude/ 
 # documentation and markdown (development only)
 /docs/
 *.md
