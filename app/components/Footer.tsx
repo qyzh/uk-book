@@ -3,9 +3,9 @@ import { X, Globe } from 'lucide-react'
 
 const InstagramIcon = ({ size = 16 }: { size?: number }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
   </svg>
 )
 
@@ -35,6 +35,7 @@ const navLinks: NavLink[] = [
 export default function Footer() {
   return (
     <footer className="mt-auto border-t border-[#30302e] bg-[#141413]">
+
       <div className="max-w-7xl mx-auto px-12 py-8">
 
         {/* Profile row */}
@@ -74,7 +75,21 @@ export default function Footer() {
             ))}
           </div>
         </div>
-
+        {/* Big decorative display text */}
+        <div className="relative overflow-hidden select-none pointer-events-none" aria-hidden="true">
+          <p
+            className="text-center font-bold leading-none text-[#faf9f5]"
+            style={{
+              fontFamily: "var(--font-playfair), Georgia, serif",
+              fontSize: "clamp(80px, 18vw, 220px)",
+              opacity: 0.07,
+              letterSpacing: "-0.02em",
+              marginBottom: "-0.15em",
+            }}
+          >
+            ukbuku
+          </p>
+        </div>
         {/* Divider */}
         <div className="border-t border-[#30302e] mb-4" />
 
