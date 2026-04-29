@@ -374,16 +374,6 @@ export default function BookPageClient({ bookId, initialBook }: Props) {
             <div className="text-slate-600 py-12">no quotes captured yet from this book</div>
           </section>
         )}
-
-        {/* Footer Navigation */}
-        <footer className="border-t ukborder pt-8 pb-12 text-center">
-          <Link
-            href="/browse"
-            className="text-slate-500 hover:text-slate-400 text-sm transition"
-          >
-            [explore more books]
-          </Link>
-        </footer>
       </main>
     </div>
   )
