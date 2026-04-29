@@ -101,9 +101,9 @@ export default function RootLayout({
         <AuthProvider>
           <ToastLayout>
             {children}
+            <Footer />
           </ToastLayout>
         </AuthProvider>
-        <Footer />
       </body>
     </html>
   );
