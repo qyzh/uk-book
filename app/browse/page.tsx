@@ -170,7 +170,7 @@ export default function BrowsePage() {
     <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
       <Navigation />
 
-      <main className="py-8">
+      <main className="pt-20">
         <div className="mb-8 max-w-7xl mx-auto px-12">
           <div className="flex items-center justify-between mb-4">
             <h1 className="font-serif tracking-tight text-2xl font-bold text-slate-200">Explore Library</h1>
@@ -275,10 +275,6 @@ export default function BrowsePage() {
             <div className="text-slate-600 text-sm">no books match your filters</div>
           </div>
         )}
-
-        <footer className="pt-8 pb-12 text-center text-slate-500 text-xs">
-          <Link href="/" className="hover:text-slate-400 transition">[← back to home]</Link>
-        </footer>
       </main>
     </div>
   )

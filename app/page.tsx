@@ -260,11 +260,6 @@ export default function HomePage() {
             </div>
           </RevealSection>
         )}
-
-        {/* Footer */}
-        <RevealSection as="footer" variant="up" delay={200} className="border-t ukborder pt-8 text-center text-slate-500 text-xs pb-8">
-          <p>crafted with ♡ • {new Date().getFullYear()}</p>
-        </RevealSection>
       </main>
     </div>
   )

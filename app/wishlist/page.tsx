@@ -23,7 +23,7 @@ export default function WishlistPage() {
     <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
       <Navigation />
 
-      <main className="py-8">
+      <main className="pt-20">
         <div className="mb-12 max-w-7xl mx-auto px-12">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-[#d97757] text-xl"><Bookmark className="w-5 h-5" /></span>
@@ -52,12 +52,6 @@ export default function WishlistPage() {
             </Link>
           </div>
         )}
-
-        <footer className="pt-8 pb-12 text-center text-slate-500 text-xs">
-          <Link href="/" className="hover:text-slate-400 transition">
-            [← back to home]
-          </Link>
-        </footer>
       </main>
     </div>
   )
