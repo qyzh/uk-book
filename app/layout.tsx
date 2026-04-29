@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Newsreader, Playfair_Display } from "next/font/googl
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import ToastLayout from "./components/ToastLayout";
+import Footer from "./components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -102,6 +103,7 @@ export default function RootLayout({
             {children}
           </ToastLayout>
         </AuthProvider>
+        <Footer />
       </body>
     </html>
   );
