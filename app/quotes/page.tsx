@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import { Quote } from 'lucide-react'
 import Navigation from '@/app/components/Navigation'
 import Loading from '@/app/components/Loading'
 import QuoteShareButton from '@/app/components/QuoteShareButton'
@@ -53,9 +54,12 @@ export default function QuotesPage() {
     <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
       <Navigation />
 
-      <main className="mx-auto py-8">
+      <main className="mx-auto pt-20 pb-12">
         <header className="space-y-2 max-w-7xl mx-auto px-12">
-          <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">All Quotes</h1>
+          <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200 flex items-center gap-2">
+            <Quote className="w-8 h-8 text-[#d97757]" />
+            All Quotes
+          </h1>
           <p className="text-slate-500 text-sm">
             {filteredQuotes.length} quote{filteredQuotes.length !== 1 ? 's' : ''} shown • {favoriteCount} favorite{favoriteCount !== 1 ? 's' : ''}
           </p>
@@ -129,12 +133,6 @@ export default function QuotesPage() {
             <div className="text-slate-600 text-sm">no quotes match current filters</div>
           </section>
         )}
-
-        <footer className="border-t border-slate-700 pt-8 pb-12 mt-12 text-center text-slate-500 text-xs">
-          <Link href="/" className="hover:text-slate-400 transition">
-            [← back to home]
-          </Link>
-        </footer>
       </main>
     </div>
   )
