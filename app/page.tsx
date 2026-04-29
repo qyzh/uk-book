@@ -52,7 +52,7 @@ export default function HomePage() {
                 key={currentQuoteIndex}
                 className="flex-grow flex flex-col justify-center py-6 relative z-10 animate-fade-in-up"
               >
-                <blockquote className="text-xl md:text-2xl text-slate-200 leading-relaxed mb-6 italic">
+                <blockquote className="text-xl md:text-2xl text-slate-200 leading-relaxed mb-6 italic" style={{ fontFamily: "var(--font-playfair), Georgia, serif", letterSpacing: "0.02em" }}>
                   &ldquo;{favoriteQuotes[currentQuoteIndex % favoriteQuotes.length]?.text}&rdquo;
                 </blockquote>
                 {favoriteQuotes[currentQuoteIndex % favoriteQuotes.length]?.books && (
@@ -85,7 +85,7 @@ export default function HomePage() {
         )}
 
         {/* Stats */}
-        <RevealSection as="section" variant="up" delay={100} stagger className="max-w-7xl mx-auto px-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <RevealSection as="section" variant="up" delay={100} stagger className="max-w-7xl mx-auto ukbox px-12 grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { label: 'total books', value: books.filter(b => b.reading_status !== 'wishlist').length },
             { label: 'completed', value: completedBooks.length },
@@ -94,10 +94,10 @@ export default function HomePage() {
           ].map((stat, i) => (
             <div
               key={i}
-              className="border border-[#30302e] p-4 text-center transition"
+              className="p-4 text-center transition"
             >
-              <div className="text-[#d97757] text-xs uppercase font-serif tracking-wide">{stat.label}</div>
-              <div className="text-3xl font-bold text-slate-200 mt-2">{stat.value}</div>
+              <div className="text-[#d97757] text-lg uppercase font-serif tracking-wide">{stat.label}</div>
+              <div className="text-4xl font-bold text-slate-200 mt-2">{stat.value}</div>
             </div>
           ))}
         </RevealSection>
