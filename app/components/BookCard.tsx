@@ -2,16 +2,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Book } from '@/lib/types/library'
 import { getShortId } from '@/lib/utils/slug'
-
+import { Badge } from '@/app/components/Badge'
 interface BookCardProps {
   book: Book
-}
-
-function getStatusStyles(status: string) {
-  if (status === 'completed') return 'bg-emerald-900 text-emerald-300'
-  if (status === 'reading') return 'bg-[#d97757]/20 text-[#d97757]'
-  if (status === 'wishlist') return 'bg-blue-900 text-blue-300'
-  return 'bg-slate-800 text-slate-300'
 }
 
 export default function BookCard({ book }: BookCardProps) {
@@ -51,9 +44,9 @@ export default function BookCard({ book }: BookCardProps) {
         {book.summary && <p className="text-slate-600 text-xs mb-3 line-clamp-2">{book.summary}</p>}
 
         <div className="mb-2 inline-block">
-          <span className={`text-xs font-bold px-2 py-1 rounded ${getStatusStyles(book.reading_status)}`}>
+          <Badge variant={book.reading_status}>
             {book.reading_status}
-          </span>
+          </Badge>
         </div>
 
         <div className="space-y-1 text-xs text-slate-600 mb-3">

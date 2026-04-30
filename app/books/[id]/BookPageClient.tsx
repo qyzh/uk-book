@@ -7,7 +7,7 @@ import Image from 'next/image'
 import Navigation from '@/app/components/Navigation'
 import Loading from '@/app/components/Loading'
 import BookShareButton from '@/app/components/BookShareButton'
-
+import { Badge } from '@/app/components/Badge'
 interface Author {
   id: string
   name: string
@@ -186,18 +186,9 @@ export default function BookPageClient({ bookId, initialBook }: Props) {
             <div className="ukbox p-4 space-y-3">
               <div>
                 <div className="text-xs text-slate-500 uppercase tracking-wide mb-1">status</div>
-                <div
-                  className={`text-sm font-bold inline-block px-2 py-1 rounded ${book.reading_status === 'completed'
-                    ? 'bg-emerald-900 text-emerald-300'
-                    : book.reading_status === 'reading'
-                      ? 'bg-[#d97757]/20 text-[#d97757] animate-pulse'
-                      : book.reading_status === 'wishlist'
-                        ? 'bg-blue-900 text-blue-300'
-                        : 'bg-slate-800 text-slate-300'
-                    }`}
-                >
+                <Badge variant={book.reading_status} className={book.reading_status === 'reading' ? 'animate-pulse' : ''}>
                   {book.reading_status}
-                </div>
+                </Badge>
               </div>
 
               {book.genre && (

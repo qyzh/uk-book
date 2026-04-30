@@ -103,30 +103,46 @@ export default function QuotesPage() {
 
         {filteredQuotes.length > 0 ? (
           <section className="space-y-4 max-w-7xl mx-auto px-12">
-            {filteredQuotes.map((quote) => (
-              <article
-                key={quote.id}
-                className={`border p-5 transition ${quote.is_favorite
-                  ? 'border-[#d97757] bg-[#d97757]/10'
-                  : 'border-slate-700 bg-black bg-opacity-20'
-                  }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <blockquote className="text-slate-200 italic leading-relaxed">&ldquo;{quote.text}&rdquo;</blockquote>
-                  {quote.is_favorite && <span className="text-[#d97757] text-xs font-bold whitespace-nowrap">favorite</span>}
-                </div>
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                  <div className="text-xs text-slate-500">
-                    <span>book: {quote.books?.title || 'unknown book'}</span>
-                    {quote.page_number && <span className="ml-3">page {quote.page_number}</span>}
+            {filteredQuotes.map((quote) => {
+              const innerContent = (
+                <>
+                  <div className="flex items-start justify-between gap-3">
+                    <blockquote className="text-slate-200 italic leading-relaxed">&ldquo;{quote.text}&rdquo;</blockquote>
+                    {quote.is_favorite && <span className="text-[#d97757] text-[10px] font-bold whitespace-nowrap uppercase tracking-wider">Favorite</span>}
                   </div>
-                  <QuoteShareButton
-                    quoteText={quote.text}
-                    bookTitle={quote.books?.title || 'Unknown Book'}
-                  />
-                </div>
-              </article>
-            ))}
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                    <div className="text-xs text-slate-500">
+                      <span>book: {quote.books?.title || 'unknown book'}</span>
+                      {quote.page_number && <span className="ml-3">page {quote.page_number}</span>}
+                    </div>
+                    <QuoteShareButton
+                      quoteText={quote.text}
+                      bookTitle={quote.books?.title || 'Unknown Book'}
+                    />
+                  </div>
+                </>
+              )
+
+              if (quote.is_favorite) {
+                return (
+                  <div key={quote.id} className="relative p-[1px] overflow-hidden rounded-lg group">
+                    {/* Spinning Gradient Border */}
+                    <div className="absolute top-1/2 left-1/2 aspect-square w-[200%] sm:w-[150%] md:w-[120%] lg:w-[200%] -translate-x-1/2 -translate-y-1/2 animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#d97757_60%,transparent_100%)] opacity-80 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    
+                    {/* Inner Content */}
+                    <article className="relative bg-black h-full w-full rounded-[7px] p-6 z-10">
+                      {innerContent}
+                    </article>
+                  </div>
+                )
+              }
+
+              return (
+                <article key={quote.id} className="border border-slate-800 bg-black bg-opacity-20 p-6 rounded-lg hover:border-slate-700 transition">
+                  {innerContent}
+                </article>
+              )
+            })}
           </section>
         ) : (
           <section className="border border-slate-700 bg-black bg-opacity-30 p-12 text-center">
