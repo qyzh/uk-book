@@ -11,6 +11,7 @@ import RevealSection from '@/app/components/RevealSection'
 import { useBooks } from '@/lib/hooks/useBooks'
 import { useQuoteCarousel } from '@/lib/hooks/useQuoteCarousel'
 import { getShortId } from '@/lib/utils/slug'
+import { Badge } from '@/app/components/Badge'
 
 export default function HomePage() {
   const { books, loading } = useBooks()
@@ -110,7 +111,7 @@ export default function HomePage() {
                 <Library className="w-10 h-10 text-[#d97757]" /> Library
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal-stagger">
-                {recentBooks.map((book) => (
+                {recentBooks.map((book, index) => (
                   <Link
                     key={book.id}
                     href={`/books/${getShortId(book.id)}`}
@@ -124,6 +125,7 @@ export default function HomePage() {
                           fill
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           className="object-cover group-hover:scale-105 transition duration-500"
+                          priority={index === 0}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1f1e1d] to-[#1f1e1d]">
@@ -144,16 +146,9 @@ export default function HomePage() {
                       <p className="text-slate-500 text-sm mb-3">{book.authors?.name}</p>
                       <div className="flex items-center justify-between text-xs text-slate-600">
                         <span>{book.published_year || '—'}</span>
-                        <span
-                          className={`${book.reading_status === 'completed'
-                            ? 'text-slate-400'
-                            : book.reading_status === 'reading'
-                              ? 'text-[#d97757]'
-                              : 'text-slate-600'
-                            }`}
-                        >
-                          [{book.reading_status}]
-                        </span>
+                        <Badge variant={book.reading_status}>
+                          {book.reading_status}
+                        </Badge>
                       </div>
                     </div>
                   </Link>
