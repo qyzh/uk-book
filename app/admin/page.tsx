@@ -22,7 +22,7 @@ import BookForm, {
 import QuoteForm, { type QuoteFormData, EMPTY_QUOTE_FORM } from './components/QuoteForm'
 import NoteForm, { type NoteFormData, EMPTY_NOTE_FORM } from './components/NoteForm'
 import AuthorForm, { type AuthorFormData, EMPTY_AUTHOR_FORM } from './components/AuthorForm'
-import type { Book, Author } from '@/lib/types/library'
+import type { Book, Author, Tag } from '@/lib/types/library'
 
 interface Quote {
   id: string
@@ -31,6 +31,7 @@ interface Quote {
   page_number?: number
   is_favorite: boolean
   books?: { id: string; title: string }
+  tags?: Tag[]
 }
 
 interface Note {
@@ -42,7 +43,7 @@ interface Note {
   updated_at: string
 }
 
-type PanelMode = 'new-book' | 'edit-book' | 'new-quote' | 'new-note' | 'new-author' | null
+type PanelMode = 'new-book' | 'edit-book' | 'new-quote' | 'edit-quote' | 'new-note' | 'new-author' | null
 
 export default function AdminPage() {
   const { signOut } = useAuth()
@@ -58,6 +59,7 @@ export default function AdminPage() {
 
   const [panelMode, setPanelMode] = useState<PanelMode>(null)
   const [editingBook, setEditingBook] = useState<Book | null>(null)
+  const [editingQuote, setEditingQuote] = useState<Quote | null>(null)
 
   const [bookForm, setBookForm] = useState<BookFormData>(EMPTY_BOOK_FORM)
   const [quoteForm, setQuoteForm] = useState<QuoteFormData>(EMPTY_QUOTE_FORM)
@@ -120,16 +122,28 @@ export default function AdminPage() {
   const closePanel = () => {
     setPanelMode(null)
     setEditingBook(null)
+    setEditingQuote(null)
     setBookForm(EMPTY_BOOK_FORM)
     setQuoteForm(EMPTY_QUOTE_FORM)
     setNoteForm(EMPTY_NOTE_FORM)
     setAuthorForm(EMPTY_AUTHOR_FORM)
   }
 
-  const openNewBook = () => { setBookForm(EMPTY_BOOK_FORM); setPanelMode('new-book') }
-  const openEditBook = (book: Book) => { setEditingBook(book); setBookForm(bookToFormData(book)); setPanelMode('edit-book') }
-  const openNewQuote = () => { setQuoteForm(EMPTY_QUOTE_FORM); setPanelMode('new-quote') }
-  const openNewNote = () => { setNoteForm(EMPTY_NOTE_FORM); setPanelMode('new-note') }
+  const openNewBook   = () => { setBookForm(EMPTY_BOOK_FORM); setPanelMode('new-book') }
+  const openEditBook  = (book: Book) => { setEditingBook(book); setBookForm(bookToFormData(book)); setPanelMode('edit-book') }
+  const openNewQuote  = () => { setQuoteForm(EMPTY_QUOTE_FORM); setPanelMode('new-quote') }
+  const openEditQuote = (quote: Quote) => {
+    setEditingQuote(quote)
+    setQuoteForm({
+      book_id:     quote.book_id,
+      text:        quote.text,
+      page_number: quote.page_number ? String(quote.page_number) : '',
+      is_favorite: quote.is_favorite,
+      tag_ids:     (quote.tags ?? []).map((t) => t.id),
+    })
+    setPanelMode('edit-quote')
+  }
+  const openNewNote   = () => { setNoteForm(EMPTY_NOTE_FORM); setPanelMode('new-note') }
   const openNewAuthor = () => { setAuthorForm(EMPTY_AUTHOR_FORM); setPanelMode('new-author') }
 
   // ── Handlers ───────────────────────────────────────────────────
@@ -181,13 +195,50 @@ export default function AdminPage() {
     if (submitting) return
     setSubmitting(true)
     try {
-      const res = await fetch('/api/quotes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      const payload = {
+        book_id: data.book_id,
+        text: data.text,
+        page_number: data.page_number ? parseInt(data.page_number) : undefined,
+        is_favorite: data.is_favorite,
+        tag_ids: data.tag_ids ?? [],
+      }
+      const res = await fetch('/api/quotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
       if (!res.ok) throw new Error()
       toast.success('Quote added')
       await fetchQuotes()
       closePanel()
     } catch {
       toast.error('Failed to add quote')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleUpdateQuote = async (data: QuoteFormData) => {
+    if (submitting || !editingQuote) return
+    setSubmitting(true)
+    try {
+      const payload = {
+        text:        data.text,
+        page_number: data.page_number ? parseInt(data.page_number) : undefined,
+        is_favorite: data.is_favorite,
+        tag_ids:     data.tag_ids ?? [],
+      }
+      const res = await fetch(`/api/quotes/${editingQuote.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) throw new Error()
+      toast.success('Quote updated')
+      await fetchQuotes()
+      closePanel()
+    } catch {
+      toast.error('Failed to update quote')
     } finally {
       setSubmitting(false)
     }
@@ -275,11 +326,12 @@ export default function AdminPage() {
 
   const panelOpen = panelMode !== null
   const panelTitle =
-    panelMode === 'edit-book'  ? 'Edit Book'  :
-    panelMode === 'new-book'   ? 'New Book'   :
-    panelMode === 'new-quote'  ? 'New Quote'  :
-    panelMode === 'new-note'   ? 'New Note'   :
-    panelMode === 'new-author' ? 'New Author' : ''
+    panelMode === 'edit-book'   ? 'Edit Book'   :
+    panelMode === 'new-book'    ? 'New Book'    :
+    panelMode === 'new-quote'   ? 'New Quote'   :
+    panelMode === 'edit-quote'  ? 'Edit Quote'  :
+    panelMode === 'new-note'    ? 'New Note'    :
+    panelMode === 'new-author'  ? 'New Author'  : ''
 
   // ── Render ─────────────────────────────────────────────────────
 
@@ -327,6 +379,7 @@ export default function AdminPage() {
               quotes={quotes}
               onToggleFavorite={handleToggleFavorite}
               onDelete={handleDeleteQuote}
+              onEdit={openEditQuote}
               onNew={openNewQuote}
             />
           )}
@@ -352,7 +405,13 @@ export default function AdminPage() {
           title={panelTitle}
           onClose={closePanel}
           onSave={panelOpen ? () => {} : undefined}
-          onDelete={panelMode === 'edit-book' && editingBook ? () => handleDeleteBook(editingBook.id) : undefined}
+          onDelete={
+            panelMode === 'edit-book' && editingBook
+              ? () => handleDeleteBook(editingBook.id)
+              : panelMode === 'edit-quote' && editingQuote
+              ? () => handleDeleteQuote(editingQuote.id)
+              : undefined
+          }
           saving={submitting}
         >
           {(panelMode === 'new-book' || panelMode === 'edit-book') && (
@@ -364,13 +423,14 @@ export default function AdminPage() {
               onSubmit={handleSaveBook}
             />
           )}
-          {panelMode === 'new-quote' && (
+          {(panelMode === 'new-quote' || panelMode === 'edit-quote') && (
             <QuoteForm
               formId="detail-form"
               data={quoteForm}
               books={books}
+              mode={panelMode === 'edit-quote' ? 'edit' : 'new'}
               onChange={setQuoteForm}
-              onSubmit={handleSaveQuote}
+              onSubmit={panelMode === 'edit-quote' ? handleUpdateQuote : handleSaveQuote}
             />
           )}
           {panelMode === 'new-note' && (

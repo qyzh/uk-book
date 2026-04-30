@@ -26,11 +26,44 @@ export interface Book {
   authors: Author
 }
 
+// ─── Tag System ──────────────────────────────────────────────────
+
+/** Color keys that map to visual badge styles in the UI. */
+export type TagColor =
+  | 'gray'
+  | 'blue'
+  | 'green'
+  | 'yellow'
+  | 'red'
+  | 'purple'
+  | 'orange'
+  | 'pink'
+
+export interface Tag {
+  id: string
+  name: string
+  slug: string
+  color: TagColor
+  created_at?: string
+}
+
+/** Raw row from the quote_tags junction table. */
+export interface QuoteTag {
+  quote_id: string
+  tag_id: string
+  tags?: Tag
+}
+
+// ─── Quotes ──────────────────────────────────────────────────────
+
 export interface Quote {
   id: string
   book_id: string
   text: string
   page_number?: number
   is_favorite: boolean
+  created_at?: string
   books?: { id: string; title: string }
+  /** Tags attached to this quote, populated via the quote_tags join. */
+  tags?: Tag[]
 }

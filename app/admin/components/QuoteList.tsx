@@ -1,6 +1,7 @@
 'use client'
 
-import { Plus, Star, Trash2, Quote as QuoteIcon } from 'lucide-react'
+import { Plus, Star, Trash2, Pencil, Quote as QuoteIcon } from 'lucide-react'
+import type { Tag } from '@/lib/types/library'
 
 interface Quote {
   id: string
@@ -9,17 +10,35 @@ interface Quote {
   page_number?: number
   is_favorite: boolean
   books?: { id: string; title: string }
+  tags?: Tag[]
 }
 
 interface QuoteListProps {
   quotes: Quote[]
   onToggleFavorite: (quote: Quote) => void
   onDelete: (id: string) => void
+  onEdit: (quote: Quote) => void
   onNew: () => void
 }
 
-export default function QuoteList({ quotes, onToggleFavorite, onDelete, onNew }: QuoteListProps) {
-  const favorites = quotes.filter(q => q.is_favorite).length
+// Minimal colour map for tag pills in the list view
+const TAG_COLORS: Record<string, { bg: string; text: string }> = {
+  gray:   { bg: 'bg-slate-700/60',   text: 'text-slate-300'  },
+  blue:   { bg: 'bg-blue-900/50',    text: 'text-blue-300'   },
+  green:  { bg: 'bg-emerald-900/50', text: 'text-emerald-300'},
+  yellow: { bg: 'bg-yellow-900/50',  text: 'text-yellow-300' },
+  red:    { bg: 'bg-red-900/50',     text: 'text-red-300'    },
+  purple: { bg: 'bg-purple-900/50',  text: 'text-purple-300' },
+  orange: { bg: 'bg-[#d97757]/20',   text: 'text-[#d97757]'  },
+  pink:   { bg: 'bg-pink-900/50',    text: 'text-pink-300'   },
+}
+
+function tagColors(color: string) {
+  return TAG_COLORS[color] ?? TAG_COLORS.gray
+}
+
+export default function QuoteList({ quotes, onToggleFavorite, onDelete, onEdit, onNew }: QuoteListProps) {
+  const favorites = quotes.filter((q) => q.is_favorite).length
 
   return (
     <div className="flex flex-col h-full" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
@@ -49,46 +68,68 @@ export default function QuoteList({ quotes, onToggleFavorite, onDelete, onNew }:
             <QuoteIcon className="w-8 h-8 text-[#30302e]" />
             <span className="text-[#87867f] text-sm">No quotes yet</span>
           </div>
-        ) : quotes.map(quote => (
-          <div key={quote.id} className="px-5 py-4 hover:bg-[#1a1918] group transition">
-            {/* Header row */}
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <span className="text-[11px] font-bold text-[#d97757] bg-[#d97757]/10 px-2 py-0.5 rounded">
-                {quote.books?.title ?? 'Unknown Book'}
-              </span>
-              <div className="flex gap-1 shrink-0">
-                <button
-                  onClick={() => onToggleFavorite(quote)}
-                  className={`p-1.5 rounded-lg transition ${
-                    quote.is_favorite
-                      ? 'text-yellow-400 bg-yellow-900/20'
-                      : 'text-[#87867f] hover:text-yellow-400 hover:bg-yellow-900/20'
-                  }`}
-                  title={quote.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
-                >
-                  <Star className={`w-3.5 h-3.5 ${quote.is_favorite ? 'fill-current' : ''}`} />
-                </button>
-                <button
-                  onClick={() => onDelete(quote.id)}
-                  className="p-1.5 rounded-lg text-[#87867f] hover:text-red-400 hover:bg-red-900/20 transition opacity-0 group-hover:opacity-100"
-                  title="delete"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+        ) : (
+          quotes.map((quote) => (
+            <div key={quote.id} className="px-5 py-4 hover:bg-[#1a1918] group transition">
+              {/* Header row */}
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <span className="text-[11px] font-bold text-[#d97757] bg-[#d97757]/10 px-2 py-0.5 rounded">
+                  {quote.books?.title ?? 'Unknown Book'}
+                </span>
+                <div className="flex gap-1 shrink-0">
+                  <button
+                    onClick={() => onToggleFavorite(quote)}
+                    className={`p-1.5 rounded-lg transition ${
+                      quote.is_favorite
+                        ? 'text-yellow-400 bg-yellow-900/20'
+                        : 'text-[#87867f] hover:text-yellow-400 hover:bg-yellow-900/20'
+                    }`}
+                    title={quote.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+                  >
+                    <Star className={`w-3.5 h-3.5 ${quote.is_favorite ? 'fill-current' : ''}`} />
+                  </button>
+                  <button
+                    onClick={() => onEdit(quote)}
+                    className="p-1.5 rounded-lg text-[#87867f] hover:text-[#d97757] hover:bg-[#d97757]/10 transition opacity-0 group-hover:opacity-100"
+                    title="edit"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => onDelete(quote.id)}
+                    className="p-1.5 rounded-lg text-[#87867f] hover:text-red-400 hover:bg-red-900/20 transition opacity-0 group-hover:opacity-100"
+                    title="delete"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Quote text */}
+              <p className="text-sm text-[#e8e6e1] italic line-clamp-3 leading-relaxed mb-2">
+                &ldquo;{quote.text}&rdquo;
+              </p>
+
+              {/* Footer: page + tags */}
+              <div className="flex items-center flex-wrap gap-2 mt-1.5">
+                {quote.page_number && (
+                  <span className="text-[11px] text-[#87867f]">p. {quote.page_number}</span>
+                )}
+                {(quote.tags ?? []).map((tag) => {
+                  const c = tagColors(tag.color)
+                  return (
+                    <span
+                      key={tag.id}
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${c.bg} ${c.text}`}
+                    >
+                      {tag.name}
+                    </span>
+                  )
+                })}
               </div>
             </div>
-
-            {/* Quote text */}
-            <p className="text-sm text-[#e8e6e1] italic line-clamp-3 leading-relaxed">
-              &ldquo;{quote.text}&rdquo;
-            </p>
-
-            {/* Footer */}
-            {quote.page_number && (
-              <span className="text-[11px] text-[#87867f] mt-1.5 block">p. {quote.page_number}</span>
-            )}
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   )

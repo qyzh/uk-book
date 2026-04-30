@@ -8,6 +8,8 @@ import Navigation from '@/app/components/Navigation'
 import Loading from '@/app/components/Loading'
 import BookShareButton from '@/app/components/BookShareButton'
 import { Badge } from '@/app/components/Badge'
+import type { Tag } from '@/lib/types/library'
+
 interface Author {
   id: string
   name: string
@@ -40,6 +42,8 @@ interface Quote {
   text: string
   page_number?: number
   is_favorite: boolean
+  created_at?: string
+  tags?: Tag[]
 }
 
 interface Props {
