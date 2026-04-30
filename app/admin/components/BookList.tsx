@@ -13,7 +13,6 @@ interface BookListProps {
   onNew: () => void
 }
 
-
 export default function BookList({ books, onEdit, onDelete, onNew }: BookListProps) {
   const [search, setSearch] = useState('')
 
