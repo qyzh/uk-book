@@ -13,13 +13,27 @@ interface BookListProps {
   onNew: () => void
 }
 
+type StatusFilter = 'all' | 'reading' | 'completed' | 'wishlist' | 'to-read'
+
+const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
+  { value: 'all',       label: 'All' },
+  { value: 'reading',   label: 'Reading' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'to-read',   label: 'To Read' },
+  { value: 'wishlist',  label: 'Wishlist' },
+]
+
 export default function BookList({ books, onEdit, onDelete, onNew }: BookListProps) {
   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
 
-  const filtered = books.filter(b =>
-    b.title.toLowerCase().includes(search.toLowerCase()) ||
-    b.authors?.name?.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = books.filter(b => {
+    const matchesSearch =
+      b.title.toLowerCase().includes(search.toLowerCase()) ||
+      b.authors?.name?.toLowerCase().includes(search.toLowerCase())
+    const matchesStatus = statusFilter === 'all' || b.reading_status === statusFilter
+    return matchesSearch && matchesStatus
+  })
 
   return (
     <div className="flex flex-col h-full" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
@@ -43,10 +57,53 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
         </button>
       </div>
 
+      {/* Status filter tabs */}
+      <div className="flex items-center gap-1.5 px-5 py-2.5 border-b border-[#30302e] shrink-0 overflow-x-auto">
+        {STATUS_FILTERS.map(({ value, label }) => {
+          const counts: Record<StatusFilter, number> = {
+            all:       books.length,
+            reading:   books.filter(b => b.reading_status === 'reading').length,
+            completed: books.filter(b => b.reading_status === 'completed').length,
+            'to-read': books.filter(b => b.reading_status === 'to-read').length,
+            wishlist:  books.filter(b => b.reading_status === 'wishlist').length,
+          }
+          const active = statusFilter === value
+          const dotColor: Record<StatusFilter, string> = {
+            all:       '#87867f',
+            reading:   '#eab308',
+            completed: '#22c55e',
+            'to-read': '#87867f',
+            wishlist:  '#3b82f6',
+          }
+          return (
+            <button
+              key={value}
+              onClick={() => setStatusFilter(value)}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition border ${
+                active
+                  ? 'bg-[#d97757]/15 border-[#d97757]/50 text-[#d97757]'
+                  : 'bg-transparent border-[#30302e] text-[#87867f] hover:border-[#87867f] hover:text-[#faf9f5]'
+              }`}
+            >
+              {value !== 'all' && (
+                <span
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: dotColor[value] }}
+                />
+              )}
+              {label}
+              <span className={`text-[10px] ${active ? 'text-[#d97757]/70' : 'text-[#87867f]/60'}`}>
+                {counts[value]}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
       {/* Count bar */}
       <div className="px-5 py-2 border-b border-[#30302e]/50 shrink-0">
         <span className="text-[11px] text-[#87867f]">
-          {filtered.length} {filtered.length === 1 ? 'book' : 'books'}{search && ` matching "${search}"`}
+          {filtered.length} {filtered.length === 1 ? 'book' : 'books'}{search && ` matching "${search}"`}{statusFilter !== 'all' && !search && ` · ${STATUS_FILTERS.find(f => f.value === statusFilter)?.label}`}
         </span>
       </div>
 
