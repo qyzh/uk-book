@@ -6,10 +6,13 @@ import { useBooks } from '@/lib/hooks/useBooks'
 export function useCurrentlyReading() {
   const { books, loading, error, refetch } = useBooks()
 
-  const currentBook = useMemo(
-    () => books.find((book) => book.reading_status === 'reading') || null,
+  const currentBooks = useMemo(
+    () => books.filter((book) => book.reading_status === 'reading'),
     [books],
   )
 
-  return { currentBook, loading, error, refetch }
+  // keep backward compat
+  const currentBook = currentBooks[0] ?? null
+
+  return { currentBook, currentBooks, loading, error, refetch }
 }

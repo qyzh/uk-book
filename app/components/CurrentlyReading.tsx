@@ -2,17 +2,19 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { BookOpen, Clock } from 'lucide-react'
+import { BookOpen, Clock, ChevronLeft, ChevronRight } from 'lucide-react'
 import Loading from '@/app/components/Loading'
 import { useCurrentlyReading } from '@/lib/hooks/useCurrentlyReading'
 import { getShortId } from '@/lib/utils/slug'
+import { useState } from 'react'
 
 interface CurrentlyReadingProps {
   minimal?: boolean
 }
 
 export default function CurrentlyReading({ minimal = false }: CurrentlyReadingProps) {
-  const { currentBook, loading } = useCurrentlyReading()
+  const { currentBooks, loading } = useCurrentlyReading()
+  const [index, setIndex] = useState(0)
 
   if (loading) {
     return (
@@ -22,60 +24,88 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
     )
   }
 
-  if (!currentBook) {
-    return null
-  }
+  if (currentBooks.length === 0) return null
 
-  const progressPercent = currentBook.pages && currentBook.current_page
-    ? Math.round((currentBook.current_page / currentBook.pages) * 100)
+  const total = currentBooks.length
+  const book = currentBooks[index]
+  const prev = () => setIndex(i => (i - 1 + total) % total)
+  const next = () => setIndex(i => (i + 1) % total)
+
+  const progressPercent = book.pages && book.current_page
+    ? Math.round((book.current_page / book.pages) * 100)
     : 0
 
   if (minimal) {
     return (
-      <Link href={`/books/${getShortId(currentBook.id)}`}>
-        <div className="group cursor-pointer">
-          <div className="relative overflow-hidden rounded-xl mb-3 aspect-[3/4] bg-black">
-            {currentBook.cover_url ? (
-              <Image
-                src={currentBook.cover_url}
-                alt={currentBook.title}
-                fill
-                sizes="200px"
-                loading="eager"
-                className="object-cover group-hover:scale-105 transition duration-500"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-                <span className="text-4xl">📖</span>
+      <div className="relative">
+        <Link href={`/books/${getShortId(book.id)}`}>
+          <div className="group cursor-pointer">
+            <div className="relative overflow-hidden rounded-xl mb-3 aspect-[3/4] bg-black">
+              {book.cover_url ? (
+                <Image
+                  src={book.cover_url}
+                  alt={book.title}
+                  fill
+                  sizes="200px"
+                  loading="eager"
+                  className="object-cover group-hover:scale-105 transition duration-500"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+                  <span className="text-4xl">📖</span>
+                </div>
+              )}
+              <div className="absolute top-2 right-2">
+                <div className="bg-gradient-to-r from-[#d97757] to-[#e09e72] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
+                  NOW READING
+                </div>
+              </div>
+              {total > 1 && (
+                <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  {index + 1}/{total}
+                </div>
+              )}
+            </div>
+            <h3 className="font-serif text-sm font-bold text-slate-200 line-clamp-2 group-hover:text-[#d97757] transition">
+              {book.title}
+            </h3>
+            <p className="text-xs text-slate-500 mb-2">{book.authors?.name}</p>
+            {book.pages && book.current_page && (
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs text-slate-600">
+                  <span>Reading Progress</span>
+                  <span className="font-mono text-[#d97757]">{progressPercent}%</span>
+                </div>
+                <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-[#d97757] to-[#e09e72] h-full rounded-full transition-all duration-700"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
               </div>
             )}
-            {/* "Now Reading" Badge */}
-            <div className="absolute top-2 right-2">
-              <div className="bg-gradient-to-r from-[#d97757] to-[#e09e72] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
-                NOW READING
-              </div>
-            </div>
           </div>
-          <h3 className="font-serif text-sm font-bold text-slate-200 line-clamp-2 group-hover:text-[#d97757] transition">
-            {currentBook.title}
-          </h3>
-          <p className="text-xs text-slate-500 mb-2">{currentBook.authors?.name}</p>
-          {currentBook.pages && currentBook.current_page && (
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs text-slate-600">
-                <span>Reading Progress</span>
-                <span className="font-mono text-[#d97757]">{progressPercent}%</span>
-              </div>
-              <div className="w-full bg-slate-700 rounded-full h-1.5 overflow-hidden">
-                <div
-                  className="bg-gradient-to-r from-[#d97757] to-[#e09e72] h-full rounded-full transition-all duration-700"
-                  style={{ width: `${progressPercent}%` }}
+        </Link>
+        {total > 1 && (
+          <div className="flex justify-center gap-2 mt-3">
+            <button onClick={prev} className="p-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+            <div className="flex items-center gap-1">
+              {currentBooks.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setIndex(i)}
+                  className={`rounded-full transition-all ${i === index ? 'w-3 h-1.5 bg-[#d97757]' : 'w-1.5 h-1.5 bg-slate-600 hover:bg-slate-400'}`}
                 />
-              </div>
+              ))}
             </div>
-          )}
-        </div>
-      </Link>
+            <button onClick={next} className="p-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition">
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+      </div>
     )
   }
 
@@ -90,53 +120,86 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
         {/* Left Side: Info */}
         <div className="flex-1 w-full space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-slate-400 uppercase mb-2">
-              <span className="w-2 h-2 rounded-full bg-[#d97757] animate-pulse shadow-[0_0_10px_#d97757]"></span>
-              Currently Reading
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-slate-400 uppercase">
+                <span className="w-2 h-2 rounded-full bg-[#d97757] animate-pulse shadow-[0_0_10px_#d97757]"></span>
+                Currently Reading
+                {total > 1 && (
+                  <span className="ml-1 text-[#d97757]/70 normal-case tracking-normal font-mono">
+                    [{index + 1}/{total}]
+                  </span>
+                )}
+              </div>
+
+              {total > 1 && (
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={prev}
+                    className="p-1.5 rounded-full border border-slate-700 hover:border-[#d97757]/50 text-slate-400 hover:text-[#d97757] transition"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <div className="flex items-center gap-1">
+                    {currentBooks.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setIndex(i)}
+                        className={`rounded-full transition-all ${i === index ? 'w-4 h-1.5 bg-[#d97757]' : 'w-1.5 h-1.5 bg-slate-700 hover:bg-slate-500'}`}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    onClick={next}
+                    className="p-1.5 rounded-full border border-slate-700 hover:border-[#d97757]/50 text-slate-400 hover:text-[#d97757] transition"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
 
-            <Link href={`/books/${getShortId(currentBook.id)}`} className="block">
+            <Link href={`/books/${getShortId(book.id)}`} className="block">
               <h2 className="font-serif text-5xl md:text-6xl text-slate-100 hover:text-[#d97757] transition-colors tracking-tight leading-tight">
-                {currentBook.title}
+                {book.title}
               </h2>
             </Link>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-slate-400 text-lg">
-              <span>By <strong className="text-slate-200 font-medium">{currentBook.authors?.name}</strong></span>
+              <span>By <strong className="text-slate-200 font-medium">{book.authors?.name}</strong></span>
             </div>
 
             <div className="flex items-center gap-4 text-sm text-slate-500 font-medium">
-              {currentBook.pages ? (
+              {book.pages ? (
                 <span className="flex items-center gap-1.5">
                   <BookOpen className="w-4 h-4 opacity-70" />
-                  {currentBook.pages} pages
+                  {book.pages} pages
                 </span>
               ) : null}
-              {currentBook.started_at ? (
+              {book.started_at ? (
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 opacity-70" />
-                  Started {new Date(currentBook.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  Started {new Date(book.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               ) : null}
             </div>
           </div>
 
-          {currentBook.summary && (
+          {book.summary && (
             <p className="text-slate-400 leading-relaxed max-w-2xl text-sm md:text-base line-clamp-4">
-              {currentBook.summary}
+              {book.summary}
             </p>
           )}
 
           {/* Progress Section */}
           <div className="pt-4 max-w-md space-y-5">
             <div className="flex gap-4">
-              <Link href={`/books/${getShortId(currentBook.id)}`} className="bg-[#d97757] hover:bg-[#e09e72] text-white font-bold px-8 py-3 rounded shadow-lg transition tracking-widest text-xs flex items-center gap-2">
+              <Link href={`/books/${getShortId(book.id)}`} className="bg-[#d97757] hover:bg-[#e09e72] text-white font-bold px-8 py-3 rounded shadow-lg transition tracking-widest text-xs flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
                 VIEW BOOK
               </Link>
             </div>
 
-            {currentBook.pages && currentBook.current_page && (
+            {book.pages && book.current_page && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-400 tracking-wider">
                   <span>PROGRESS</span>
@@ -149,8 +212,8 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
                   />
                 </div>
                 <div className="flex justify-between text-xs text-slate-500 font-medium">
-                  <span>{currentBook.current_page} of {currentBook.pages} pages read</span>
-                  <span>{currentBook.pages - currentBook.current_page} remaining</span>
+                  <span>{book.current_page} of {book.pages} pages read</span>
+                  <span>{book.pages - book.current_page} remaining</span>
                 </div>
               </div>
             )}
@@ -159,12 +222,12 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
 
         {/* Right Side: Book Cover */}
         <div className="w-[220px] md:w-[320px] shrink-0 mx-auto md:mx-0">
-          <Link href={`/books/${getShortId(currentBook.id)}`} className="block group/cover perspective-1000">
+          <Link href={`/books/${getShortId(book.id)}`} className="block group/cover perspective-1000">
             <div className="aspect-[3/4] bg-black relative overflow-hidden rounded-r-[2rem] rounded-l-md border border-slate-700/50 border-l-[8px] border-l-slate-800 shadow-[20px_20px_40px_rgba(0,0,0,0.8),_0_0_20px_rgba(255,255,255,0.02)] group-hover/cover:shadow-[20px_20px_50px_rgba(0,0,0,0.9),_0_0_30px_rgba(168,85,247,0.15)] group-hover/cover:-translate-y-2 transition-all duration-500 ease-out preserve-3d group-hover/cover:rotate-y-[-5deg]">
-              {currentBook.cover_url ? (
+              {book.cover_url ? (
                 <Image
-                  src={currentBook.cover_url}
-                  alt={currentBook.title}
+                  src={book.cover_url}
+                  alt={book.title}
                   fill
                   sizes="(max-width: 768px) 100vw, 320px"
                   loading="eager"
