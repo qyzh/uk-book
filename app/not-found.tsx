@@ -1,41 +1,48 @@
 import Link from 'next/link'
-import Navigation from '@/app/components/Navigation'
+import { LightbulbOff } from 'lucide-react'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-black text-slate-100" style={{ fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'Courier New', monospace" }}>
-      <Navigation />
+    <div className="min-h-screen flex flex-col justify-center bg-[var(--background)] text-[var(--foreground)] px-8 sm:px-16 md:px-24 lg:px-32 relative overflow-hidden">
+      
+      {/* Noise overlay for texture matching the image's grainy feel */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
+        style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.8%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}
+      ></div>
 
-      <main className="max-w-7xl mx-auto px-4 py-12 flex flex-col items-center justify-center min-h-[70vh]">
-        <div className="text-center space-y-6">
-          <div className="text-8xl font-bold text-slate-700">404</div>
+      <div className="max-w-6xl w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-12 lg:gap-24 z-10">
+        
+        <div className="flex flex-col gap-6 md:gap-8 w-full max-w-2xl animate-fade-in-up">
+          <p className="text-sm tracking-wider font-medium text-[var(--color-text-secondary)]">
+            Error 404
+          </p>
           
-          <div className="space-y-2">
-            <h1 className="font-serif tracking-tight text-2xl font-bold text-slate-300">page not found</h1>
-            <p className="text-slate-500">the page you&apos;re looking for doesn&apos;t exist</p>
-          </div>
+          <h1 className="text-6xl sm:text-7xl md:text-8xl tracking-tight leading-[1.05] font-[family-name:var(--font-playfair)]">
+            There&apos;s no<br />
+            light in here
+          </h1>
 
-          <div className="border border-slate-700 bg-black bg-opacity-40 p-6 rounded-lg">
-            <p className="text-slate-400 text-sm">
-              maybe it was moved, deleted, or never existed
-            </p>
-          </div>
+          <p className="text-[var(--color-text-secondary)] text-base sm:text-lg lg:text-xl leading-relaxed mt-2 max-w-lg">
+            The page you were looking for doesn&apos;t exist. You may have mistyped the address or the page may have moved.
+          </p>
 
-          <div className="pt-6">
-            <Link
+          <div className="pt-8 sm:pt-12">
+            <Link 
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-3 border border-slate-700 hover:border-[#d97757] text-slate-300 hover:text-[#d97757] transition rounded"
+              className="inline-block text-[var(--foreground)] hover:text-[var(--color-accent)] border-b border-[var(--foreground)] hover:border-[var(--color-accent)] pb-1 transition-colors duration-300 text-sm sm:text-base tracking-wide"
             >
-              <span className="text-[#d97757]">←</span>
-              back to library
+              Return to homepage
             </Link>
           </div>
         </div>
-      </main>
 
-      <footer className="border-t border-slate-700 py-8 text-center text-slate-500 text-xs">
-        <p>crafted with ♡ • {new Date().getFullYear()}</p>
-      </footer>
+        {/* Decorative Lucide Icon replacing a traditional illustration/image */}
+        <div className="hidden md:flex justify-center items-center text-[var(--color-text-secondary)] opacity-[0.07] rotate-12 reveal in-view">
+          <LightbulbOff className="w-64 h-64 lg:w-96 lg:h-96" strokeWidth={0.5} />
+        </div>
+
+      </div>
     </div>
   )
 }
