@@ -84,80 +84,80 @@ export default function HomePage() {
             </div>
           </RevealSection>
         )}
-
-        {/* Stats */}
-        <RevealSection as="section" variant="up" delay={100} stagger className="max-w-7xl mx-auto ukbox px-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'total books', value: books.filter(b => b.reading_status !== 'wishlist').length },
-            { label: 'completed', value: completedBooks.length },
-            { label: 'total quotes', value: quotes.length },
-            { label: 'favorites', value: favoriteQuotes.length },
-          ].map((stat, i) => (
-            <div
-              key={i}
-              className="p-4 text-center transition"
-            >
-              <div className="text-[#d97757] text-lg uppercase font-serif tracking-wide">{stat.label}</div>
-              <div className="text-4xl font-bold text-slate-200 mt-2">{stat.value}</div>
-            </div>
-          ))}
-        </RevealSection>
-
-        {/* Library Section */}
-        {recentBooks.length > 0 && (
-          <RevealSection as="section" variant="up" threshold={0.05} className='uksection border-y'>
-            <div className="max-w-7xl mx-auto px-12 py-10">
-              <h2 className="text-4xl font-bold text-[#faf9f5] mb-6 flex items-center gap-2 font-serif">
-                <Library className="w-10 h-10 text-[#d97757]" /> Library
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal-stagger">
-                {recentBooks.map((book, index) => (
-                  <Link
-                    key={book.id}
-                    href={`/books/${getShortId(book.id)}`}
-                    className="group block transition duration-300 hover:-translate-y-1"
-                  >
-                    <div className="aspect-[3/4] bg-black relative overflow-hidden rounded-r-2xl rounded-l-md border border-slate-700 border-l-[4px] border-l-slate-800 shadow-[5px_5px_15px_rgba(0,0,0,0.8),_0_0_15px_rgba(217, 119, 87,0.1)] group-hover:shadow-[5px_5px_20px_rgba(0,0,0,0.8),_0_0_20px_rgba(217, 119, 87, 1)] transition-shadow">
-                      {book.cover_url ? (
-                        <Image
-                          src={book.cover_url}
-                          alt={book.title}
-                          fill
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover group-hover:scale-105 transition duration-500"
-                          priority={index === 0}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1f1e1d] to-[#1f1e1d]">
-                          <div className="text-center px-4">
-                            <div className="text-3xl mb-2">📖</div>
-                            <div className="text-slate-500 text-xs text-center line-clamp-2">{book.title}</div>
-                          </div>
-                        </div>
-                      )}
-                      <div className="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-black/40 via-white/10 to-transparent pointer-events-none mix-blend-overlay"></div>
-                      <div className="absolute inset-y-0 left-0 w-[1px] bg-white/20 pointer-events-none mix-blend-overlay"></div>
-                      <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-r-2xl rounded-l-md pointer-events-none"></div>
-                    </div>
-                    <div className="pt-4 bg-transparent text-left">
-                      <h3 className="font-semibold text-[#faf9f5] line-clamp-2 mb-1 group-hover:text-[#d97757] transition font-serif">
-                        {book.title}
-                      </h3>
-                      <p className="text-slate-500 text-sm mb-3">{book.authors?.name}</p>
-                      <div className="flex items-center justify-between text-xs text-slate-600">
-                        <span>{book.published_year || '—'}</span>
-                        <Badge variant={book.reading_status}>
-                          {book.reading_status}
-                        </Badge>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+        <section className="uksection border-y">
+          {/* Stats */}
+          <RevealSection as="section" variant="up" delay={100} stagger className="max-w-7xl mx-auto pt-12 pb-6 px-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: 'total books', value: books.filter(b => b.reading_status !== 'wishlist').length },
+              { label: 'completed', value: completedBooks.length },
+              { label: 'total quotes', value: quotes.length },
+              { label: 'favorites', value: favoriteQuotes.length },
+            ].map((stat, i) => (
+              <div
+                key={i}
+                className="opacity-80 hover:opacity-100 p-4 ukboxsecond border text-center transition"
+              >
+                <div className="text-[#d97757] text-lg uppercase font-serif tracking-wide">{stat.label}</div>
+                <div className="text-4xl font-bold text-slate-200 mt-2">{stat.value}</div>
               </div>
-            </div>
+            ))}
           </RevealSection>
-        )}
 
+          {/* Library Section */}
+          {recentBooks.length > 0 && (
+            <RevealSection as="section" variant="up" threshold={0.05}>
+              <div className="max-w-7xl mx-auto px-12 pt-6 pb-12">
+                <h2 className="text-4xl font-bold text-[#faf9f5] mb-6 flex items-center gap-2 font-serif">
+                  <Library className="w-10 h-10 text-[#d97757]" /> Library
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal-stagger">
+                  {recentBooks.map((book, index) => (
+                    <Link
+                      key={book.id}
+                      href={`/books/${getShortId(book.id)}`}
+                      className="group block transition duration-300 hover:-translate-y-1"
+                    >
+                      <div className="aspect-[3/4] bg-black relative overflow-hidden rounded-r-2xl rounded-l-md border border-slate-700 border-l-[4px] border-l-slate-800 shadow-[5px_5px_15px_rgba(0,0,0,0.8),_0_0_15px_rgba(217, 119, 87,0.1)] group-hover:shadow-[5px_5px_20px_rgba(0,0,0,0.8),_0_0_20px_rgba(217, 119, 87, 1)] transition-shadow">
+                        {book.cover_url ? (
+                          <Image
+                            src={book.cover_url}
+                            alt={book.title}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-cover group-hover:scale-105 transition duration-500"
+                            priority={index === 0}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1f1e1d] to-[#1f1e1d]">
+                            <div className="text-center px-4">
+                              <div className="text-3xl mb-2">📖</div>
+                              <div className="text-slate-500 text-xs text-center line-clamp-2">{book.title}</div>
+                            </div>
+                          </div>
+                        )}
+                        <div className="absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-black/40 via-white/10 to-transparent pointer-events-none mix-blend-overlay"></div>
+                        <div className="absolute inset-y-0 left-0 w-[1px] bg-white/20 pointer-events-none mix-blend-overlay"></div>
+                        <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-r-2xl rounded-l-md pointer-events-none"></div>
+                      </div>
+                      <div className="pt-4 bg-transparent text-left">
+                        <h3 className="font-semibold text-[#faf9f5] line-clamp-2 mb-1 group-hover:text-[#d97757] transition font-serif">
+                          {book.title}
+                        </h3>
+                        <p className="text-slate-500 text-sm mb-3">{book.authors?.name}</p>
+                        <div className="flex items-center justify-between text-xs text-slate-600">
+                          <span>{book.published_year || '—'}</span>
+                          <Badge variant={book.reading_status}>
+                            {book.reading_status}
+                          </Badge>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </RevealSection>
+          )}
+        </section>
         {/* Wishlist Section */}
         {wishlistBooks.length > 0 && (
           <RevealSection as="section" variant="left" threshold={0.05} className='max-w-7xl mx-auto'>
