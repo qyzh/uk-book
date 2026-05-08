@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Share2 } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 
 interface QuoteShareButtonProps {
   quoteText: string
@@ -39,7 +39,7 @@ export default function QuoteShareButton({ quoteText, bookTitle, author }: Quote
       className="inline-flex items-center gap-2 px-3 py-1.5 text-xs rounded border border-slate-600 text-slate-300 hover:border-[#d97757] hover:text-[#d97757] transition disabled:opacity-50 disabled:cursor-not-allowed"
       title="Download as Instagram Story image"
     >
-      <Share2 className="w-4 h-4" />
+      <PixelArtIcon name="Upload" size={16} />
       {isLoading ? 'Creating...' : 'Share'}
     </button>
   )

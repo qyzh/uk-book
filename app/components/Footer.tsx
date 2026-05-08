@@ -1,5 +1,7 @@
 import Link from 'next/link'
-import { X, Globe } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
+
+const TwitterIcon = () => <PixelArtIcon name="Delete" size={16} />
 
 const InstagramIcon = ({ size = 16 }: { size?: number }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -12,7 +14,7 @@ const InstagramIcon = ({ size = 16 }: { size?: number }) => (
 interface SocialLink {
   href: string
   label: string
-  Icon: React.ComponentType<{ size?: number }>
+  Icon: React.ComponentType<{ size?: number }> | (() => React.ReactNode)
 }
 
 interface NavLink {
@@ -21,9 +23,9 @@ interface NavLink {
 }
 
 const socialLinks: SocialLink[] = [
-  { href: 'https://twitter.com/asetdunia', label: 'Twitter @asetdunia', Icon: X },
+  { href: 'https://twitter.com/asetdunia', label: 'Twitter @asetdunia', Icon: TwitterIcon },
   { href: 'https://instagram.com/syauqashdllh', label: 'Instagram syauqashdllh', Icon: InstagramIcon },
-  { href: 'https://kyxis.my.id', label: 'kyxis.my.id', Icon: Globe },
+  { href: 'https://kyxis.my.id', label: 'kyxis.my.id', Icon: () => <PixelArtIcon name="Globe" size={16} /> },
 ]
 
 const navLinks: NavLink[] = [
@@ -70,7 +72,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#1a1918] border border-[#30302e] text-[#87867f] transition-colors duration-200 hover:border-[#d97757] hover:text-[#d97757]"
               >
-                <Icon size={16} />
+                {typeof Icon === 'function' && Icon.prototype ? <Icon size={16} /> : <Icon />}
               </a>
             ))}
           </div>

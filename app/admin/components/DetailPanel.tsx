@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { X } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 
 interface DetailPanelProps {
   open: boolean
@@ -57,7 +57,7 @@ export default function DetailPanel({
             onClick={onClose}
             className="p-1 rounded text-[#87867f] hover:text-[#faf9f5] hover:bg-[#1f1e1d] transition"
           >
-            <X className="w-4 h-4" />
+            <PixelArtIcon name="Delete" size={16} />
           </button>
         </div>
 

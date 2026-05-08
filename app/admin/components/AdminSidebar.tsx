@@ -1,6 +1,7 @@
 'use client'
 
-import { Library, Quote, NotebookPen, Users, LogOut, BookMarked } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
+import type * as PixelIcons from 'pixelarticons/react'
 
 export type AdminSection = 'books' | 'quotes' | 'notes' | 'authors'
 
@@ -18,11 +19,11 @@ interface AdminSidebarProps {
   onLogout: () => void
 }
 
-const NAV_ITEMS: { id: AdminSection; label: string; Icon: React.ElementType }[] = [
-  { id: 'books',   label: 'Books',   Icon: Library },
-  { id: 'quotes',  label: 'Quotes',  Icon: Quote },
-  { id: 'notes',   label: 'Notes',   Icon: NotebookPen },
-  { id: 'authors', label: 'Authors', Icon: Users },
+const NAV_ITEMS: { id: AdminSection; label: string; icon: keyof typeof PixelIcons }[] = [
+  { id: 'books',   label: 'Books',   icon: 'Library' },
+  { id: 'quotes',  label: 'Quotes',  icon: 'QuoteTextInline' },
+  { id: 'notes',   label: 'Notes',   icon: 'Notebook' },
+  { id: 'authors', label: 'Authors', icon: 'Users' },
 ]
 
 export default function AdminSidebar({
@@ -41,7 +42,7 @@ export default function AdminSidebar({
       <div className="px-5 py-5 border-b border-[#30302e]">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-[#d97757] flex items-center justify-center shrink-0">
-            <BookMarked className="w-3.5 h-3.5 text-white" />
+            <PixelArtIcon name="Bookmark" size={16} color="white" />
           </div>
           <div>
             <div className="text-[#faf9f5] text-sm font-bold leading-none">ukbook</div>
@@ -55,7 +56,7 @@ export default function AdminSidebar({
         <div className="text-[10px] font-bold text-[#87867f] uppercase tracking-widest px-3 mb-2">
           Content
         </div>
-        {NAV_ITEMS.map(({ id, label, Icon }) => {
+        {NAV_ITEMS.map(({ id, label, icon }) => {
           const isActive = active === id
           return (
             <button
@@ -68,7 +69,11 @@ export default function AdminSidebar({
                   : 'text-[#87867f] hover:text-[#faf9f5] hover:bg-[#1f1e1d]'}
               `}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#d97757]' : ''}`} />
+              <PixelArtIcon 
+                name={icon}
+                size={16}
+                className={isActive ? 'text-[#d97757]' : ''}
+              />
               <span className="flex-1 text-left">{label}</span>
               <span
                 className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
@@ -130,7 +135,7 @@ export default function AdminSidebar({
           onClick={onLogout}
           className="flex items-center gap-2 text-xs text-[#87867f] hover:text-red-400 transition w-full px-3 py-2 rounded-lg hover:bg-red-950/30"
         >
-          <LogOut className="w-3.5 h-3.5" />
+          <PixelArtIcon name="Logout" size={16} />
           Sign out
         </button>
       </div>

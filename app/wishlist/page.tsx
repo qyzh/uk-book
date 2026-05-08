@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Bookmark } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import Navigation from '@/app/components/Navigation'
 import BookCard from '@/app/components/BookCard'
 import Loading from '@/app/components/Loading'
@@ -26,7 +26,7 @@ export default function WishlistPage() {
       <main className="pt-20">
         <div className="mb-12 max-w-7xl mx-auto px-12">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-[#d97757] text-xl"><Bookmark className="w-5 h-5" /></span>
+            <span className="text-[#d97757] text-xl"><PixelArtIcon name="Bookmark" size={32} className="w-5 h-5" /></span>
             <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">My Wishlist</h1>
           </div>
           <p className="text-slate-500 text-sm">{wishlistBooks.length} book{wishlistBooks.length !== 1 ? 's' : ''} on my wishlist</p>

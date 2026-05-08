@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { BookOpen, Clock, ChevronLeft, ChevronRight } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import Loading from '@/app/components/Loading'
 import { useCurrentlyReading } from '@/lib/hooks/useCurrentlyReading'
 import { getShortId } from '@/lib/utils/slug'
@@ -89,7 +89,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
         {total > 1 && (
           <div className="flex justify-center gap-2 mt-3">
             <button onClick={prev} className="p-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition">
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <PixelArtIcon name="ChevronLeft" size={16} />
             </button>
             <div className="flex items-center gap-1">
               {currentBooks.map((_, i) => (
@@ -101,7 +101,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
               ))}
             </div>
             <button onClick={next} className="p-1 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition">
-              <ChevronRight className="w-3.5 h-3.5" />
+              <PixelArtIcon name="ChevronRight" size={16} />
             </button>
           </div>
         )}
@@ -137,7 +137,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
                     onClick={prev}
                     className="p-1.5 rounded-full border border-slate-700 hover:border-[#d97757]/50 text-slate-400 hover:text-[#d97757] transition"
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <PixelArtIcon name="ChevronLeft" size={16} />
                   </button>
                   <div className="flex items-center gap-1">
                     {currentBooks.map((_, i) => (
@@ -152,7 +152,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
                     onClick={next}
                     className="p-1.5 rounded-full border border-slate-700 hover:border-[#d97757]/50 text-slate-400 hover:text-[#d97757] transition"
                   >
-                    <ChevronRight className="w-4 h-4" />
+                    <PixelArtIcon name="ChevronRight" size={16} />
                   </button>
                 </div>
               )}
@@ -171,13 +171,13 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
             <div className="flex items-center gap-4 text-sm text-slate-500 font-medium">
               {book.pages ? (
                 <span className="flex items-center gap-1.5">
-                  <BookOpen className="w-4 h-4 opacity-70" />
+                  <PixelArtIcon name="BookOpen" size={16} className="opacity-70" />
                   {book.pages} pages
                 </span>
               ) : null}
               {book.started_at ? (
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 opacity-70" />
+                  <PixelArtIcon name="Clock" size={16} className="opacity-70" />
                   Started {new Date(book.started_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               ) : null}
@@ -194,7 +194,7 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
           <div className="pt-4 max-w-md space-y-5">
             <div className="flex gap-4">
               <Link href={`/books/${getShortId(book.id)}`} className="bg-[#d97757] hover:bg-[#e09e72] text-white font-bold px-8 py-3 rounded shadow-lg transition tracking-widest text-xs flex items-center gap-2">
-                <BookOpen className="w-4 h-4" />
+                <PixelArtIcon name="BookOpen" size={16} color="white" />
                 VIEW BOOK
               </Link>
             </div>

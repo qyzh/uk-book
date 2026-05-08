@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Plus, Users, Globe } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import type { Author } from '@/lib/types/library'
 
 interface AuthorListProps {
@@ -19,7 +19,7 @@ export default function AuthorList({ authors, onNew }: AuthorListProps) {
           onClick={onNew}
           className="flex items-center gap-1.5 px-4 py-2 bg-[#d97757] hover:bg-[#e09e72] text-white text-xs font-bold rounded-lg transition shadow-lg shadow-[#d97757]/20"
         >
-          <Plus className="w-3.5 h-3.5" /> Add Author
+          <PixelArtIcon name="Plus" size={16} color="white" /> Add Author
         </button>
       </div>
 
@@ -27,7 +27,7 @@ export default function AuthorList({ authors, onNew }: AuthorListProps) {
       <div className="flex-1 overflow-y-auto p-5">
         {authors.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 gap-2">
-            <Users className="w-8 h-8 text-[#30302e]" />
+            <PixelArtIcon name="Users" size={24} className="text-[#30302e]" />
             <span className="text-[#87867f] text-sm">No authors yet</span>
           </div>
         ) : (
@@ -43,7 +43,7 @@ export default function AuthorList({ authors, onNew }: AuthorListProps) {
                     <Image src={author.photo_url} alt={author.name} fill sizes="40px" className="object-cover" />
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <Users className="w-4 h-4 text-[#87867f]" />
+                      <PixelArtIcon name="Users" size={16} className="text-[#87867f]" />
                     </div>
                   )}
                 </div>
@@ -53,7 +53,7 @@ export default function AuthorList({ authors, onNew }: AuthorListProps) {
                   <div className="font-bold text-[#faf9f5] text-sm truncate">{author.name}</div>
                   {author.nationality && (
                     <div className="flex items-center gap-1 mt-0.5">
-                      <Globe className="w-2.5 h-2.5 text-[#87867f] shrink-0" />
+                      <PixelArtIcon name="Globe" size={12} className="text-[#87867f] shrink-0" />
                       <span className="text-[11px] text-[#87867f] truncate">{author.nationality}</span>
                     </div>
                   )}

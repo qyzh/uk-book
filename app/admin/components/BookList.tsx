@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Plus, Search, Pencil, Trash2, BookOpen } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import type { Book } from '@/lib/types/library'
 import { Badge } from '@/app/components/Badge'
 
@@ -40,7 +40,9 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
       {/* Toolbar */}
       <div className="flex items-center gap-3 px-5 py-3 border-b border-[#30302e] shrink-0">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#87867f]" />
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#87867f]">
+            <PixelArtIcon name="Search" size={16} />
+          </div>
           <input
             type="text"
             placeholder="Search books or authors..."
@@ -53,7 +55,7 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
           onClick={onNew}
           className="flex items-center gap-1.5 px-4 py-2 bg-[#d97757] hover:bg-[#e09e72] text-white text-xs font-bold rounded-lg transition shadow-lg shadow-[#d97757]/20 shrink-0"
         >
-          <Plus className="w-3.5 h-3.5" /> Add Book
+          <PixelArtIcon name="Plus" size={16} color="white" /> Add Book
         </button>
       </div>
 
@@ -111,7 +113,7 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
       <div className="flex-1 overflow-y-auto">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 gap-2">
-            <BookOpen className="w-8 h-8 text-[#30302e]" />
+            <PixelArtIcon name="BookOpen" size={24} className="text-[#30302e]" />
             <span className="text-[#87867f] text-sm">No books found</span>
           </div>
         ) : (
@@ -128,7 +130,7 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
                     <Image src={book.cover_url} alt={book.title} fill sizes="40px" className="object-cover" />
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <BookOpen className="w-4 h-4 text-[#87867f]" />
+                      <PixelArtIcon name="BookOpen" size={16} className="text-[#87867f]" />
                     </div>
                   )}
                 </div>
@@ -156,14 +158,14 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
                     className="p-2 rounded-lg text-[#87867f] hover:text-[#d97757] hover:bg-[#d97757]/10 transition"
                     title="edit"
                   >
-                    <Pencil className="w-3.5 h-3.5" />
+                    <PixelArtIcon name="Download" size={16} />
                   </button>
                   <button
                     onClick={e => { e.stopPropagation(); onDelete(book.id) }}
                     className="p-2 rounded-lg text-[#87867f] hover:text-red-400 hover:bg-red-900/20 transition"
                     title="delete"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <PixelArtIcon name="Delete" size={16} />
                   </button>
                 </div>
               </div>

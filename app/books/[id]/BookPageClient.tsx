@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { TextQuote, MessageSquareHeart } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import Image from 'next/image'
 import Navigation from '@/app/components/Navigation'
 import Loading from '@/app/components/Loading'
@@ -319,7 +319,7 @@ export default function BookPageClient({ bookId, initialBook }: Props) {
         {favoriteQuotes.length > 0 && (
           <section className="border-t ukborder pt-12">
             <h2 className="text-xl font-bold text-slate-300 mb-8 flex items-center gap-2">
-              <span className="text-[#d97757]"><MessageSquareHeart className="w-5 h-5" /></span> Favorite Quotes ({favoriteQuotes.length})
+              <span className="text-[#d97757]"><PixelArtIcon name="Heart" size={20} /></span> Favorite Quotes ({favoriteQuotes.length})
             </h2>
             <div className="space-y-4">
               {favoriteQuotes.map((quote) => (
@@ -343,7 +343,7 @@ export default function BookPageClient({ bookId, initialBook }: Props) {
         {quotes.length > 0 && (
           <section className="border-t ukborder pt-12">
             <h2 className="text-xl font-bold text-slate-300 mb-8 flex items-center gap-2">
-              <span className="text-slate-500"><TextQuote className='w-5 h-5' /></span> All Quotes ({quotes.length})
+              <span className="text-slate-500"><PixelArtIcon name="QuoteTextInline" size={20} /></span> All Quotes ({quotes.length})
             </h2>
             <div className="space-y-4">
               {quotes.filter(q => !q.is_favorite).map((quote) => (

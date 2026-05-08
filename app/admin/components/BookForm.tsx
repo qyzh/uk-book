@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import { GENRES, SUB_GENRES } from '@/lib/constants/library'
 import type { Author, Book } from '@/lib/types/library'
 
@@ -210,7 +210,7 @@ export default function BookForm({ formId, data, authors, onChange, onSubmit }: 
               <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#d97757]/20 border border-[#d97757]/40 text-[#d97757] text-xs rounded">
                 {sg}
                 <button type="button" onClick={() => removeSubGenre(i)} className="hover:text-white">
-                  <X className="w-3 h-3" />
+                  <PixelArtIcon name="Delete" size={12} />
                 </button>
               </span>
             ))}

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { Search, XCircle } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import Navigation from '@/app/components/Navigation'
 import BookCard from '@/app/components/BookCard'
 import Loading from '@/app/components/Loading'
@@ -180,7 +180,7 @@ export default function BrowsePage() {
           <div className="flex flex-wrap items-center gap-3">
             {/* Search */}
             <div className="relative w-full sm:w-auto">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <PixelArtIcon name="Search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search by name..."
@@ -255,7 +255,7 @@ export default function BrowsePage() {
                 onClick={resetFilters}
                 className="flex items-center gap-1.5 text-slate-500 hover:text-slate-300 text-sm ml-2 transition"
               >
-                <XCircle className="w-4 h-4" />
+                <PixelArtIcon name="Delete" size={16} />
                 Reset filters
               </button>
             )}

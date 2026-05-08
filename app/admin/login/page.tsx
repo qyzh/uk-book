@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import Link from 'next/link'
-import { Lock } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import RevealSection from '@/app/components/RevealSection'
 
 export default function LoginPage() {
@@ -44,7 +44,7 @@ export default function LoginPage() {
 
                         <div className="text-center mb-8 relative z-10">
                             <div className="flex items-center justify-center gap-2 mb-2">
-                                <Lock className="w-4 h-4 text-[#d97757]" />
+                                <PixelArtIcon name="Lock" size={16} color="#d97757" />
                                 <div className="text-slate-500 text-xs uppercase tracking-widest">ukbook system</div>
                             </div>
                             <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">admin login</h1>

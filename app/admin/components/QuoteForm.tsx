@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Tag as TagIcon, X } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import type { Book, Tag } from '@/lib/types/library'
 import { fetchTags } from '@/lib/api/quotes'
 
@@ -130,7 +130,7 @@ export default function QuoteForm({ formId, data, books, mode = 'new', onChange,
       <div>
         <label className={labelClass}>
           <span className="inline-flex items-center gap-1.5">
-            <TagIcon className="w-3 h-3" />
+            <PixelArtIcon name="IconCategory" size={12} />
             tags
             <span className="text-[#87867f] font-normal">(pick one or more)</span>
           </span>
@@ -157,7 +157,7 @@ export default function QuoteForm({ formId, data, books, mode = 'new', onChange,
                   ].join(' ')}
                 >
                   {tag.name}
-                  {selected && <X className="w-2.5 h-2.5 shrink-0" />}
+                  {selected && <PixelArtIcon name="Delete" size={12} className="shrink-0" />}
                 </button>
               )
             })}

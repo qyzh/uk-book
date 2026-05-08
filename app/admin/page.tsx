@@ -7,7 +7,8 @@ import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 import { toast } from '@/lib/toast'
 import Loading from '@/app/components/Loading'
-import { Library, Quote, NotebookPen, Users } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
+import * as PixelIcons from 'pixelarticons/react'
 import AdminSidebar, { type AdminSection } from './components/AdminSidebar'
 import DetailPanel from './components/DetailPanel'
 import BookList from './components/BookList'
@@ -456,11 +457,11 @@ export default function AdminPage() {
       {/* Mobile bottom nav */}
       <nav className="lg:hidden flex border-t border-[#30302e] bg-[#0f0e0d] shrink-0">
         {([
-          { id: 'books',   Icon: Library },
-          { id: 'quotes',  Icon: Quote },
-          { id: 'notes',   Icon: NotebookPen },
-          { id: 'authors', Icon: Users },
-        ] as { id: AdminSection; Icon: React.ElementType }[]).map(({ id, Icon }) => (
+          { id: 'books',   iconName: 'Library' as keyof typeof PixelIcons },
+          { id: 'quotes',  iconName: 'QuoteTextInline' as keyof typeof PixelIcons },
+          { id: 'notes',   iconName: 'Notebook' as keyof typeof PixelIcons },
+          { id: 'authors', iconName: 'Users' as keyof typeof PixelIcons },
+        ] as { id: AdminSection; iconName: keyof typeof PixelIcons }[]).map(({ id, iconName }) => (
           <button
             key={id}
             onClick={() => { setSection(id); closePanel() }}
@@ -468,7 +469,7 @@ export default function AdminPage() {
               section === id ? 'text-[#d97757]' : 'text-[#87867f]'
             }`}
           >
-            <Icon className="w-4 h-4" />
+            <PixelArtIcon name={iconName} size={16} />
             {id}
           </button>
         ))}
