@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
+import Button from '@/app/components/Button'
 
 interface DetailPanelProps {
   open: boolean
@@ -53,12 +54,9 @@ export default function DetailPanel({
         {/* Sticky header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#30302e] shrink-0">
           <h2 className="text-sm font-bold text-[#faf9f5]">{title}</h2>
-          <button
-            onClick={onClose}
-            className="p-1 rounded text-[#87867f] hover:text-[#faf9f5] hover:bg-[#1f1e1d] transition"
-          >
-            <PixelArtIcon name="Delete" size={16} />
-          </button>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <PixelArtIcon name="ArrowLeft" size={16} />
+          </Button>
         </div>
 
         {/* Scrollable body */}
@@ -70,24 +68,20 @@ export default function DetailPanel({
         {(onSave || onDelete) && (
           <div className="flex items-center gap-2 px-4 py-3 border-t border-[#30302e] shrink-0">
             {onDelete && (
-              <button
-                type="button"
-                onClick={onDelete}
-                className="p-2 rounded border border-red-800 text-red-400 hover:bg-red-900/30 transition"
-                title="delete"
-              >
-                <span className="text-xs">delete</span>
-              </button>
+              <Button variant="destructive" size="sm" onClick={onDelete}>
+                delete
+              </Button>
             )}
             {onSave && (
-              <button
+              <Button
                 type="submit"
                 form="detail-form"
                 disabled={saving}
-                className="ml-auto flex items-center gap-2 px-4 py-2 bg-[#d97757] hover:bg-[#e09e72] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold rounded transition"
+                loading={saving}
+                className="ml-auto"
               >
-                {saving ? 'saving...' : 'save'}
-              </button>
+                save
+              </Button>
             )}
           </div>
         )}

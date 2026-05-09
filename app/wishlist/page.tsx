@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import Button from '@/app/components/Button'
 import { useMemo } from 'react'
 import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import Navigation from '@/app/components/Navigation'
@@ -44,12 +44,7 @@ export default function WishlistPage() {
           <div className="border border-slate-700 bg-black bg-opacity-30 p-12 text-center">
             <div className="text-[#d97757] text-4xl mb-4">☆</div>
             <div className="text-slate-500 text-sm mb-6">your wishlist is empty</div>
-            <Link
-              href="/browse"
-              className="inline-block px-4 py-2 bg-[#d97757] hover:bg-[#e09e72] text-white text-sm font-bold rounded transition"
-            >
-              browse books
-            </Link>
+            <Button href="/browse" variant="primary" size="md">browse books</Button>
           </div>
         )}
       </main>

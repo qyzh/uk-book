@@ -2,6 +2,7 @@
 
 import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import type { Tag } from '@/lib/types/library'
+import Button from '@/app/components/Button'
 
 interface Quote {
   id: string
@@ -53,12 +54,9 @@ export default function QuoteList({ quotes, onToggleFavorite, onDelete, onEdit, 
             </span>
           )}
         </div>
-        <button
-          onClick={onNew}
-          className="flex items-center gap-1.5 px-4 py-2 bg-[#d97757] hover:bg-[#e09e72] text-white text-xs font-bold rounded-lg transition shadow-lg shadow-[#d97757]/20"
-        >
+        <Button onClick={onNew} size="sm">
           <PixelArtIcon name="Plus" size={16} color="white" /> Add Quote
-        </button>
+        </Button>
       </div>
 
       {/* List */}
@@ -88,20 +86,24 @@ export default function QuoteList({ quotes, onToggleFavorite, onDelete, onEdit, 
                   >
                     <PixelArtIcon name="Heart" size={16} className={quote.is_favorite ? 'fill-current' : ''} />
                   </button>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => onEdit(quote)}
-                    className="p-1.5 rounded-lg text-[#87867f] hover:text-[#d97757] hover:bg-[#d97757]/10 transition opacity-0 group-hover:opacity-100"
+                    className="opacity-0 group-hover:opacity-100"
                     title="edit"
                   >
                     <PixelArtIcon name="Download" size={16} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => onDelete(quote.id)}
-                    className="p-1.5 rounded-lg text-[#87867f] hover:text-red-400 hover:bg-red-900/20 transition opacity-0 group-hover:opacity-100"
+                    className="hover:!text-red-400 hover:!bg-red-900/20 opacity-0 group-hover:opacity-100"
                     title="delete"
                   >
                     <PixelArtIcon name="Delete" size={16} />
-                  </button>
+                  </Button>
                 </div>
               </div>
 

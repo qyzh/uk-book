@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { GENRES, SUB_GENRES } from '@/lib/constants/library'
+import Button from '@/app/components/Button'
 
 interface Author {
   id: string
@@ -365,20 +366,16 @@ export default function AddBookPage() {
 
             {/* Buttons */}
             <div className="flex gap-4 pt-6">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition font-medium"
-              >
+              <Button type="submit" disabled={loading} loading={loading} className="flex-1 py-2">
                 {loading ? 'Adding...' : 'Add Book'}
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="secondary"
                 onClick={() => router.back()}
-                className="flex-1 bg-slate-200 text-slate-700 py-2 rounded-lg hover:bg-slate-300 transition font-medium"
+                className="flex-1 py-2"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         </div>

@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import type { Author } from '@/lib/types/library'
+import Button from '@/app/components/Button'
 
 interface AuthorListProps {
   authors: Author[]
@@ -15,12 +16,9 @@ export default function AuthorList({ authors, onNew }: AuthorListProps) {
       {/* Toolbar */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-[#30302e] shrink-0">
         <span className="text-xs text-[#87867f]">{authors.length} authors</span>
-        <button
-          onClick={onNew}
-          className="flex items-center gap-1.5 px-4 py-2 bg-[#d97757] hover:bg-[#e09e72] text-white text-xs font-bold rounded-lg transition shadow-lg shadow-[#d97757]/20"
-        >
+        <Button onClick={onNew} size="sm">
           <PixelArtIcon name="Plus" size={16} color="white" /> Add Author
-        </button>
+        </Button>
       </div>
 
       {/* Grid */}

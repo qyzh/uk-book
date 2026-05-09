@@ -7,6 +7,7 @@ import Loading from '@/app/components/Loading'
 import { useCurrentlyReading } from '@/lib/hooks/useCurrentlyReading'
 import { getShortId } from '@/lib/utils/slug'
 import { useState } from 'react'
+import Button from '@/app/components/Button'
 
 interface CurrentlyReadingProps {
   minimal?: boolean
@@ -193,10 +194,10 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
           {/* Progress Section */}
           <div className="pt-4 max-w-md space-y-5">
             <div className="flex gap-4">
-              <Link href={`/books/${getShortId(book.id)}`} className="bg-[#d97757] hover:bg-[#e09e72] text-white font-bold px-8 py-3 rounded shadow-lg transition tracking-widest text-xs flex items-center gap-2">
-                <PixelArtIcon name="BookOpen" size={16} color="white" />
+              <Button href={`/books/${getShortId(book.id)}`} size="sm" className="tracking-widest">
+                <PixelArtIcon name="BookOpen" size={16} />
                 VIEW BOOK
-              </Link>
+              </Button>
             </div>
 
             {book.pages && book.current_page && (

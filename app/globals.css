@@ -222,3 +222,73 @@ body {
     transform: none;
   }
 }
+
+/* Button helpers (Tailwind v4) - utility classes for consistent buttons across the app */
+.btn {
+  @apply px-4 py-2 gap-2 inline-flex items-center justify-center rounded font-bold transition focus:outline-none;
+}
+
+.btn-primary {
+  @apply bg-[#d97757] text-white shadow-lg shadow-[#d97757]/20;
+}
+
+.btn-primary:hover {
+  @apply bg-[#e09e72];
+}
+
+.btn-secondary {
+  @apply bg-[#1f1e1d] border border-[#30302e] text-[#faf9f5];
+}
+
+.btn-secondary:hover {
+  @apply border-[#d97757];
+}
+
+.btn-outline {
+  @apply bg-transparent border border-[#d97757] text-[#e09e72];
+}
+
+.btn-outline:hover {
+  @apply bg-[#d97757]/30;
+}
+
+.btn-ghost {
+  @apply bg-transparent text-[#d97757];
+}
+
+.btn-ghost:hover {
+  @apply bg-[#d97757]/10;
+}
+
+.btn-destructive {
+  @apply bg-transparent border border-red-800 text-red-400;
+}
+
+.btn-destructive:hover {
+  @apply bg-red-900/30;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  @apply opacity-60 cursor-not-allowed pointer-events-none;
+}
+
+.btn-sm {
+  @apply px-2 py-1 text-xs;
+}
+
+.btn-md {
+  @apply px-3 py-2 text-sm;
+}
+
+.btn-lg {
+  @apply px-4 py-2 text-base;
+}
+
+.btn-icon {
+  @apply p-2;
+}
+
+.btn:focus {
+  box-shadow: 0 0 0 4px rgba(217, 119, 87, 0.18);
+}
