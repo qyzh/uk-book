@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useMemo } from 'react'
 import Image from 'next/image'
-import { Library, Bookmark, LibraryBig } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import Navigation from '@/app/components/Navigation'
 import CurrentlyReading from '@/app/components/CurrentlyReading'
 import Loading from '@/app/components/Loading'
@@ -108,7 +108,7 @@ export default function HomePage() {
             <RevealSection as="section" variant="up" threshold={0.05}>
               <div className="max-w-7xl mx-auto px-12 pt-6 pb-12">
                 <h2 className="text-4xl font-bold text-[#faf9f5] mb-6 flex items-center gap-2 font-serif">
-                  <Library className="w-10 h-10 text-[#d97757]" /> Library
+                  <PixelArtIcon name="Library" size={32} color="#d97757" /> Library
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal-stagger">
                   {recentBooks.map((book, index) => (
@@ -163,7 +163,7 @@ export default function HomePage() {
           <RevealSection as="section" variant="left" threshold={0.05} className='max-w-7xl mx-auto'>
             <div className="flex items-center justify-between px-12 mb-6">
               <h2 className="text-4xl font-bold text-[#faf9f5] flex items-center gap-2 font-serif">
-                <Bookmark className="w-10 h-10 text-[#d97757]" /> Wishlist ({wishlistBooks.length})
+                <PixelArtIcon name="Bookmark" size={32} color="#d97757" /> Wishlist ({wishlistBooks.length})
               </h2>
               {wishlistBooks.length > 4 && (
                 <Link href="/wishlist" className="text-xs text-[#d97757] hover:text-[#e09e72] transition">
@@ -212,7 +212,7 @@ export default function HomePage() {
           <RevealSection as="section" variant="up" threshold={0.05} className='max-w-7xl mx-auto'>
             <div className="flex items-center justify-between px-12 mb-6">
               <h2 className="text-4xl font-bold text-[#faf9f5] flex items-center gap-2 font-serif">
-                <LibraryBig className="w-10 h-10 text-[#d97757]" /> All Books ({books.filter(b => b.reading_status !== 'wishlist').length})
+                <PixelArtIcon name="Library" size={32} color="#d97757" /> All Books ({books.filter(b => b.reading_status !== 'wishlist').length})
               </h2>
               {books.filter(b => b.reading_status !== 'wishlist').length > 14 && (
                 <Link href="/browse" className="text-xs text-[#d97757] hover:text-[#e09e72] transition">

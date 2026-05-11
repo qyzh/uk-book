@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navigation from '@/app/components/Navigation'
+import Button from '@/app/components/Button'
 
 export default function AddAuthorPage() {
   const router = useRouter()
@@ -139,19 +140,12 @@ export default function AddAuthorPage() {
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 border border-[#d97757] text-[#e09e72] hover:bg-[#d97757]/30 hover:text-black transition text-sm font-bold disabled:opacity-50"
-            >
+            <Button type="submit" variant="outline" disabled={loading} loading={loading}>
               {loading ? 'saving...' : 'save author'}
-            </button>
-            <Link
-              href="/authors"
-              className="px-4 py-2 border border-slate-700 text-slate-400 hover:text-slate-300 hover:border-slate-600 transition text-sm"
-            >
+            </Button>
+            <Button href="/authors" variant="secondary">
               cancel
-            </Link>
+            </Button>
           </div>
         </form>
       </main>

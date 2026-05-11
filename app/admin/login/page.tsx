@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import Link from 'next/link'
-import { Lock } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import RevealSection from '@/app/components/RevealSection'
+import Button from '@/app/components/Button'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -44,7 +45,7 @@ export default function LoginPage() {
 
                         <div className="text-center mb-8 relative z-10">
                             <div className="flex items-center justify-center gap-2 mb-2">
-                                <Lock className="w-4 h-4 text-[#d97757]" />
+                                <PixelArtIcon name="Lock" size={16} color="#d97757" />
                                 <div className="text-slate-500 text-xs uppercase tracking-widest">ukbook system</div>
                             </div>
                             <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">admin login</h1>
@@ -89,13 +90,14 @@ export default function LoginPage() {
                                 </div>
                             </div>
 
-                            <button
+                            <Button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3 rounded-lg bg-[#d97757] text-white font-medium hover:bg-[#e09e72] transition-colors shadow-[0_0_15px_rgba(217,119,87,0.3)] hover:shadow-[0_0_25px_rgba(217,119,87,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+                                loading={loading}
+                                className="w-full py-3 shadow-[0_0_15px_rgba(217,119,87,0.3)] hover:shadow-[0_0_25px_rgba(217,119,87,0.5)]"
                             >
                                 {loading ? 'authenticating...' : 'login'}
-                            </button>
+                            </Button>
                         </form>
 
                         <div className="mt-8 text-center relative z-10">

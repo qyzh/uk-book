@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Plus, Search, Pencil, Trash2, BookOpen } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import type { Book } from '@/lib/types/library'
 import { Badge } from '@/app/components/Badge'
+import Button from '@/app/components/Button'
 
 interface BookListProps {
   books: Book[]
@@ -16,11 +17,11 @@ interface BookListProps {
 type StatusFilter = 'all' | 'reading' | 'completed' | 'wishlist' | 'to-read'
 
 const STATUS_FILTERS: { value: StatusFilter; label: string }[] = [
-  { value: 'all',       label: 'All' },
-  { value: 'reading',   label: 'Reading' },
+  { value: 'all', label: 'All' },
+  { value: 'reading', label: 'Reading' },
   { value: 'completed', label: 'Completed' },
-  { value: 'to-read',   label: 'To Read' },
-  { value: 'wishlist',  label: 'Wishlist' },
+  { value: 'to-read', label: 'To Read' },
+  { value: 'wishlist', label: 'Wishlist' },
 ]
 
 export default function BookList({ books, onEdit, onDelete, onNew }: BookListProps) {
@@ -40,7 +41,9 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
       {/* Toolbar */}
       <div className="flex items-center gap-3 px-5 py-3 border-b border-[#30302e] shrink-0">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#87867f]" />
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#87867f]">
+            <PixelArtIcon name="Search" size={16} />
+          </div>
           <input
             type="text"
             placeholder="Search books or authors..."
@@ -49,41 +52,37 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
             className="w-full pl-9 pr-3 py-2 bg-[#1a1918] border border-[#30302e] text-sm text-[#faf9f5] placeholder:text-[#87867f] rounded-lg outline-none focus:border-[#d97757] transition"
           />
         </div>
-        <button
-          onClick={onNew}
-          className="flex items-center gap-1.5 px-4 py-2 bg-[#d97757] hover:bg-[#e09e72] text-white text-xs font-bold rounded-lg transition shadow-lg shadow-[#d97757]/20 shrink-0"
-        >
-          <Plus className="w-3.5 h-3.5" /> Add Book
-        </button>
+        <Button onClick={onNew} size="sm" className="shrink-0">
+          <PixelArtIcon name="Plus" size={16} color="white" /> Add Book
+        </Button>
       </div>
 
       {/* Status filter tabs */}
       <div className="flex items-center gap-1.5 px-5 py-2.5 border-b border-[#30302e] shrink-0 overflow-x-auto">
         {STATUS_FILTERS.map(({ value, label }) => {
           const counts: Record<StatusFilter, number> = {
-            all:       books.length,
-            reading:   books.filter(b => b.reading_status === 'reading').length,
+            all: books.length,
+            reading: books.filter(b => b.reading_status === 'reading').length,
             completed: books.filter(b => b.reading_status === 'completed').length,
             'to-read': books.filter(b => b.reading_status === 'to-read').length,
-            wishlist:  books.filter(b => b.reading_status === 'wishlist').length,
+            wishlist: books.filter(b => b.reading_status === 'wishlist').length,
           }
           const active = statusFilter === value
           const dotColor: Record<StatusFilter, string> = {
-            all:       '#87867f',
-            reading:   '#eab308',
+            all: '#87867f',
+            reading: '#eab308',
             completed: '#22c55e',
             'to-read': '#87867f',
-            wishlist:  '#3b82f6',
+            wishlist: '#3b82f6',
           }
           return (
             <button
               key={value}
               onClick={() => setStatusFilter(value)}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition border ${
-                active
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition border ${active
                   ? 'bg-[#d97757]/15 border-[#d97757]/50 text-[#d97757]'
                   : 'bg-transparent border-[#30302e] text-[#87867f] hover:border-[#87867f] hover:text-[#faf9f5]'
-              }`}
+                }`}
             >
               {value !== 'all' && (
                 <span
@@ -111,7 +110,7 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
       <div className="flex-1 overflow-y-auto">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-40 gap-2">
-            <BookOpen className="w-8 h-8 text-[#30302e]" />
+            <PixelArtIcon name="BookOpen" size={24} className="text-[#30302e]" />
             <span className="text-[#87867f] text-sm">No books found</span>
           </div>
         ) : (
@@ -128,7 +127,7 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
                     <Image src={book.cover_url} alt={book.title} fill sizes="40px" className="object-cover" />
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <BookOpen className="w-4 h-4 text-[#87867f]" />
+                      <PixelArtIcon name="BookOpen" size={16} className="text-[#87867f]" />
                     </div>
                   )}
                 </div>
@@ -151,20 +150,23 @@ export default function BookList({ books, onEdit, onDelete, onNew }: BookListPro
 
                 {/* Actions */}
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={e => { e.stopPropagation(); onEdit(book) }}
-                    className="p-2 rounded-lg text-[#87867f] hover:text-[#d97757] hover:bg-[#d97757]/10 transition"
                     title="edit"
                   >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                  <button
+                    <PixelArtIcon name="MagicEdit" size={16} />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={e => { e.stopPropagation(); onDelete(book.id) }}
-                    className="p-2 rounded-lg text-[#87867f] hover:text-red-400 hover:bg-red-900/20 transition"
+                    className="hover:!text-red-400 hover:!bg-red-900/20"
                     title="delete"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                    <PixelArtIcon name="Delete" size={16} />
+                  </Button>
                 </div>
               </div>
             ))}

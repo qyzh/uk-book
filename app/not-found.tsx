@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { LightbulbOff } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 
 export default function NotFound() {
   return (
@@ -37,9 +37,9 @@ export default function NotFound() {
           </div>
         </div>
 
-        {/* Decorative Lucide Icon replacing a traditional illustration/image */}
+        {/* Decorative Pixel Art Icon replacing a traditional illustration/image */}
         <div className="hidden md:flex justify-center items-center text-[var(--color-text-secondary)] opacity-[0.07] rotate-12 reveal in-view">
-          <LightbulbOff className="w-64 h-64 lg:w-96 lg:h-96" strokeWidth={0.5} />
+          <PixelArtIcon name="LightbulbOff" size={96} />
         </div>
 
       </div>

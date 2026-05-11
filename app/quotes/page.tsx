@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Quote, Tag as TagIcon } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import Navigation from '@/app/components/Navigation'
 import Loading from '@/app/components/Loading'
 import QuoteShareButton from '@/app/components/QuoteShareButton'
@@ -94,7 +94,7 @@ export default function QuotesPage() {
         {/* ── Header ── */}
         <header className="space-y-2 max-w-7xl mx-auto px-12">
           <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200 flex items-center gap-2">
-            <Quote className="w-8 h-8 text-[#d97757]" />
+            <PixelArtIcon name="QuoteTextInline" size={24} color="#d97757" />
             All Quotes
           </h1>
           <p className="text-slate-500 text-sm">
@@ -147,7 +147,7 @@ export default function QuotesPage() {
             {availableTags.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <TagIcon className="w-3.5 h-3.5 text-slate-500" />
+                  <PixelArtIcon name="IconCategory" size={12} className="text-slate-500" />
                   <span className="text-slate-400 text-xs font-bold">filter by tag</span>
                 </div>
                 <div className="flex flex-wrap gap-2">

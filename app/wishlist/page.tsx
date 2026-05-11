@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
+import Button from '@/app/components/Button'
 import { useMemo } from 'react'
-import { Bookmark } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import Navigation from '@/app/components/Navigation'
 import BookCard from '@/app/components/BookCard'
 import Loading from '@/app/components/Loading'
@@ -26,7 +26,7 @@ export default function WishlistPage() {
       <main className="pt-20">
         <div className="mb-12 max-w-7xl mx-auto px-12">
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-[#d97757] text-xl"><Bookmark className="w-5 h-5" /></span>
+            <span className="text-[#d97757] text-xl"><PixelArtIcon name="Bookmark" size={32} className="w-5 h-5" /></span>
             <h1 className="font-serif tracking-tight text-3xl font-bold text-slate-200">My Wishlist</h1>
           </div>
           <p className="text-slate-500 text-sm">{wishlistBooks.length} book{wishlistBooks.length !== 1 ? 's' : ''} on my wishlist</p>
@@ -44,12 +44,7 @@ export default function WishlistPage() {
           <div className="border border-slate-700 bg-black bg-opacity-30 p-12 text-center">
             <div className="text-[#d97757] text-4xl mb-4">☆</div>
             <div className="text-slate-500 text-sm mb-6">your wishlist is empty</div>
-            <Link
-              href="/browse"
-              className="inline-block px-4 py-2 bg-[#d97757] hover:bg-[#e09e72] text-white text-sm font-bold rounded transition"
-            >
-              browse books
-            </Link>
+            <Button href="/browse" variant="primary" size="md">browse books</Button>
           </div>
         )}
       </main>

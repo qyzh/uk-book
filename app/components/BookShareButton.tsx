@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Share2 } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import type { Book } from '@/lib/types/library'
+import Button from '@/app/components/Button'
 
 interface BookShareButtonProps {
   book: Book
@@ -34,14 +35,16 @@ export default function BookShareButton({ book, status = 'to-read' }: BookShareB
   }
 
   return (
-    <button
+    <Button
+      variant="outline"
+      size="sm"
       onClick={handleShare}
       disabled={isLoading}
-      className="inline-flex items-center gap-2 px-3 py-1.5 text-xs rounded border ukborder text-slate-300 hover:border-[#d97757] hover:text-[#d97757] transition disabled:opacity-50 disabled:cursor-not-allowed"
+      loading={isLoading}
       title="Download book as Instagram Story image"
     >
-      <Share2 className="w-4 h-4" />
+      <PixelArtIcon name="Upload" size={16} />
       {isLoading ? 'Creating...' : 'Share'}
-    </button>
+    </Button>
   )
 }

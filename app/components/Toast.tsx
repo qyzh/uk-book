@@ -1,13 +1,21 @@
 'use client'
 
-import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react'
+import { PixelArtIcon } from '@/lib/components/PixelArtIcon'
 import { useToast, Toast as ToastType } from '@/lib/hooks/useToast'
+import type * as PixelIcons from 'pixelarticons/react'
 
-const icons = {
-  success: <CheckCircle className="w-5 h-5 text-emerald-400" />,
-  error: <XCircle className="w-5 h-5 text-red-400" />,
-  warning: <AlertTriangle className="w-5 h-5 text-amber-400" />,
-  info: <Info className="w-5 h-5 text-[#d97757]" />,
+const icons: Record<ToastType['type'], keyof typeof PixelIcons> = {
+  success: 'Check',
+  error: 'Delete',
+  warning: 'SquareAlert',
+  info: 'InfoBox',
+}
+
+const iconColors = {
+  success: 'text-emerald-400',
+  error: 'text-red-400',
+  warning: 'text-amber-400',
+  info: 'text-[#d97757]',
 }
 
 const borderColors = {
@@ -18,11 +26,16 @@ const borderColors = {
 }
 
 function ToastItem({ toast, onClose }: { toast: ToastType; onClose: () => void }) {
+  const iconName = icons[toast.type]
+  const iconColor = iconColors[toast.type]
+
   return (
     <div
       className={`flex items-start gap-3 bg-black border border-slate-700 border-l-4 ${borderColors[toast.type]} rounded-lg shadow-lg p-4 min-w-[320px] max-w-md animate-slide-in`}
     >
-      <div className="flex-shrink-0">{icons[toast.type]}</div>
+      <div className={`flex-shrink-0 ${iconColor}`}>
+        <PixelArtIcon name={iconName} size={20} />
+      </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-white">{toast.title}</p>
         {toast.message && (
@@ -33,7 +46,7 @@ function ToastItem({ toast, onClose }: { toast: ToastType; onClose: () => void }
         onClick={onClose}
         className="flex-shrink-0 text-slate-500 hover:text-white transition-colors"
       >
-        <X className="w-4 h-4" />
+        <PixelArtIcon name="Delete" size={16} />
       </button>
     </div>
   )

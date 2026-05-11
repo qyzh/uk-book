@@ -5,6 +5,7 @@ import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Navigation from '@/app/components/Navigation'
 import Loading from '@/app/components/Loading'
+import Button from '@/app/components/Button'
 
 interface AuthorPayload {
   id: string
@@ -180,19 +181,12 @@ export default function EditAuthorPage({ params }: { params: Promise<{ id: strin
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2 border border-[#d97757] text-[#e09e72] hover:bg-[#d97757]/30 hover:text-black transition text-sm font-bold disabled:opacity-50"
-            >
+            <Button type="submit" variant="outline" disabled={saving} loading={saving}>
               {saving ? 'updating...' : 'update author'}
-            </button>
-            <Link
-              href="/authors"
-              className="px-4 py-2 border border-slate-700 text-slate-400 hover:text-slate-300 hover:border-slate-600 transition text-sm"
-            >
+            </Button>
+            <Button href="/authors" variant="secondary">
               cancel
-            </Link>
+            </Button>
           </div>
         </form>
       </main>
