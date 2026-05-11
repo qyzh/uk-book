@@ -49,6 +49,8 @@ function tagColors(color: string) {
 export default function QuoteForm({ formId, data, books, mode = 'new', onChange, onSubmit }: QuoteFormProps) {
   const [availableTags, setAvailableTags] = useState<Tag[]>([])
   const [loadingTags, setLoadingTags] = useState(true)
+  const [suggestLoading, setSuggestLoading] = useState(false)
+  const [suggestError, setSuggestError] = useState('')
 
   const set = (patch: Partial<QuoteFormData>) => onChange({ ...data, ...patch })
 
@@ -71,6 +73,30 @@ export default function QuoteForm({ formId, data, books, mode = 'new', onChange,
       ? current.filter((id) => id !== tagId)
       : [...current, tagId]
     set({ tag_ids: next })
+  }
+
+  const handleAiSuggest = async () => {
+    if (!data.text.trim()) return
+    setSuggestLoading(true)
+    setSuggestError('')
+    try {
+      const res = await fetch('/api/ai/suggest-tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: data.text }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        setSuggestError(json.code === 'NOT_CONFIGURED' ? 'AI not available' : (json.error || 'Failed'))
+        return
+      }
+      const merged = Array.from(new Set([...(data.tag_ids ?? []), ...(json.data ?? [])]))
+      set({ tag_ids: merged })
+    } catch {
+      setSuggestError('Failed to get suggestions')
+    } finally {
+      setSuggestLoading(false)
+    }
   }
 
   const selectedTagIds = new Set(data.tag_ids ?? [])
@@ -128,13 +154,24 @@ export default function QuoteForm({ formId, data, books, mode = 'new', onChange,
 
       {/* Tag picker */}
       <div>
-        <label className={labelClass}>
-          <span className="inline-flex items-center gap-1.5">
-            <PixelArtIcon name="IconCategory" size={12} />
-            tags
-            <span className="text-[#87867f] font-normal">(pick one or more)</span>
-          </span>
-        </label>
+        <div className="flex items-center justify-between mb-1">
+          <label className={labelClass}>
+            <span className="inline-flex items-center gap-1.5">
+              <PixelArtIcon name="IconCategory" size={12} />
+              tags
+              <span className="text-[#87867f] font-normal">(pick one or more)</span>
+            </span>
+          </label>
+          <button
+            type="button"
+            onClick={handleAiSuggest}
+            disabled={!data.text.trim() || suggestLoading}
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-[#d97757]/15 text-[#d97757] hover:bg-[#d97757]/30 disabled:opacity-30 disabled:cursor-not-allowed transition"
+          >
+            {suggestLoading ? '...' : '✦ AI Suggest'}
+          </button>
+        </div>
+        {suggestError && <p className="text-red-400 text-[11px] mb-1">{suggestError}</p>}
 
         {loadingTags ? (
           <div className="text-xs text-[#87867f] animate-pulse py-2">loading tags…</div>

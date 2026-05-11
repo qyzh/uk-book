@@ -194,8 +194,8 @@ export default function CurrentlyReading({ minimal = false }: CurrentlyReadingPr
           {/* Progress Section */}
           <div className="pt-4 max-w-md space-y-5">
             <div className="flex gap-4">
-              <Button href={`/books/${getShortId(book.id)}`} size="sm" className="tracking-widest">
-                <PixelArtIcon name="BookOpen" size={16} />
+              <Button href={`/books/${getShortId(book.id)}`} size="lg" className="tracking-widest">
+                <PixelArtIcon name="BookOpen" size={20} />
                 VIEW BOOK
               </Button>
             </div>
